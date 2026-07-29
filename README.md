@@ -51,7 +51,7 @@ Clone the repository and install the dependencies:
 
 ```bash
 # Clone the repository
-git clone https://github.com/mstrnaul/rove-website.git
+git clone https://github.com/misternaul/rove-website.git
 cd rove-website
 
 # Install dependencies
@@ -77,11 +77,11 @@ npm run start
 
 Because this project is built with standard **Next.js App Router** guidelines, deploying it live via **Vercel** (Next.js's native hosting platform) takes under 2 minutes:
 
-1. **Push to GitHub**: Ensure your latest changes are committed and pushed to `https://github.com/mstrnaul/rove-website`.
+1. **Push to GitHub**: Ensure your latest changes are committed and pushed to `https://github.com/misternaul/rove-website`.
 2. **Import to Vercel**:
    - Log in to your [Vercel Dashboard](https://vercel.com/new).
    - Click **"Add New..."** → **"Project"**.
-   - Select the `mstrnaul/rove-website` repository from your imported GitHub account and click **Import**.
+   - Select the `misternaul/rove-website` repository from your imported GitHub account and click **Import**.
 3. **Deploy**:
    - Vercel automatically detects Next.js, configures build settings (`npm run build`), and sets up the serverless API endpoints.
    - Click **Deploy**. Within seconds, your live production URL will be ready!
