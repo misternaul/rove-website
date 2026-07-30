@@ -20,8 +20,14 @@ export default function WaitlistSection() {
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [liveConfig, setLiveConfig] = useState(siteContent);
 
   useEffect(() => {
+    fetch("/api/cms")
+      .then((r) => r.json())
+      .then((d) => { if (d.success && d.data) setLiveConfig(d.data); })
+      .catch(() => {});
+
     const handleProductSelect = (e: Event) => {
       const customEvent = e as CustomEvent<{ color: string; size: string; price?: string; drop?: string }>;
       if (customEvent.detail) {
@@ -44,6 +50,30 @@ export default function WaitlistSection() {
     setErrorMessage("");
 
     try {
+      const accessKey = liveConfig.brand.web3formsAccessKey || "b0a8ee37-de57-4314-acee-4c65d60c8580";
+
+      // 1. Send DIRECTLY from client-side browser to Web3Forms to avoid Cloudflare bot blocking!
+      let web3Success = false;
+      if (accessKey && accessKey.trim() !== "") {
+        try {
+          const wRes = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({
+              access_key: accessKey.trim(),
+              subject: `🌟 Rove Waitlist Reservation: ${email.trim()} (${reservedProduct?.color || "Item"}, Size ${reservedProduct?.size || "M"})`,
+              from_name: "ROVE Studio Allocation Hub",
+              message: `New studio priority waitlist registration!\n\nClient Email: ${email.trim()}\nTarget Release: ${reservedProduct?.drop || "Drop 001"}\nColorway: ${reservedProduct?.color || "Unspecified"}\nSize Grade: ${reservedProduct?.size || "Unspecified"}\nValuation: ${reservedProduct?.price || defaultPrice}\nTimestamp: ${new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" })}`,
+            }),
+          });
+          const wData = await wRes.json();
+          if (wData && wData.success) web3Success = true;
+        } catch (clientErr) {
+          console.warn("Client Web3Forms waitlist notice warning:", clientErr);
+        }
+      }
+
+      // 2. Transmit to backend API for internal logging
       const response = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,7 +88,7 @@ export default function WaitlistSection() {
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok && !web3Success) {
         throw new Error(data.error || "Failed to submit reservation.");
       }
 

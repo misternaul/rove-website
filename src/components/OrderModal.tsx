@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, ShoppingBag, ShieldCheck, Truck, PhoneCall, AlertCircle, MessageCircle } from "lucide-react";
+import { siteContent } from "@/config/siteContent";
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -35,6 +36,16 @@ export default function OrderModal({
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [confirmedOrderId, setConfirmedOrderId] = useState("");
+  const [liveConfig, setLiveConfig] = useState(siteContent);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetch("/api/cms")
+        .then((r) => r.json())
+        .then((d) => { if (d.success && d.data) setLiveConfig(d.data); })
+        .catch(() => {});
+    }
+  }, [isOpen]);
 
   const resetForm = () => {
     setFullName("");
@@ -69,7 +80,62 @@ export default function OrderModal({
     setStatus("submitting");
     setErrorMessage("");
 
+    const orderId = `ROVE-${Math.floor(100000 + Math.random() * 900000)}`;
+    const timestamp = new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" });
+
+    const orderSummaryText = `
+🛍️ NEW ROVE ORDER RECEIVED: ${orderId} (${productName})
+===================================================================
+Time: ${timestamp}
+Item: ${productName}
+Colorway: ${selectedColor}
+Size Grade & Specs: ${selectedSize}
+Total Valuation: ${priceFormatted} (COD / Direct Fulfillment)
+
+📋 CUSTOMER SHIPPING INFORMATION
+-------------------------------------------------------------------
+Full Name: ${fullName.trim()}
+Phone / WhatsApp: ${phone.trim()}
+Customer Email: ${email.trim() || "Not provided"}
+City & Province: ${city.trim()}
+Primary Address: ${primaryAddress.trim()}
+2nd Address / Sector: ${secondaryAddress.trim() || "N/A"}
+Nearest Landmark: ${landmark.trim() || "N/A"}
+
+📝 Special Instructions / Notes:
+${notes.trim() || "None"}
+
+===================================================================
+👉 WhatsApp Confirmation Routing Available to: ${liveConfig.brand.whatsappNumber || whatsappNumber}
+    `;
+
     try {
+      const accessKey = liveConfig.brand.web3formsAccessKey || "b0a8ee37-de57-4314-acee-4c65d60c8580";
+      
+      // 1. Send DIRECTLY from client browser to Web3Forms to bypass Cloudflare bot detection!
+      let web3FormsSuccess = false;
+      if (accessKey && accessKey.trim() !== "") {
+        try {
+          const web3Res = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({
+              access_key: accessKey.trim(),
+              subject: `🚨 Order ${orderId} - ${selectedColor} (${selectedSize.split(" ")[0]}) - ${priceFormatted}`,
+              from_name: "ROVE Studio Order Hub",
+              message: orderSummaryText,
+            }),
+          });
+          const web3Data = await web3Res.json();
+          if (web3Data.success) {
+            web3FormsSuccess = true;
+          }
+        } catch (clientErr) {
+          console.warn("Client Web3Forms delivery warning:", clientErr);
+        }
+      }
+
+      // 2. Transmit to backend API for internal logging and backup Resend delivery
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -86,16 +152,17 @@ export default function OrderModal({
           selectedColor,
           selectedSize,
           priceFormatted,
+          customWeb3FormsKey: accessKey,
         }),
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
+      if (!res.ok && !web3FormsSuccess) {
         throw new Error(data.error || "Failed to submit your order.");
       }
 
-      setConfirmedOrderId(data.orderId);
+      setConfirmedOrderId(data.orderId || orderId);
       setStatus("success");
     } catch (err: unknown) {
       const error = err as Error;
@@ -109,8 +176,7 @@ export default function OrderModal({
   const openWhatsAppVerification = () => {
     const text = `Hi ROVE Studio! I just placed an order on the website.\n\n*Order ID:* ${confirmedOrderId}\n*Item:* ${productName}\n*Color:* ${selectedColor}\n*Size:* ${selectedSize}\n*Price:* ${priceFormatted} (COD)\n*Name:* ${fullName}\n*Phone:* ${phone}\n*City:* ${city}\n*Address:* ${primaryAddress} ${secondaryAddress ? `(${secondaryAddress})` : ""} ${landmark ? `[Near ${landmark}]` : ""}\n\nPlease confirm my Cash on Delivery allocation!`;
     
-    // Format number cleanly (removing + or leading zero if present)
-    const cleanNumber = whatsappNumber.replace(/[^0-9]/g, "").replace(/^0/, "92");
+    const cleanNumber = (liveConfig.brand.whatsappNumber || whatsappNumber).replace(/[^0-9]/g, "").replace(/^0/, "92");
     const whatsappUrl = `https://wa.me/${cleanNumber || "923000000000"}?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, "_blank");
   };
@@ -163,9 +229,6 @@ export default function OrderModal({
           <div className="p-6 md:p-8 overflow-y-auto flex-1 space-y-8">
             
             {status === "success" ? (
-              // --------------------------------------------------------------
-              // SUCCESS / ORDER CONFIDENCE RECEIPT & WHATSAPP LINK
-              // --------------------------------------------------------------
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -215,7 +278,7 @@ export default function OrderModal({
                     <MessageCircle className="w-4 h-4 fill-[#25D366] text-black" /> Step 2: Instant WhatsApp Confirmation
                   </strong>
                   <p className="text-xs text-white/80 leading-relaxed font-sans font-light">
-                    Click below to open WhatsApp with our fulfillment team ({whatsappNumber}). Your order details will be automatically attached for fastest dispatch!
+                    Click below to open WhatsApp with our fulfillment team ({liveConfig.brand.whatsappNumber || whatsappNumber}). Your order details will be automatically attached for fastest dispatch!
                   </p>
                 </div>
 
@@ -236,12 +299,8 @@ export default function OrderModal({
                 </div>
               </motion.div>
             ) : (
-              // --------------------------------------------------------------
-              // ORDER PLACEMENT FORM
-              // --------------------------------------------------------------
               <form onSubmit={handleSubmit} className="space-y-6">
                 
-                {/* Item Summary Card */}
                 <div className="p-4 bg-[#0D0D0D] border border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono text-xs">
                   <div>
                     <span className="text-[10px] text-[#D4AF37] uppercase tracking-[0.2em] block mb-1">Selected Allocation</span>

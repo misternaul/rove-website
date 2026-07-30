@@ -52,7 +52,7 @@ export interface SiteConfig {
     logoIconImage: string;
     founderEmail: string;
     whatsappNumber: string; // Enter your full WhatsApp number with country code without + (e.g., "923001234567")
-    web3formsAccessKey?: string; // Optional free email service alternative to Resend!
+    web3formsAccessKey?: string; // Permanently configured free email service delivering directly to rovepresence@gmail.com!
     defaultCurrency: string;
   };
   nav: {
@@ -135,7 +135,7 @@ export const siteContent: SiteConfig = {
     logoIconImage: "/images/logo-icon.jpg",
     founderEmail: "rovepresence@gmail.com",
     whatsappNumber: "923000000000", // 👉 REPLACE THIS with your real WhatsApp number (e.g. 923001234567)
-    web3formsAccessKey: "", // Enter a Web3Forms access key if you want instant bulletproof Gmail delivery without Resend domains
+    web3formsAccessKey: "b0a8ee37-de57-4314-acee-4c65d60c8580", // Permanently embedded Web3Forms access key for rovepresence@gmail.com!
     defaultCurrency: "PKR",
   },
 
