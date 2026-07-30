@@ -18,6 +18,7 @@ import {
   Layers,
   Ruler,
   Image as ImageIcon,
+  Send,
 } from "lucide-react";
 import { SiteConfig, siteContent, ColorOption, SizeOption } from "@/config/siteContent";
 
@@ -33,6 +34,10 @@ export default function StudioAdminPage() {
   const [selectedDropIndex, setSelectedDropIndex] = useState(0);
   const [copiedJson, setCopiedJson] = useState(false);
 
+  // Email Diagnostic State
+  const [testEmailStatus, setTestEmailStatus] = useState<"idle" | "testing" | "success" | "error">("idle");
+  const [testEmailMessage, setTestEmailMessage] = useState("");
+
   useEffect(() => {
     fetch("/api/cms")
       .then((res) => res.json())
@@ -46,9 +51,8 @@ export default function StudioAdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Updated Studio PIN requested by founder: rovepresence0842
     if (pin.trim() !== "rovepresence0842" && pin.trim() !== "rove2026") {
-      setPinError("Invalid Studio PIN. Please enter rovepresence0842");
+      setPinError("Invalid Security PIN.");
       return;
     }
     setIsAuthenticated(true);
@@ -82,6 +86,33 @@ export default function StudioAdminPage() {
     navigator.clipboard.writeText(JSON.stringify(config, null, 2));
     setCopiedJson(true);
     setTimeout(() => setCopiedJson(false), 3000);
+  };
+
+  // Dedicated function to test and diagnose why Resend emails might be failing!
+  const runEmailDiagnosticTest = async () => {
+    setTestEmailStatus("testing");
+    setTestEmailMessage("Transmitting test dispatch through Vercel servers...");
+    
+    try {
+      const res = await fetch("/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isTestEmail: true }),
+      });
+      const data = await res.json();
+      
+      if (!res.ok) {
+        setTestEmailStatus("error");
+        setTestEmailMessage(data.error || "Failed to deliver email. Read error details.");
+      } else {
+        setTestEmailStatus("success");
+        setTestEmailMessage(data.message || "✅ Success! Test email delivered.");
+      }
+    } catch (err: unknown) {
+      const e = err as Error;
+      setTestEmailStatus("error");
+      setTestEmailMessage(e.message || "Network error while connecting to test endpoint.");
+    }
   };
 
   // --- DROP OPERATIONS ---
@@ -198,12 +229,12 @@ export default function StudioAdminPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs uppercase tracking-wider text-white/70 mb-2">Studio Admin PIN</label>
+              <label className="block text-xs uppercase tracking-wider text-white/70 mb-2">Studio Authentication</label>
               <input
                 type="password"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                placeholder="Enter PIN (rovepresence0842)"
+                placeholder="Enter Studio Security PIN"
                 className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3.5 text-sm text-white font-mono focus:outline-none focus:border-[#D4AF37] text-center tracking-[0.2em]"
               />
               {pinError && <span className="text-red-400 text-xs block mt-2">{pinError}</span>}
@@ -632,9 +663,43 @@ export default function StudioAdminPage() {
                   className="w-full bg-[#0D0D0D] border border-white/20 p-4 text-sm text-white font-mono"
                 />
                 <span className="text-[11px] text-white/50 block mt-2 leading-relaxed font-sans">
-                  This is the inbox where Resend attempts to deliver order confirmations.
+                  This is the inbox where Resend attempts to deliver order confirmations. Must match your Resend signup email if on the free tier.
                 </span>
               </div>
+
+              {/* LIVE EMAIL DIAGNOSTIC TESTING SUITE */}
+              <div className="p-6 mt-8 bg-[#0D0D0D] border border-white/10 space-y-4 shadow-inner">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h4 className="text-sm font-mono text-[#D4AF37] font-bold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" /> Not Receiving Emails? Test It Live!
+                    </h4>
+                    <p className="text-xs text-white/60 font-sans mt-1">
+                      Click the button below to send a test order to your inbox. If there is a configuration error (missing API key, or sandbox restrictions), we will show you exactly what Resend says so you can fix it instantly!
+                    </p>
+                  </div>
+                  <button
+                    onClick={runEmailDiagnosticTest}
+                    disabled={testEmailStatus === "testing"}
+                    className="px-5 py-3 bg-[#141414] hover:bg-white/10 text-white border border-white/20 hover:border-[#D4AF37] font-mono text-[10px] uppercase tracking-wider whitespace-nowrap transition-all flex items-center gap-2"
+                  >
+                    <Send className="w-3 h-3" />
+                    {testEmailStatus === "testing" ? "Transmitting..." : "Send Test Order Email"}
+                  </button>
+                </div>
+                
+                {/* Real-time Email Test Diagnostic Feedback */}
+                {testEmailStatus !== "idle" && (
+                  <div className={`p-4 mt-2 text-xs font-mono leading-relaxed border ${
+                    testEmailStatus === "success" ? "bg-green-950/50 border-green-500/30 text-green-300" :
+                    testEmailStatus === "error" ? "bg-red-950/50 border-red-500/40 text-red-300" :
+                    "bg-[#141414] border-white/10 text-white/60"
+                  }`}>
+                    {testEmailMessage}
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
         )}
