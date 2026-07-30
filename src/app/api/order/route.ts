@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const timestamp = new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" });
 
     const liveConfig = await getLiveSiteContent();
-    const targetEmail = process.env.ADMIN_EMAIL || liveConfig.brand.founderEmail || "orders@rovepresence.com";
+    const targetEmail = process.env.ADMIN_EMAIL || liveConfig.brand.founderEmail || "rovepresence@gmail.com";
 
     // Construct the formatted notification text for the founder
     const orderSummaryText = `
@@ -65,55 +65,87 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
     console.log(orderSummaryText);
     console.log("=========================================");
 
-    // ------------------------------------------------------------------------
-    // RESEND EMAIL DELIVERY INTEGRATION & LIVE DIAGNOSTIC FEEDBACK
-    // ------------------------------------------------------------------------
-    const resendApiKey = process.env.RESEND_API_KEY;
     let emailDeliveryStatus = "NOT_ATTEMPTED";
     let emailErrorMessage = "";
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const web3formsKey = process.env.WEB3FORMS_ACCESS_KEY || liveConfig.brand.web3formsAccessKey;
 
-    if (!resendApiKey) {
-      emailDeliveryStatus = "FAILED_MISSING_API_KEY";
-      emailErrorMessage =
-        "RESEND_API_KEY environment variable is NOT set in Vercel! To receive emails: 1) Go to Vercel -> Settings -> Environment Variables. 2) Add RESEND_API_KEY with your Resend API Key. 3) You MUST click 'Redeploy' under Vercel Deployments after adding an env variable!";
-      console.warn(`🚨 ${emailErrorMessage}`);
-    } else {
+    // ------------------------------------------------------------------------
+    // OPTION A: WEB3FORMS (Zero-Config, Bypass Resend Gmail Sandbox & Suppression)
+    // ------------------------------------------------------------------------
+    if (web3formsKey && web3formsKey.trim() !== "") {
       try {
-        const resendResponse = await fetch("https://api.resend.com/emails", {
+        const web3Res = await fetch("https://api.web3forms.com/submit", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${resendApiKey}`,
-          },
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify({
-            from: "ROVE Studio Orders <onboarding@resend.dev>",
-            to: [targetEmail],
+            access_key: web3formsKey.trim(),
             subject: `🚨 ${isTestEmail ? "[TEST]" : ""} Order ${orderId} - ${selectedColor || "Jet Black"} (${selectedSize || "M"}) - ${priceFormatted || "PKR 2,299"}`,
-            text: orderSummaryText,
+            from_name: "ROVE Studio Order Hub",
+            message: orderSummaryText,
           }),
         });
-
-        const resendData = await resendResponse.json();
-
-        if (!resendResponse.ok) {
-          emailDeliveryStatus = "FAILED_RESEND_REJECTED";
-          emailErrorMessage = `Resend rejected email to (${targetEmail}). EXACT ERROR FROM RESEND: "${resendData.message || JSON.stringify(resendData)}". CRITICAL NOTE: On a free Resend trial account, Resend ONLY allows sending emails TO THE EXACT SAME EMAIL ADDRESS you used when you registered on Resend.com! Make sure your Founder Order Email in Admin exactly matches your Resend login email!`;
-          console.warn("🚨 Resend Delivery Error:", resendData);
+        const web3Data = await web3Res.json();
+        if (web3Data.success) {
+          emailDeliveryStatus = "SUCCESS_WEB3FORMS";
+          console.log("✅ Order notification successfully dispatched via Web3Forms!");
         } else {
-          emailDeliveryStatus = "SUCCESS";
-          console.log(`✅ Order notification successfully dispatched via Resend to ${targetEmail}`);
+          console.warn("⚠️ Web3Forms delivery unsuccessful:", web3Data);
+          emailErrorMessage += `Web3Forms Error: ${web3Data.message || "Failed to submit"}. `;
         }
-      } catch (emailErr: unknown) {
-        const e = emailErr as Error;
-        emailDeliveryStatus = "FAILED_NETWORK_ERROR";
-        emailErrorMessage = e.message || "Network failure connecting to api.resend.com";
-        console.error("❌ Failed to transmit email via Resend:", e);
+      } catch (e: unknown) {
+        const err = e as Error;
+        console.error("❌ Web3Forms network exception:", err);
       }
     }
 
-    // If this was an explicit test request from the Admin Dashboard, return the exact diagnostic email results
+    // ------------------------------------------------------------------------
+    // OPTION B: RESEND API (Attempt if Web3Forms was not used or failed)
+    // ------------------------------------------------------------------------
+    if (emailDeliveryStatus !== "SUCCESS_WEB3FORMS") {
+      if (!resendApiKey) {
+        emailDeliveryStatus = "FAILED_MISSING_CREDENTIALS";
+        emailErrorMessage +=
+          "Neither RESEND_API_KEY nor Web3Forms Access Key is set! To receive free reliable emails immediately without domain rules, enter a Web3Forms Access Key in Admin Tab #2 (get one completely free at web3forms.com).";
+        console.warn(`🚨 ${emailErrorMessage}`);
+      } else {
+        try {
+          const resendResponse = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${resendApiKey}`,
+            },
+            body: JSON.stringify({
+              from: "ROVE Studio Orders <onboarding@resend.dev>",
+              to: [targetEmail],
+              subject: `🚨 ${isTestEmail ? "[TEST]" : ""} Order ${orderId} - ${selectedColor || "Jet Black"} (${selectedSize || "M"}) - ${priceFormatted || "PKR 2,299"}`,
+              text: orderSummaryText,
+            }),
+          });
+
+          const resendData = await resendResponse.json();
+
+          if (!resendResponse.ok) {
+            emailDeliveryStatus = "FAILED_RESEND_REJECTED";
+            emailErrorMessage += `Resend API rejected transmission: "${resendData.message || JSON.stringify(resendData)}". NOTE: If your emails show as 'Failed' in Resend's dashboard, Gmail's DMARC filters may have rejected onboarding@resend.dev or placed rovepresence@gmail.com in Resend's Suppression List. Check Tab #2 in Admin for the simple 2-minute Web3Forms free workaround!`;
+            console.warn("🚨 Resend Delivery Error:", resendData);
+          } else {
+            emailDeliveryStatus = "SUCCESS_RESEND";
+            console.log(`✅ Order notification accepted into Resend queue for ${targetEmail}`);
+          }
+        } catch (emailErr: unknown) {
+          const e = emailErr as Error;
+          emailDeliveryStatus = "FAILED_NETWORK_ERROR";
+          emailErrorMessage += `Resend network exception: ${e.message}`;
+          console.error("❌ Failed to transmit email via Resend:", e);
+        }
+      }
+    }
+
+    // If this was an explicit test request from the Admin Dashboard, return the exact diagnostic results
     if (isTestEmail) {
-      if (emailDeliveryStatus !== "SUCCESS") {
+      if (!emailDeliveryStatus.startsWith("SUCCESS")) {
         return NextResponse.json(
           {
             success: false,
@@ -126,7 +158,7 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
       } else {
         return NextResponse.json({
           success: true,
-          message: `✅ Verification test email successfully delivered to ${targetEmail} via Resend! Check your inbox (and spam/promotions folder).`,
+          message: `✅ Verification test email successfully delivered via ${emailDeliveryStatus === "SUCCESS_WEB3FORMS" ? "Web3Forms" : "Resend"}! Check your inbox at ${targetEmail} (and spam/promotions folder).`,
           targetEmail,
         });
       }

@@ -19,6 +19,8 @@ import {
   Ruler,
   Image as ImageIcon,
   Send,
+  Mail,
+  ShieldAlert,
 } from "lucide-react";
 import { SiteConfig, siteContent, ColorOption, SizeOption } from "@/config/siteContent";
 
@@ -88,7 +90,6 @@ export default function StudioAdminPage() {
     setTimeout(() => setCopiedJson(false), 3000);
   };
 
-  // Dedicated function to test and diagnose why Resend emails might be failing!
   const runEmailDiagnosticTest = async () => {
     setTestEmailStatus("testing");
     setTestEmailMessage("Transmitting test dispatch through Vercel servers...");
@@ -169,8 +170,8 @@ export default function StudioAdminPage() {
       hex: "#787878",
       priceFormatted: "PKR 2,499",
       priceNumeric: 2499,
-      frontImage: "/images/polo-sand-front.jpg", // Image 1
-      backImage: "/images/polo-sand-back.jpg",   // Image 2
+      frontImage: "/images/polo-sand-front.jpg",
+      backImage: "/images/polo-sand-back.jpg",
       caption: "Describe this variation's tone and texture.",
       sizes: [
         { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },
@@ -320,7 +321,7 @@ export default function StudioAdminPage() {
             onClick={() => setActiveTab("brand")}
             className={`px-6 py-3 text-xs uppercase tracking-[0.2em] flex items-center gap-2 border-b-2 font-mono whitespace-nowrap transition-all ${activeTab === "brand" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10 font-bold" : "border-transparent text-white/60 hover:text-white"}`}
           >
-            <Settings className="w-4 h-4" /> 2. WhatsApp & Email Routing
+            <Settings className="w-4 h-4" /> 2. Fix Email Delivery & WhatsApp
           </button>
           <button
             onClick={() => setActiveTab("storage")}
@@ -623,17 +624,69 @@ export default function StudioAdminPage() {
           </div>
         )}
 
-        {/* TAB 2: WHATSAPP & BRAND EMAIL SETUP */}
+        {/* TAB 2: FIX EMAIL DELIVERY & WHATSAPP */}
         {activeTab === "brand" && (
-          <div className="max-w-3xl bg-[#141414] border border-white/10 p-8 space-y-8 shadow-2xl">
+          <div className="max-w-4xl bg-[#141414] border border-white/10 p-8 space-y-10 shadow-2xl">
             <div>
-              <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37] block mb-2">Customer Verification & Order Dispatch</span>
-              <h3 className="text-2xl font-serif text-white mb-2">WhatsApp Confirmation Button & Email Routing</h3>
-              <p className="text-xs text-white/70 leading-relaxed font-sans">
-                Configure your real-time notification endpoints below. When shoppers complete their order, clicking &quot;Send WhatsApp Confirmation&quot; will instantly open a chat to this number with their exact item, measurements, and PKR pricing!
+              <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37] block mb-2">Order Dispatch & Real-Time Notifications</span>
+              <h3 className="text-2xl sm:text-3xl font-serif text-white mb-2">Fix Email Delivery & WhatsApp Setup</h3>
+              <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-sans">
+                Below you can configure both WhatsApp automatic order routing and choose between two bulletproof email gateways!
               </p>
             </div>
 
+            {/* WHY DID RESEND SHOW 'FAILED' IN THE DASHBOARD? */}
+            <div className="p-6 bg-[#0D0D0D] border-l-4 border-red-500 space-y-4 shadow-xl">
+              <h4 className="text-base sm:text-lg font-serif text-red-400 font-bold flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5 flex-shrink-0" /> Why did Resend show &quot;Failed&quot; when sending to rovepresence@gmail.com?
+              </h4>
+              <p className="text-white/80 text-xs sm:text-sm leading-relaxed font-sans">
+                In your Resend dashboard screenshot, your website <strong>successfully sent the API requests</strong> to Resend, but Resend failed to deliver them to Gmail! This happens for two common reasons:
+              </p>
+              <ol className="list-decimal pl-5 text-xs sm:text-sm text-white/90 space-y-2 font-sans">
+                <li><strong>Suppression List Block (Most Likely!):</strong> Look in the top right corner of your Resend dashboard screenshot. Click the button named <strong>&quot;Suppression list&quot;</strong>. If <code>rovepresence@gmail.com</code> bounced even once during testing, Resend permanently blocks all future emails until you click Delete/Remove in that Suppression List!</li>
+                <li><strong>Gmail Strict Spam Rules:</strong> When using Resend&apos;s test domain (<code>onboarding@resend.dev</code>), Gmail&apos;s anti-spam servers often reject unauthenticated test emails.</li>
+              </ol>
+            </div>
+
+            {/* SOLUTION 1: WEB3FORMS (100% FREE, ZERO-CONFIG GMAIL WORKAROUND) */}
+            <div className="p-6 bg-[#0D0D0D] border border-[#D4AF37]/40 space-y-5 shadow-2xl">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <span className="px-3 py-1 bg-[#D4AF37] text-black font-mono font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
+                  <Mail className="w-4 h-4 fill-black text-[#D4AF37]" /> Recommended Solution: Web3Forms (Bypass Resend Entirely)
+                </span>
+                <span className="text-xs text-green-400 font-mono">✔ 100% Free & Reliable for Gmail</span>
+              </div>
+              
+              <p className="text-xs sm:text-sm text-white/85 font-sans leading-relaxed">
+                Want your orders delivered straight to your Gmail instantly without ever fighting Resend spam filters or checking Suppression Lists? We built native support for <strong>Web3Forms</strong>!
+              </p>
+              
+              <div className="space-y-3 bg-[#141414] p-5 border border-white/10 font-mono text-xs">
+                <strong className="text-[#D4AF37] uppercase block">👉 60-Second Setup Instructions:</strong>
+                <ol className="list-decimal pl-5 space-y-2 text-white/80">
+                  <li>Go to <a href="https://web3forms.com/#start" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline font-bold">https://web3forms.com</a> in your browser.</li>
+                  <li>Type in <code>rovepresence@gmail.com</code> and click <strong>Create Access Key</strong>.</li>
+                  <li>Open your email inbox, copy the free Access Key they just sent you, and paste it into the box below!</li>
+                  <li>Click <strong>&quot;Publish Live Updates&quot;</strong> above, and your store will instantly send all future order notifications directly through Web3Forms!</li>
+                </ol>
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-[#D4AF37] font-bold mb-2 font-mono">
+                  Paste Web3Forms Access Key Here
+                </label>
+                <input
+                  type="text"
+                  value={config.brand.web3formsAccessKey || ""}
+                  onChange={(e) => setConfig({ ...config, brand: { ...config.brand, web3formsAccessKey: e.target.value } })}
+                  placeholder="e.g. 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d"
+                  className="w-full bg-[#141414] border border-[#D4AF37]/60 p-4 text-sm text-white font-mono focus:border-[#D4AF37]"
+                />
+              </div>
+            </div>
+
+            {/* SOLUTION 2: WHATSAPP NUMBER & RESEND RECOVERY */}
             <div className="space-y-6 border-t border-white/10 pt-6">
               <div>
                 <label className="block text-xs uppercase tracking-wider text-[#D4AF37] font-bold mb-2 flex items-center gap-2 font-mono">
@@ -653,42 +706,38 @@ export default function StudioAdminPage() {
 
               <div>
                 <label className="block text-xs uppercase tracking-wider text-white/80 mb-2 font-mono">
-                  Founder Order Fulfillment Email Address
+                  Founder Order Fulfillment Email Address (For Resend)
                 </label>
                 <input
                   type="email"
                   value={config.brand.founderEmail}
                   onChange={(e) => setConfig({ ...config, brand: { ...config.brand, founderEmail: e.target.value } })}
-                  placeholder="your.personal@email.com"
+                  placeholder="rovepresence@gmail.com"
                   className="w-full bg-[#0D0D0D] border border-white/20 p-4 text-sm text-white font-mono"
                 />
-                <span className="text-[11px] text-white/50 block mt-2 leading-relaxed font-sans">
-                  This is the inbox where Resend attempts to deliver order confirmations. Must match your Resend signup email if on the free tier.
-                </span>
               </div>
 
               {/* LIVE EMAIL DIAGNOSTIC TESTING SUITE */}
               <div className="p-6 mt-8 bg-[#0D0D0D] border border-white/10 space-y-4 shadow-inner">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div className="flex-1 min-w-[240px]">
                     <h4 className="text-sm font-mono text-[#D4AF37] font-bold flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4" /> Not Receiving Emails? Test It Live!
+                      <AlertCircle className="w-4 h-4" /> Test Your Order Email Delivery Live
                     </h4>
                     <p className="text-xs text-white/60 font-sans mt-1">
-                      Click the button below to send a test order to your inbox. If there is a configuration error (missing API key, or sandbox restrictions), we will show you exactly what Resend says so you can fix it instantly!
+                      After pasting a Web3Forms key above or cleaning your Resend Suppression List, click below to send a live test order!
                     </p>
                   </div>
                   <button
                     onClick={runEmailDiagnosticTest}
                     disabled={testEmailStatus === "testing"}
-                    className="px-5 py-3 bg-[#141414] hover:bg-white/10 text-white border border-white/20 hover:border-[#D4AF37] font-mono text-[10px] uppercase tracking-wider whitespace-nowrap transition-all flex items-center gap-2"
+                    className="px-5 py-3 bg-[#D4AF37] hover:bg-[#c49f27] text-[#0D0D0D] font-mono font-bold text-xs uppercase tracking-wider whitespace-nowrap transition-all flex items-center gap-2 shadow-xl"
                   >
                     <Send className="w-3 h-3" />
                     {testEmailStatus === "testing" ? "Transmitting..." : "Send Test Order Email"}
                   </button>
                 </div>
                 
-                {/* Real-time Email Test Diagnostic Feedback */}
                 {testEmailStatus !== "idle" && (
                   <div className={`p-4 mt-2 text-xs font-mono leading-relaxed border ${
                     testEmailStatus === "success" ? "bg-green-950/50 border-green-500/30 text-green-300" :

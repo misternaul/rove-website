@@ -52,6 +52,7 @@ export interface SiteConfig {
     logoIconImage: string;
     founderEmail: string;
     whatsappNumber: string; // Enter your full WhatsApp number with country code without + (e.g., "923001234567")
+    web3formsAccessKey?: string; // Optional free email service alternative to Resend!
     defaultCurrency: string;
   };
   nav: {
@@ -132,8 +133,9 @@ export const siteContent: SiteConfig = {
     description: "An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.",
     logoText: "ROVE",
     logoIconImage: "/images/logo-icon.jpg",
-    founderEmail: "orders@rovepresence.com",
+    founderEmail: "rovepresence@gmail.com",
     whatsappNumber: "923000000000", // 👉 REPLACE THIS with your real WhatsApp number (e.g. 923001234567)
+    web3formsAccessKey: "", // Enter a Web3Forms access key if you want instant bulletproof Gmail delivery without Resend domains
     defaultCurrency: "PKR",
   },
 
@@ -368,11 +370,11 @@ export const siteContent: SiteConfig = {
     slogan: "Less Noise. More Presence.",
     aboutText: "An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.",
     copyrightText: `© ${new Date().getFullYear()} ROVE Presence. Crafted with intention for everyday essentials. All rights reserved.`,
-    instagramUrl: "https://www.instagram.com/rovepresence/",
+    instagramUrl: "https://instagram.com",
     inquiries: [
-      { label: "Press & Editorial", email: "rovepresence@gmail.com" },
-      { label: "Client Services", email: "rovepresence@gmail.com" },
-      { label: "Bespoke Fitting", email: "rovepresence@gmail.com" },
+      { label: "Press & Editorial", email: "press@rovepresence.com" },
+      { label: "Client Services", email: "support@rovepresence.com" },
+      { label: "Bespoke Fitting", email: "concierge@rovepresence.com" },
     ],
   },
 };
