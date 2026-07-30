@@ -112,9 +112,9 @@ export default function WaitlistSection() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-[#141414]/90 border border-[#D4AF37]/30 p-8 md:p-16 shadow-2xl relative"
+          viewport={{ once: true, margin: "-100px", amount: 0.2 }}
+          transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
+          className="bg-[#141414]/90 border border-[#D4AF37]/30 p-8 md:p-16 shadow-2xl relative gpu-layer"
         >
           {/* Corner decorative gold indicators */}
           <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#D4AF37]" />

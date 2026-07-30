@@ -11,7 +11,7 @@ export default function LookbookGallery() {
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = direction === "left" ? -450 : 450;
+      const scrollAmount = direction === "left" ? -460 : 460;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
@@ -50,20 +50,21 @@ export default function LookbookGallery() {
         </div>
       </div>
 
-      {/* Horizontal Scroll Gallery Container */}
+      {/* Horizontal Scroll Gallery Container with Lenis Prevent & Hardware Optimization */}
       <div
         ref={scrollRef}
+        data-lenis-prevent="true"
         className="flex overflow-x-auto gap-8 px-6 md:px-12 max-w-7xl mx-auto no-scrollbar scroll-smooth pb-8"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none", overscrollBehaviorX: "contain" }}
       >
         {siteContent.gallery.images.map((item, index) => (
           <motion.div
             key={item.title}
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: 35 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="flex-shrink-0 w-[300px] sm:w-[380px] md:w-[440px] flex flex-col group"
+            viewport={{ once: true, margin: "-80px", amount: 0.1 }}
+            transition={{ duration: 0.85, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="flex-shrink-0 w-[300px] sm:w-[380px] md:w-[440px] flex flex-col group gpu-layer"
           >
             {/* Image Box */}
             <div
@@ -73,8 +74,10 @@ export default function LookbookGallery() {
                 src={item.src}
                 alt={item.title}
                 fill
+                quality={85}
+                loading="lazy"
                 className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                sizes="440px"
+                sizes="(max-width: 640px) 300px, (max-width: 768px) 380px, 440px"
               />
               <div className="absolute top-4 left-4 px-3 py-1 bg-[#0D0D0D]/90 border border-[#D4AF37]/30">
                 <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-[#D4AF37]">

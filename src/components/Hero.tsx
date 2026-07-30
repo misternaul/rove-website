@@ -7,20 +7,6 @@ import { ArrowDown, Sparkles } from "lucide-react";
 import { siteContent } from "@/config/siteContent";
 
 export default function Hero() {
-  const scrollToExplore = () => {
-    const section = document.getElementById("showcase");
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const scrollToManifesto = () => {
-    const section = document.getElementById("manifesto");
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   const currentDrop = siteContent.drops[0] || { name: "Drop 001", colors: [{ priceFormatted: "PKR 2,299" }] };
   const basePrice = currentDrop.colors[0]?.priceFormatted || "PKR 2,299";
 
@@ -35,10 +21,10 @@ export default function Hero() {
         
         {/* Top Tagline */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-center gap-3 mb-6 md:mb-10"
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center gap-3 mb-6 md:mb-10 gpu-layer"
         >
           <div className="h-[1px] w-12 bg-[#D4AF37]" />
           <span className="text-[11px] md:text-xs font-mono uppercase tracking-[0.3em] text-[#D4AF37] flex items-center gap-2">
@@ -52,12 +38,12 @@ export default function Hero() {
           
           {/* Headline Title & Manifesto Pitch (Columns 1-7) */}
           <motion.div
-            initial={{ opacity: 0, y: 35 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 flex flex-col z-10"
+            transition={{ duration: 1.1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-7 flex flex-col z-10 gpu-layer"
           >
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-light font-serif tracking-tight leading-[0.95] mb-8 text-[#FFFFFF] font-editorial">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-light font-serif tracking-tight leading-[0.95] mb-8 text-[#FFFFFF]">
               <span className="block font-normal text-white hover:text-[#D4AF37] transition-colors duration-700">
                 {siteContent.hero.titleLine1}
               </span>
@@ -70,29 +56,29 @@ export default function Hero() {
               {siteContent.hero.subtitle}
             </p>
 
-            {/* Action Buttons */}
+            {/* Action Buttons with Anchor Gliding */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 max-w-md">
-              <button
-                onClick={scrollToExplore}
-                className="px-8 py-4 bg-[#D4AF37] hover:bg-[#c49f27] text-[#0D0D0D] font-mono font-semibold text-xs tracking-[0.25em] uppercase transition-all duration-500 shadow-xl text-center"
+              <a
+                href="#showcase"
+                className="px-8 py-4 bg-[#D4AF37] hover:bg-[#c49f27] text-[#0D0D0D] font-mono font-semibold text-xs tracking-[0.25em] uppercase transition-all duration-500 shadow-xl text-center block"
               >
                 {siteContent.hero.ctaPrimary}
-              </button>
-              <button
-                onClick={scrollToManifesto}
-                className="px-8 py-4 bg-[#141414] hover:bg-white/10 text-white border border-white/20 hover:border-[#D4AF37] font-mono text-xs tracking-[0.25em] uppercase transition-all duration-500 text-center"
+              </a>
+              <a
+                href="#manifesto"
+                className="px-8 py-4 bg-[#141414] hover:bg-white/10 text-white border border-white/20 hover:border-[#D4AF37] font-mono text-xs tracking-[0.25em] uppercase transition-all duration-500 text-center block"
               >
                 {siteContent.hero.ctaSecondary}
-              </button>
+              </a>
             </div>
           </motion.div>
 
           {/* Framed Split-Studio Diptych Photography (Columns 8-12) */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 relative flex justify-center mt-6 lg:mt-0"
+            transition={{ duration: 1.3, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 relative flex justify-center mt-6 lg:mt-0 gpu-layer"
           >
             <div className="grid grid-cols-2 gap-4 md:gap-6 w-full max-w-lg lg:max-w-none">
               
@@ -104,6 +90,7 @@ export default function Hero() {
                     alt={siteContent.hero.images.leftFramed.caption}
                     fill
                     priority
+                    quality={90}
                     className="object-cover transition-transform duration-1000 group-hover:scale-105"
                     sizes="(max-width: 768px) 50vw, 300px"
                   />
@@ -122,6 +109,7 @@ export default function Hero() {
                     alt={siteContent.hero.images.rightFramed.caption}
                     fill
                     priority
+                    quality={90}
                     className="object-cover transition-transform duration-1000 group-hover:scale-105"
                     sizes="(max-width: 768px) 50vw, 300px"
                   />
@@ -153,15 +141,15 @@ export default function Hero() {
           ))}
         </div>
 
-        <button
-          onClick={scrollToExplore}
+        <a
+          href="#showcase"
           className="group flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] hover:text-white transition-colors"
         >
           <span>{siteContent.hero.scrollText}</span>
           <div className="w-8 h-8 rounded-full border border-[#D4AF37] group-hover:border-white flex items-center justify-center transition-colors">
             <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
           </div>
-        </button>
+        </a>
       </div>
     </section>
   );

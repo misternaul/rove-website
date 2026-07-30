@@ -32,11 +32,11 @@ export default function CraftDetails() {
           {siteContent.craft.items.map((item, idx) => (
             <motion.div
               key={item.title}
-              initial={{ opacity: 0, y: 35 }}
+              initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className={`group bg-[#141414] border border-white/10 hover:border-[#D4AF37]/50 transition-all duration-500 flex flex-col overflow-hidden ${
+              viewport={{ once: true, margin: "-100px", amount: 0.15 }}
+              transition={{ duration: 0.85, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
+              className={`group bg-[#141414] border border-white/10 hover:border-[#D4AF37]/50 transition-all duration-500 flex flex-col overflow-hidden gpu-layer ${
                 idx === 0 ? "md:col-span-2 lg:col-span-1" : ""
               }`}
             >
@@ -46,8 +46,10 @@ export default function CraftDetails() {
                   src={item.image}
                   alt={item.title}
                   fill
+                  quality={85}
+                  loading="lazy"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 400px"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent opacity-60" />
                 <div className="absolute top-4 right-4 px-2.5 py-1 bg-[#0D0D0D]/80 border border-[#D4AF37]/20">

@@ -11,18 +11,18 @@ export default function Manifesto() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.18,
         delayChildren: 0.1,
       },
     },
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 35 },
+    hidden: { opacity: 0, y: 28 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 0.95, ease: [0.16, 1, 0.3, 1] },
     },
   };
 
@@ -39,11 +39,11 @@ export default function Manifesto() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="flex flex-col items-center"
+          viewport={{ once: true, margin: "-120px", amount: 0.15 }}
+          className="flex flex-col items-center gpu-layer"
         >
           {/* Subtle Icon Mark at top of Manifesto */}
-          <motion.div variants={itemVariants} className="relative w-16 h-12 mb-8 opacity-90">
+          <motion.div variants={itemVariants} className="relative w-16 h-12 mb-8 opacity-90 gpu-layer">
             <Image
               src={siteContent.brand.logoIconImage}
               alt="ROVE Horizon Icon"
@@ -54,39 +54,35 @@ export default function Manifesto() {
 
           <motion.span
             variants={itemVariants}
-            className="text-[11px] font-mono uppercase tracking-[0.35em] text-[#D4AF37] mb-10 block"
+            className="text-[11px] font-mono uppercase tracking-[0.35em] text-[#D4AF37] mb-10 block gpu-layer"
           >
             {siteContent.manifesto.title}
           </motion.span>
-
-          {/* Paragraph 1 */}
+          
           <motion.p
             variants={itemVariants}
-            className="text-xl sm:text-2xl md:text-3xl font-light text-[#FFFFFF] leading-[1.6] mb-8 font-serif max-w-3xl"
+            className="text-xl sm:text-2xl md:text-3xl font-light text-[#FFFFFF] leading-[1.6] mb-8 font-serif max-w-3xl gpu-layer"
           >
             {siteContent.manifesto.paragraph1}
           </motion.p>
-
-          {/* Paragraph 2 */}
+          
           <motion.p
             variants={itemVariants}
-            className="text-base sm:text-lg md:text-xl font-light text-[#CDBFA6]/90 leading-relaxed mb-8 max-w-2xl font-sans"
+            className="text-base sm:text-lg md:text-xl font-light text-[#CDBFA6]/90 leading-relaxed mb-8 max-w-2xl font-sans gpu-layer"
           >
             {siteContent.manifesto.paragraph2}
           </motion.p>
-
-          {/* Quote */}
+          
           <motion.p
             variants={itemVariants}
-            className="text-lg sm:text-xl md:text-2xl font-normal italic text-gold-gradient tracking-wide max-w-2xl font-serif"
+            className="text-lg sm:text-xl md:text-2xl font-normal italic text-gold-gradient tracking-wide max-w-2xl font-serif gpu-layer"
           >
             {siteContent.manifesto.quote}
           </motion.p>
-
-          {/* Brand pillars / value icons row */}
+          
           <motion.div
             variants={itemVariants}
-            className="mt-16 pt-12 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 w-full max-w-3xl text-left sm:text-center"
+            className="mt-16 pt-12 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 w-full max-w-3xl text-left sm:text-center gpu-layer"
           >
             {siteContent.manifesto.pillars.map((pillar) => (
               <div key={pillar.title}>

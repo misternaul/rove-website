@@ -35,6 +35,30 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ==========================================================================
+   LENIS SMOOTH SCROLL OPTIMIZATION RULES
+   ========================================================================== */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 ::selection {
@@ -58,7 +82,7 @@ body {
   background: #D4AF37;
 }
 
-/* Utility classes for luxury editorial finishes */
+/* Utility classes for luxury editorial finishes & GPU rendering acceleration */
 .gold-glow {
   box-shadow: 0 0 50px rgba(212, 175, 55, 0.07);
 }
@@ -71,4 +95,10 @@ body {
   background: linear-gradient(135deg, #FFFFFF 0%, #D4AF37 85%, #9E7D1C 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
