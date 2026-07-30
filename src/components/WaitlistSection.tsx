@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Send, Sparkles, AlertCircle, Lock } from "lucide-react";
+import { siteContent } from "@/config/siteContent";
 
 export default function WaitlistSection() {
   const [email, setEmail] = useState("");
   const [reservedProduct, setReservedProduct] = useState<{ color: string; size: string } | null>({
-    color: "Jet Black Obsidian",
-    size: "M / L",
+    color: siteContent.product.colors[0]?.name || "Jet Black Obsidian",
+    size: siteContent.product.sizes[1]?.id || "M / L",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -28,7 +29,7 @@ export default function WaitlistSection() {
     e.preventDefault();
     if (!email || !email.includes("@") || !email.includes(".")) {
       setStatus("error");
-      setErrorMessage("Please input a valid email address to reserve your spot.");
+      setErrorMessage("Please input a valid email address to reserve your allocation spot.");
       return;
     }
 
@@ -37,7 +38,6 @@ export default function WaitlistSection() {
 
     try {
       // POST to our serverless API route
-      // TODO: connect to email service (e.g. Mailchimp, Resend, ConvertKit, or database) inside /api/waitlist for production
       const response = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -86,15 +86,15 @@ export default function WaitlistSection() {
 
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#0D0D0D] border border-[#D4AF37]/30 text-[10px] font-mono tracking-[0.3em] text-[#D4AF37] uppercase mb-8">
             <Sparkles className="w-3 h-3 text-[#D4AF37] animate-pulse" />
-            <span>Drop 001 — Allocation Access</span>
+            <span>{siteContent.waitlist.badge}</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-light font-serif tracking-tight text-white mb-4">
-            Be First to Know What&apos;s Next
+            {siteContent.waitlist.title}
           </h2>
           
-          <p className="text-sm md:text-base text-[#CDBFA6]/80 font-light max-w-xl mx-auto leading-relaxed mb-8">
-            Our productions are intentional and uncompromised. Enroll in our private allocation list to secure early notification before Drop 001 opens to the public.
+          <p className="text-sm md:text-base text-[#CDBFA6]/80 font-light max-w-xl mx-auto leading-relaxed mb-8 font-sans">
+            {siteContent.waitlist.description}
           </p>
 
           {/* Reserved product indicator badge if forwarded from Product Showcase CTA */}
@@ -103,7 +103,7 @@ export default function WaitlistSection() {
               <div>
                 <span className="text-[9px] uppercase tracking-[0.2em] text-[#D4AF37] block">Selected Allocation</span>
                 <span className="text-white font-medium block mt-0.5">
-                  {reservedProduct.color} • Size {reservedProduct.size}
+                  {reservedProduct.color} • Size {reservedProduct.size} ({siteContent.product.priceFormatted})
                 </span>
               </div>
               <button
@@ -129,7 +129,7 @@ export default function WaitlistSection() {
                 </div>
                 <h3 className="text-xl font-serif text-white mb-2">You Are On The List</h3>
                 <p className="text-xs text-white/75 leading-relaxed font-light mb-6 font-mono">
-                  Your reservation request has been secured in our records. You will receive an invitation prior to public launch.
+                  Your allocation priority has been logged in our studio records. You will receive private notice prior to public commercial release.
                 </p>
                 <button
                   onClick={() => setStatus("idle")}
@@ -162,7 +162,7 @@ export default function WaitlistSection() {
                     disabled={status === "loading"}
                     className="px-8 py-4 bg-[#D4AF37] hover:bg-[#D4AF37]/90 disabled:opacity-50 text-[#0D0D0D] font-mono font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap shadow-lg"
                   >
-                    <span>{status === "loading" ? "Securing..." : "Request Access"}</span>
+                    <span>{status === "loading" ? "Securing..." : siteContent.waitlist.buttonText}</span>
                     <Send className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -177,7 +177,7 @@ export default function WaitlistSection() {
 
                 <div className="mt-4 flex items-center justify-center gap-2 text-[10px] font-mono text-white/40 tracking-wider">
                   <Lock className="w-3 h-3 text-[#D4AF37]" />
-                  <span>Strictly zero spam. Private data architecture. Unsubscribe anytime.</span>
+                  <span>{siteContent.waitlist.privacyNote}</span>
                 </div>
               </motion.form>
             )}

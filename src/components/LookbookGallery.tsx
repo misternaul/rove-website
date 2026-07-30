@@ -4,44 +4,7 @@ import React, { useRef } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Eye } from "lucide-react";
-
-const LOOKBOOK_IMAGES = [
-  {
-    src: "/images/editorial-rocks.jpg",
-    title: "Obsidian on Dark Rock",
-    caption: "Drop 001 Editorial — Jet Black Edition",
-    aspect: "aspect-[3/4]",
-    tag: "Editorial Campaign",
-  },
-  {
-    src: "/images/editorial-wardrobe.jpg",
-    title: "Sanctuary of Quiet Strength",
-    caption: "Wardrobe Framing — Nothing More. Nothing Less.",
-    aspect: "aspect-[3/4]",
-    tag: "Lifestyle Portrait",
-  },
-  {
-    src: "/images/spec-black.jpg",
-    title: "Anatomy of Jet Black",
-    caption: "Technical Blueprint & Hallmark Embroidery",
-    aspect: "aspect-[2/3]",
-    tag: "Specification Sheet",
-  },
-  {
-    src: "/images/spec-sand.jpg",
-    title: "Anatomy of Sand Dune",
-    caption: "Embossed Texture & Shoulder Architecture",
-    aspect: "aspect-[2/3]",
-    tag: "Specification Sheet",
-  },
-  {
-    src: "/images/brand-identity.jpg",
-    title: "The Horizon Principle",
-    caption: "Rove Brand Values & Typography Systems",
-    aspect: "aspect-[2/3]",
-    tag: "Brand Codex",
-  },
-];
+import { siteContent } from "@/config/siteContent";
 
 export default function LookbookGallery() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -58,10 +21,10 @@ export default function LookbookGallery() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
         <div>
           <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#D4AF37] block mb-2">
-            Visual Compendium
+            {siteContent.gallery.badge}
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-light font-serif tracking-tight text-white">
-            The Drop 001 Lookbook
+            {siteContent.gallery.title}
           </h2>
         </div>
 
@@ -93,7 +56,7 @@ export default function LookbookGallery() {
         className="flex overflow-x-auto gap-8 px-6 md:px-12 max-w-7xl mx-auto no-scrollbar scroll-smooth pb-8"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        {LOOKBOOK_IMAGES.map((item, index) => (
+        {siteContent.gallery.images.map((item, index) => (
           <motion.div
             key={item.title}
             initial={{ opacity: 0, x: 40 }}
@@ -135,7 +98,7 @@ export default function LookbookGallery() {
                 </h3>
                 <span className="text-xs font-mono text-[#D4AF37]/80 font-semibold">0{index + 1} / 05</span>
               </div>
-              <p className="text-xs text-white/60 font-light tracking-wide">
+              <p className="text-xs text-white/60 font-light tracking-wide font-sans">
                 {item.caption}
               </p>
             </div>

@@ -2,7 +2,8 @@
 
 import React from "react";
 import Image from "next/image";
-import { Globe, Bookmark, ArrowUp, Compass } from "lucide-react";
+import { Globe, ArrowUp, Compass } from "lucide-react";
+import { siteContent } from "@/config/siteContent";
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -20,21 +21,21 @@ export default function Footer() {
             <div className="flex items-center gap-4 mb-6">
               <div className="relative w-12 h-10 overflow-hidden">
                 <Image
-                  src="/images/logo-icon.jpg"
+                  src={siteContent.brand.logoIconImage}
                   alt="ROVE Logo Icon"
                   fill
                   className="object-contain"
                 />
               </div>
               <span className="font-serif tracking-[0.35em] text-2xl uppercase text-white">
-                ROVE
+                {siteContent.brand.logoText}
               </span>
             </div>
             <p className="text-xs text-[#CDBFA6]/80 font-mono uppercase tracking-[0.25em] mb-4">
-              Less Noise. More Presence.
+              {siteContent.footer.slogan}
             </p>
-            <p className="text-xs text-white/60 font-light max-w-xs leading-relaxed">
-              An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.
+            <p className="text-xs text-white/60 font-light max-w-xs leading-relaxed font-sans">
+              {siteContent.footer.aboutText}
             </p>
           </div>
 
@@ -44,12 +45,14 @@ export default function Footer() {
               <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-[#D4AF37] block mb-4 font-semibold">
                 Navigation
               </span>
-              <ul className="space-y-3 text-xs uppercase tracking-[0.2em] text-white/80 font-light">
-                <li><a href="#manifesto" className="hover:text-[#D4AF37] transition-colors">Manifesto</a></li>
-                <li><a href="#showcase" className="hover:text-[#D4AF37] transition-colors">The Polo</a></li>
-                <li><a href="#craft" className="hover:text-[#D4AF37] transition-colors">Craftsmanship</a></li>
-                <li><a href="#gallery" className="hover:text-[#D4AF37] transition-colors">Lookbook</a></li>
-                <li><a href="#waitlist" className="hover:text-[#D4AF37] transition-colors">Allocation List</a></li>
+              <ul className="space-y-3 text-xs uppercase tracking-[0.2em] text-white/80 font-light font-mono">
+                {siteContent.nav.links.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="hover:text-[#D4AF37] transition-colors">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -58,9 +61,13 @@ export default function Footer() {
                 Inquiries
               </span>
               <ul className="space-y-3 text-xs tracking-wider text-white/70 font-light font-mono">
-                <li><a href="#waitlist" className="hover:text-white transition-colors">Press & Editorial</a></li>
-                <li><a href="#waitlist" className="hover:text-white transition-colors">Client Services</a></li>
-                <li><a href="#waitlist" className="hover:text-white transition-colors">Bespoke Fitting</a></li>
+                {siteContent.footer.inquiries.map((inq) => (
+                  <li key={inq.label}>
+                    <a href={`mailto:${inq.email}`} className="hover:text-white transition-colors">
+                      {inq.label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -69,7 +76,7 @@ export default function Footer() {
           <div className="md:col-span-3 flex flex-col justify-between items-start md:items-end">
             <div className="flex items-center gap-3">
               <a
-                href="https://instagram.com"
+                href={siteContent.footer.instagramUrl}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
@@ -108,13 +115,13 @@ export default function Footer() {
 
         {/* Copyright Bottom Bar */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-mono uppercase tracking-[0.2em] text-white/40">
-          <span>&copy; {new Date().getFullYear()} ROVE Presence. All Rights Reserved.</span>
+          <span>{siteContent.footer.copyrightText}</span>
           <div className="flex items-center gap-6">
             <span className="hover:text-white/80 cursor-pointer">Privacy Codex</span>
             <span>•</span>
             <span className="hover:text-white/80 cursor-pointer">Terms of Allocation</span>
             <span>•</span>
-            <span className="text-[#D4AF37]/80">Drop 001 Release</span>
+            <span className="text-[#D4AF37]/80">Drop 001 ({siteContent.brand.defaultCurrency})</span>
           </div>
         </div>
 

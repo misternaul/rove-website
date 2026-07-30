@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
+import { siteContent } from "@/config/siteContent";
 
 export default function Manifesto() {
   const containerVariants: Variants = {
@@ -44,7 +45,7 @@ export default function Manifesto() {
           {/* Subtle Icon Mark at top of Manifesto */}
           <motion.div variants={itemVariants} className="relative w-16 h-12 mb-8 opacity-90">
             <Image
-              src="/images/logo-icon.jpg"
+              src={siteContent.brand.logoIconImage}
               alt="ROVE Horizon Icon"
               fill
               className="object-contain"
@@ -55,7 +56,7 @@ export default function Manifesto() {
             variants={itemVariants}
             className="text-[11px] font-mono uppercase tracking-[0.35em] text-[#D4AF37] mb-10 block"
           >
-            The Rove Manifesto
+            {siteContent.manifesto.title}
           </motion.span>
 
           {/* Paragraph 1 */}
@@ -63,23 +64,23 @@ export default function Manifesto() {
             variants={itemVariants}
             className="text-xl sm:text-2xl md:text-3xl font-light text-[#FFFFFF] leading-[1.6] mb-8 font-serif max-w-3xl"
           >
-            ROVE is built on a singular belief: true luxury has no need to shout. We craft foundational everyday garments with uncompromised intent—where comfort meets durability, and subtlety commands attention.
+            {siteContent.manifesto.paragraph1}
           </motion.p>
 
           {/* Paragraph 2 */}
           <motion.p
             variants={itemVariants}
-            className="text-base sm:text-lg md:text-xl font-light text-[#CDBFA6]/90 leading-relaxed mb-8 max-w-2xl"
+            className="text-base sm:text-lg md:text-xl font-light text-[#CDBFA6]/90 leading-relaxed mb-8 max-w-2xl font-sans"
           >
-            Stripped of excess, every stitch is calibrated to ground your movement and elevate your poise with quiet strength.
+            {siteContent.manifesto.paragraph2}
           </motion.p>
 
-          {/* Paragraph 3 */}
+          {/* Quote */}
           <motion.p
             variants={itemVariants}
-            className="text-lg sm:text-xl md:text-2xl font-normal italic text-gold-gradient tracking-wide max-w-2xl"
+            className="text-lg sm:text-xl md:text-2xl font-normal italic text-gold-gradient tracking-wide max-w-2xl font-serif"
           >
-            &ldquo;It is not merely apparel; it is a discipline of perspective. Less noise. More presence.&rdquo;
+            {siteContent.manifesto.quote}
           </motion.p>
 
           {/* Brand pillars / value icons row */}
@@ -87,22 +88,16 @@ export default function Manifesto() {
             variants={itemVariants}
             className="mt-16 pt-12 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 w-full max-w-3xl text-left sm:text-center"
           >
-            <div>
-              <span className="block text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-medium mb-1">Calm</span>
-              <span className="text-xs text-white/60 font-light block">Clarity in mind</span>
-            </div>
-            <div>
-              <span className="block text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-medium mb-1">Perspective</span>
-              <span className="text-xs text-white/60 font-light block">Stay grounded</span>
-            </div>
-            <div>
-              <span className="block text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-medium mb-1">Direction</span>
-              <span className="text-xs text-white/60 font-light block">Move with purpose</span>
-            </div>
-            <div>
-              <span className="block text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-medium mb-1">Presence</span>
-              <span className="text-xs text-white/60 font-light block">Quiet confidence</span>
-            </div>
+            {siteContent.manifesto.pillars.map((pillar) => (
+              <div key={pillar.title}>
+                <span className="block text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-medium mb-1">
+                  {pillar.title}
+                </span>
+                <span className="text-xs text-white/60 font-light block font-sans">
+                  {pillar.subtitle}
+                </span>
+              </div>
+            ))}
           </motion.div>
         </motion.div>
       </div>

@@ -2,144 +2,142 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { Menu, X, ArrowUpRight } from "lucide-react";
+import { siteContent } from "@/config/siteContent";
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
+      if (window.scrollY > 40) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: "Manifesto", href: "#manifesto" },
-    { name: "The Polo", href: "#showcase" },
-    { name: "Craft & Detail", href: "#craft" },
-    { name: "Lookbook", href: "#gallery" },
-  ];
-
-  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
+  const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
+    const element = document.querySelector(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
-        scrolled
-          ? "bg-[#0D0D0D]/90 backdrop-blur-md py-4 border-b border-[#D4AF37]/15 shadow-2xl shadow-black/80"
-          : "bg-gradient-to-b from-[#0D0D0D]/90 via-[#0D0D0D]/40 to-transparent py-7"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-        {/* Brand Logo & Name */}
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-          className="group flex items-center gap-3 text-white transition-opacity duration-300 hover:opacity-80"
-        >
-          <div className="relative w-10 h-8 overflow-hidden">
-            <Image
-              src="/images/logo-icon.jpg"
-              alt="ROVE Logo Icon"
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-semibold tracking-[0.3em] text-lg leading-none uppercase text-white font-serif">
-              ROVE
-            </span>
-            <span className="text-[9px] tracking-[0.22em] text-[#D4AF37] uppercase font-mono mt-1 font-light opacity-90">
-              Drop 001
-            </span>
-          </div>
-        </a>
-
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-10">
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              onClick={(e) => handleScrollTo(e, link.href)}
-              className="text-xs uppercase tracking-[0.25em] text-[#FFFFFF]/80 hover:text-[#D4AF37] transition-colors duration-300 font-medium py-1 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-[#D4AF37] hover:after:w-full after:transition-all after:duration-300"
-            >
-              {link.name}
-            </a>
-          ))}
-        </nav>
-
-        {/* Action CTA Button */}
-        <div className="hidden md:flex items-center">
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-700 ${
+          isScrolled
+            ? "bg-[#0D0D0D]/95 backdrop-blur-md py-4 border-b border-[#D4AF37]/20 shadow-2xl"
+            : "bg-transparent py-7 border-b border-transparent"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+          
+          {/* Logo Branding */}
           <a
-            href="#waitlist"
-            onClick={(e) => handleScrollTo(e, "#waitlist")}
-            className="group relative px-6 py-2.5 text-xs font-medium tracking-[0.2em] uppercase text-[#D4AF37] overflow-hidden rounded-none border border-[#D4AF37]/40 hover:border-[#D4AF37] transition-all duration-500 bg-transparent hover:bg-[#D4AF37]/10"
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="flex items-center gap-3 group"
           >
-            <span className="relative z-10 flex items-center gap-2">
-              Join Priority
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse"></span>
+            <div className="relative w-8 h-8 md:w-10 md:h-10 overflow-hidden transition-transform duration-500 group-hover:scale-105">
+              <Image
+                src={siteContent.brand.logoIconImage}
+                alt={`${siteContent.brand.name} Icon`}
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="font-serif font-light text-xl md:text-2xl tracking-[0.35em] uppercase text-white group-hover:text-[#D4AF37] transition-colors duration-500">
+              {siteContent.brand.logoText}
             </span>
           </a>
-        </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden text-white hover:text-[#D4AF37] p-2 focus:outline-none transition-colors"
-          aria-label="Toggle Navigation"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden bg-[#0D0D0D] border-b border-[#D4AF37]/20 overflow-hidden"
-          >
-            <div className="px-6 py-8 flex flex-col gap-6">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleScrollTo(e, link.href)}
-                  className="text-sm uppercase tracking-[0.25em] text-[#FFFFFF]/90 hover:text-[#D4AF37] transition-colors font-medium py-2 border-b border-white/5"
-                >
-                  {link.name}
-                </a>
-              ))}
-              <a
-                href="#waitlist"
-                onClick={(e) => handleScrollTo(e, "#waitlist")}
-                className="mt-2 w-full py-3.5 text-center text-xs font-medium tracking-[0.2em] uppercase text-[#0D0D0D] bg-[#D4AF37] hover:bg-[#D4AF37]/90 transition-colors"
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex items-center gap-8 lg:gap-12">
+            {siteContent.nav.links.map((item) => (
+              <button
+                key={item.name}
+                onClick={() => scrollToSection(item.href)}
+                className="text-xs font-mono uppercase tracking-[0.25em] text-[#FFFFFF]/80 hover:text-[#D4AF37] transition-all duration-300 relative py-1 overflow-hidden group"
               >
-                Join Priority Waitlist
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+                <span>{item.name}</span>
+                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-[#D4AF37] transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+              </button>
+            ))}
+          </nav>
+
+          {/* Action Button */}
+          <div className="hidden md:flex items-center">
+            <button
+              onClick={() => scrollToSection("#showcase")}
+              className="px-6 py-2.5 bg-[#141414] hover:bg-[#D4AF37] text-[#D4AF37] hover:text-[#0D0D0D] border border-[#D4AF37]/50 hover:border-[#D4AF37] font-mono text-xs uppercase tracking-[0.25em] transition-all duration-500 flex items-center gap-2 group shadow-lg"
+            >
+              <span>{siteContent.nav.ctaText}</span>
+              <ArrowUpRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </button>
+          </div>
+
+          {/* Mobile Menu Toggle Button */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-[#D4AF37] focus:outline-none"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Overlay Menu */}
+      {mobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed inset-0 z-30 bg-[#0D0D0D]/98 backdrop-blur-xl flex flex-col justify-between px-8 py-28 md:hidden border-b border-[#D4AF37]/20"
+        >
+          <div className="flex flex-col gap-8 mt-10">
+            {siteContent.nav.links.map((item, idx) => (
+              <motion.button
+                key={item.name}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                onClick={() => scrollToSection(item.href)}
+                className="text-2xl font-serif text-left font-light text-white tracking-[0.2em] hover:text-[#D4AF37] uppercase transition-colors"
+              >
+                0{idx + 1}. {item.name}
+              </motion.button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <button
+              onClick={() => scrollToSection("#showcase")}
+              className="w-full py-4 bg-[#D4AF37] text-[#0D0D0D] font-mono text-xs uppercase tracking-[0.3em] font-bold text-center shadow-2xl"
+            >
+              {siteContent.nav.ctaText} — {siteContent.product.priceFormatted}
+            </button>
+            <span className="text-[10px] font-mono text-center text-[#CDBFA6]/60 tracking-[0.3em] uppercase">
+              {siteContent.brand.tagline}
+            </span>
+          </div>
+        </motion.div>
+      )}
+    </>
   );
 }

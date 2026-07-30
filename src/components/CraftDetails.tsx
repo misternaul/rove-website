@@ -3,44 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-
-const CRAFT_ITEMS = [
-  {
-    title: "Three-Line Sleeve Signature",
-    subtitle: "Right Arm Distinction",
-    description:
-      "Three bold gold lines meticulously embroidered exclusively on the right sleeve. An asymmetrical hallmark of intent and elevated presence.",
-    image: "/images/detail-black-sleeve.jpg",
-  },
-  {
-    title: "Slowing Dune Texture",
-    subtitle: "Tactile Embossment",
-    description:
-      "A sophisticated, subtle embossed pattern inspired by wind-swept sand dunes. Visible when catching natural light, deeply felt in everyday wearing quality.",
-    image: "/images/detail-sand-texture.jpg",
-  },
-  {
-    title: "Matte Black Engraved Button",
-    subtitle: "Custom Bespoke Hardware",
-    description:
-      "Custom matte black tactile buttons laser-engraved with the ROVE insignia. Set above reinforced woven neck tape designed to prevent collar droop over years of wear.",
-    image: "/images/detail-black-button.jpg",
-  },
-  {
-    title: "Gold Shoulder Piping",
-    subtitle: "Architectural Lines",
-    description:
-      "Precision gold piping running gracefully from the collar edge along the shoulder seam—imbuing a regular fit with sharp, athletic architecture.",
-    image: "/images/detail-sand-piping.jpg",
-  },
-  {
-    title: "Horizon Mark Embroidery",
-    subtitle: "Left Chest Insignia",
-    description:
-      "High-density gold embroidery on the left chest. The rising R emerging above the horizon line symbolizes perspective, confidence, and quiet momentum.",
-    image: "/images/detail-black-logo.jpg",
-  },
-];
+import { siteContent } from "@/config/siteContent";
 
 export default function CraftDetails() {
   return (
@@ -54,19 +17,19 @@ export default function CraftDetails() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-20 md:mb-28">
           <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#D4AF37] block mb-3">
-            Uncompromising Craftsmanship
+            {siteContent.craft.badge}
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-light font-serif tracking-tight text-white mb-6">
-            An Anatomy of Quiet Poise
+            {siteContent.craft.title}
           </h2>
-          <p className="text-sm md:text-base text-[#CDBFA6]/80 font-light leading-relaxed">
-            Every millimeter of the Rove Polo is deliberately calculated. From bespoke matte hardware to signature right-sleeve gold embroidery, explore the tactile hallmarks that separate ephemeral trends from everyday heirlooms.
+          <p className="text-sm md:text-base text-[#CDBFA6]/80 font-light leading-relaxed font-sans">
+            {siteContent.craft.description}
           </p>
         </div>
 
         {/* Editorial Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-          {CRAFT_ITEMS.map((item, idx) => (
+          {siteContent.craft.items.map((item, idx) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 35 }}
@@ -83,7 +46,7 @@ export default function CraftDetails() {
                   src={item.image}
                   alt={item.title}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-108"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, 400px"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent opacity-60" />
@@ -103,7 +66,7 @@ export default function CraftDetails() {
                   <h3 className="text-xl font-serif font-normal text-white mb-4 tracking-tight group-hover:text-[#D4AF37] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-white/70 font-light leading-relaxed">
+                  <p className="text-xs sm:text-sm text-white/70 font-light leading-relaxed font-sans">
                     {item.description}
                   </p>
                 </div>
@@ -121,7 +84,7 @@ export default function CraftDetails() {
         <div className="mt-20 md:mt-28 p-10 md:p-14 bg-[#141414]/60 border border-[#D4AF37]/20 text-center relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-60" />
           <p className="text-base sm:text-lg md:text-xl font-serif font-light text-white italic tracking-wide max-w-3xl mx-auto">
-            &ldquo;We reject decorative chatter. Every gold thread and piped contour exists solely to enhance durability, structure, and the quiet assurance of the individual wearing it.&rdquo;
+            {siteContent.craft.quote}
           </p>
           <span className="block mt-4 text-[11px] font-mono uppercase tracking-[0.3em] text-[#D4AF37]">
             — Rove Design Studio, Drop 001 Guidelines

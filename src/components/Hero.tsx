@@ -2,188 +2,164 @@
 
 import React from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowDown, Sparkles } from "lucide-react";
+import { siteContent } from "@/config/siteContent";
 
-/**
- * ARCHITECTURAL NOTE FOR THE CLIENT:
- * As noted in the specifications, the source editorial photographs (editorial-rocks.jpg & editorial-wardrobe.jpg)
- * possess an inherent resolution of 768x1024px. To prevent any artifacts, blurriness, or pixel stretching on
- * wide 4K/Retina desktop viewports, we have engineered an art-directed Framed Split-Studio Hero layout rather
- * than artificially stretching a vertical portrait across a wide horizontal viewport.
- * This framing style directly mimics high-end editorial fashion houses (Aimé Leon Dore, Our Legacy, Frame Denim),
- * turning the native resolution into an intentional museum-grade gallery showcase with smooth parallax.
- */
 export default function Hero() {
-  const { scrollY } = useScroll();
-  const yParallaxFast = useTransform(scrollY, [0, 800], [0, -120]);
-  const yParallaxSlow = useTransform(scrollY, [0, 800], [0, -60]);
-  const opacityFade = useTransform(scrollY, [0, 500], [1, 0]);
+  const scrollToExplore = () => {
+    const section = document.getElementById("showcase");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
-  const handleScrollDown = () => {
-    const nextSection = document.getElementById("manifesto");
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: "smooth" });
+  const scrollToManifesto = () => {
+    const section = document.getElementById("manifesto");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   return (
-    <section className="relative min-h-screen w-full bg-[#0D0D0D] text-white overflow-hidden flex items-center pt-24 pb-16 md:py-0">
-      {/* Background ambient lighting gradients */}
-      <div className="absolute top-1/4 left-10 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/3 right-10 w-[500px] h-[500px] bg-[#5E0E1A]/10 rounded-full blur-[140px] pointer-events-none" />
+    <section className="relative w-full min-h-screen bg-[#0D0D0D] text-white flex flex-col justify-between pt-24 pb-12 md:pb-20 overflow-hidden border-b border-[#D4AF37]/20">
       
-      {/* Decorative vertical editorial hairline border */}
-      <div className="hidden lg:block absolute top-0 bottom-0 left-12 w-[1px] bg-[#D4AF37]/15 z-10 pointer-events-none" />
+      {/* Background Radial Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-[#D4AF37]/5 via-[#5E0E1A]/10 to-transparent rounded-full blur-[160px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full z-20 my-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+      {/* Main Studio Frame Layout */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full flex-1 flex flex-col justify-center my-8 md:my-16 relative z-10">
+        
+        {/* Top Tagline */}
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center gap-3 mb-6 md:mb-10"
+        >
+          <div className="h-[1px] w-12 bg-[#D4AF37]" />
+          <span className="text-[11px] md:text-xs font-mono uppercase tracking-[0.3em] text-[#D4AF37] flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+            {siteContent.hero.badge} — {siteContent.product.priceFormatted}
+          </span>
+        </motion.div>
+
+        {/* Cinematic Headline & Editorial Diptych Gallery Frame */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* Left Column: Brand Identity & Positioning Copy */}
+          {/* Headline Title & Manifesto Pitch (Columns 1-7) */}
           <motion.div
-            style={{ y: yParallaxSlow, opacity: opacityFade }}
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 flex flex-col items-start text-left lg:pr-8"
+            initial={{ opacity: 0, y: 35 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-7 flex flex-col z-10"
           >
-            {/* Drop Tag / Minimal Badge */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-none bg-[#141414] border border-[#D4AF37]/30 mb-8">
-              <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] animate-pulse" />
-              <span className="text-[10px] uppercase font-mono tracking-[0.3em] text-[#CDBFA6]">
-                Drop 001 — The Essential Edition
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-light font-serif tracking-tight leading-[0.95] mb-8 text-[#FFFFFF] font-editorial">
+              <span className="block font-normal text-white hover:text-[#D4AF37] transition-colors duration-700">
+                {siteContent.hero.titleLine1}
               </span>
-            </div>
-
-            {/* Rove Rising Horizon Logo Lockup Presentation */}
-            <div className="relative w-56 md:w-64 h-24 mb-6">
-              <Image
-                src="/images/logo-lockup.jpg"
-                alt="ROVE Logo & Horizon Line Mark"
-                fill
-                className="object-contain object-left"
-                priority
-              />
-            </div>
-
-            {/* Strong Positioning Copy / Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-light tracking-[-0.02em] leading-[1.08] text-[#FFFFFF] mb-8 max-w-xl font-serif">
-              Less Noise. <br />
-              <span className="font-semibold text-gold-gradient italic">More Presence.</span>
+              <span className="block font-serif italic text-gold-gradient mt-2">
+                {siteContent.hero.titleLine2}
+              </span>
             </h1>
 
-            {/* Sub-copy / Positioning Description */}
-            <p className="text-sm md:text-base text-[#FFFFFF]/75 font-light max-w-lg leading-relaxed mb-10 tracking-wide">
-              An intentional pursuit of calm, clarity, and understated poise. We engineer foundational garments stripped of excess—where uncompromising craft speaks without elevating its voice.
+            <p className="text-sm sm:text-base md:text-lg text-[#CDBFA6]/90 max-w-xl font-light leading-relaxed mb-12 tracking-wide font-sans">
+              {siteContent.hero.subtitle}
             </p>
 
-            {/* Hero Interactive CTAs */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-              <a
-                href="#showcase"
-                className="px-8 py-4 bg-[#D4AF37] text-[#0D0D0D] font-medium text-xs tracking-[0.25em] uppercase hover:bg-[#D4AF37]/90 transition-all duration-300 shadow-xl shadow-[#D4AF37]/15 text-center flex items-center justify-center gap-2"
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 max-w-md">
+              <button
+                onClick={scrollToExplore}
+                className="px-8 py-4 bg-[#D4AF37] hover:bg-[#c49f27] text-[#0D0D0D] font-mono font-semibold text-xs tracking-[0.25em] uppercase transition-all duration-500 shadow-xl text-center"
               >
-                <span>Explore The Polo</span>
-              </a>
-              <a
-                href="#manifesto"
-                className="px-8 py-4 border border-[#FFFFFF]/20 text-[#FFFFFF] hover:border-[#D4AF37]/60 hover:text-[#D4AF37] font-medium text-xs tracking-[0.25em] uppercase transition-all duration-300 text-center"
+                {siteContent.hero.ctaPrimary}
+              </button>
+              <button
+                onClick={scrollToManifesto}
+                className="px-8 py-4 bg-[#141414] hover:bg-white/10 text-white border border-white/20 hover:border-[#D4AF37] font-mono text-xs tracking-[0.25em] uppercase transition-all duration-500 text-center"
               >
-                Our Manifesto
-              </a>
-            </div>
-
-            {/* Quality Specs Highlight */}
-            <div className="mt-14 pt-8 border-t border-white/10 flex items-center gap-8 w-full max-w-md">
-              <div>
-                <span className="block text-[10px] font-mono tracking-[0.2em] text-[#D4AF37] uppercase">Fabric</span>
-                <span className="text-xs text-white/90 tracking-wider font-light mt-0.5 block">200 GSM PK Cotton</span>
-              </div>
-              <div className="w-[1px] h-7 bg-white/10" />
-              <div>
-                <span className="block text-[10px] font-mono tracking-[0.2em] text-[#D4AF37] uppercase">Detailing</span>
-                <span className="text-xs text-white/90 tracking-wider font-light mt-0.5 block">Gold Sleeve Signature</span>
-              </div>
-              <div className="w-[1px] h-7 bg-white/10" />
-              <div>
-                <span className="block text-[10px] font-mono tracking-[0.2em] text-[#D4AF37] uppercase">Fit</span>
-                <span className="text-xs text-white/90 tracking-wider font-light mt-0.5 block">Tailored Regular</span>
-              </div>
+                {siteContent.hero.ctaSecondary}
+              </button>
             </div>
           </motion.div>
 
-          {/* Right Column: Art-Directed Framed Editorial Diptych */}
-          <div className="lg:col-span-5 relative flex justify-center lg:justify-end items-center">
-            {/* Main Portrait Frame (Jet Black on Lava Rocks) */}
-            <motion.div
-              style={{ y: yParallaxFast }}
-              initial={{ opacity: 0, scale: 0.94 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full max-w-sm sm:max-w-md lg:max-w-none aspect-[3/4] overflow-hidden border border-[#D4AF37]/30 shadow-2xl bg-[#141414] group"
-            >
-              <Image
-                src="/images/editorial-rocks.jpg"
-                alt="ROVE Drop 001 — Editorial Jet Black Polo on Dark Lava Rocks"
-                fill
-                className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D]/80 via-transparent to-transparent opacity-60 pointer-events-none" />
-              <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
-                <div>
-                  <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#D4AF37]">Edition 01</p>
-                  <p className="text-sm font-light text-white tracking-widest uppercase mt-1">Jet Black Obsidian</p>
+          {/* Framed Split-Studio Diptych Photography (Columns 8-12) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 relative flex justify-center mt-6 lg:mt-0"
+          >
+            <div className="grid grid-cols-2 gap-4 md:gap-6 w-full max-w-lg lg:max-w-none">
+              
+              {/* Left Plate (Editorial Rocks) */}
+              <div className="relative transform lg:-translate-y-6 group">
+                <div className="relative w-full aspect-[3/4] bg-[#141414] border border-white/10 overflow-hidden shadow-2xl">
+                  <Image
+                    src={siteContent.hero.images.leftFramed.src}
+                    alt={siteContent.hero.images.leftFramed.caption}
+                    fill
+                    priority
+                    className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                    sizes="(max-width: 768px) 50vw, 300px"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-transparent opacity-50" />
                 </div>
-                <span className="w-2 h-2 rounded-full bg-[#D4AF37]" />
+                <div className="mt-3 text-[10px] font-mono text-[#D4AF37] tracking-[0.2em] uppercase">
+                  {siteContent.hero.images.leftFramed.caption.split("—")[1]?.trim() || "Obsidian Edition"}
+                </div>
               </div>
-            </motion.div>
 
-            {/* Overlapping Secondary Framing (Wardrobe Cream/Ivory Polo) - Hidden on smallest mobile for breathability */}
-            <motion.div
-              initial={{ opacity: 0, x: 30, y: 30 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ duration: 1.4, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="hidden sm:block absolute -bottom-10 -left-10 lg:-left-20 w-48 lg:w-56 aspect-[3/4] overflow-hidden border border-white/20 shadow-2xl bg-[#141414] z-10"
-            >
-              <Image
-                src="/images/editorial-wardrobe.jpg"
-                alt="ROVE Quiet Confidence — Wardrobe Editorial"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 200px, 240px"
-              />
-              <div className="absolute inset-0 bg-black/30" />
-              <div className="absolute top-3 left-3 px-2 py-0.5 bg-[#0D0D0D]/80 border border-[#D4AF37]/30">
-                <span className="text-[8px] font-mono text-[#D4AF37] uppercase tracking-wider">Quiet Strength</span>
+              {/* Right Plate (Editorial Wardrobe) */}
+              <div className="relative transform lg:translate-y-6 group">
+                <div className="relative w-full aspect-[3/4] bg-[#141414] border border-[#D4AF37]/30 overflow-hidden shadow-2xl">
+                  <Image
+                    src={siteContent.hero.images.rightFramed.src}
+                    alt={siteContent.hero.images.rightFramed.caption}
+                    fill
+                    priority
+                    className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                    sizes="(max-width: 768px) 50vw, 300px"
+                  />
+                  <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
+                </div>
+                <div className="mt-3 text-[10px] font-mono text-white/60 tracking-[0.2em] uppercase text-right">
+                  {siteContent.hero.images.rightFramed.caption.split("—")[0]?.trim() || "Sanctuary Frame"}
+                </div>
               </div>
-            </motion.div>
-          </div>
 
+            </div>
+          </motion.div>
         </div>
+
       </div>
 
-      {/* Scroll-Down Cue */}
-      <motion.button
-        onClick={handleScrollDown}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.8 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 text-white/50 hover:text-[#D4AF37] transition-colors focus:outline-none group"
-        aria-label="Scroll to Manifesto"
-      >
-        <span className="text-[9px] uppercase tracking-[0.3em] font-mono group-hover:tracking-[0.35em] transition-all">
-          Scroll To Discover
-        </span>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="p-2 rounded-full border border-white/10 group-hover:border-[#D4AF37]/50 transition-colors"
+      {/* Bottom Specification Bar & Scroll Indicator */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10">
+        <div className="grid grid-cols-3 gap-6 md:gap-12 w-full sm:w-auto text-center sm:text-left">
+          {siteContent.hero.specItems.map((spec) => (
+            <div key={spec.label}>
+              <span className="block text-[9px] md:text-[10px] font-mono uppercase tracking-[0.25em] text-[#D4AF37]">
+                {spec.label}
+              </span>
+              <span className="block text-xs md:text-sm font-light text-white/90 mt-1 font-serif">
+                {spec.value}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={scrollToExplore}
+          className="group flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] hover:text-white transition-colors"
         >
-          <ArrowDown className="w-3.5 h-3.5" />
-        </motion.div>
-      </motion.button>
+          <span>{siteContent.hero.scrollText}</span>
+          <div className="w-8 h-8 rounded-full border border-[#D4AF37] group-hover:border-white flex items-center justify-center transition-colors">
+            <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
+          </div>
+        </button>
+      </div>
     </section>
   );
 }
