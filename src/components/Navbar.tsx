@@ -30,6 +30,8 @@ export default function Navbar() {
     }
   };
 
+  const primaryPrice = siteContent.drops[0]?.colors[0]?.priceFormatted || "PKR 2,299";
+
   return (
     <>
       <header
@@ -130,7 +132,7 @@ export default function Navbar() {
               onClick={() => scrollToSection("#showcase")}
               className="w-full py-4 bg-[#D4AF37] text-[#0D0D0D] font-mono text-xs uppercase tracking-[0.3em] font-bold text-center shadow-2xl"
             >
-              {siteContent.nav.ctaText} — {siteContent.product.priceFormatted}
+              {siteContent.nav.ctaText} — {primaryPrice}
             </button>
             <span className="text-[10px] font-mono text-center text-[#CDBFA6]/60 tracking-[0.3em] uppercase">
               {siteContent.brand.tagline}

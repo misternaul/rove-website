@@ -3,16 +3,26 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, ShoppingBag, ShieldCheck, Truck, PhoneCall, AlertCircle, MessageCircle } from "lucide-react";
-import { siteContent } from "@/config/siteContent";
 
 interface OrderModalProps {
   isOpen: boolean;
   onClose: () => void;
+  productName: string;
   selectedColor: string;
   selectedSize: string;
+  priceFormatted: string;
+  whatsappNumber: string;
 }
 
-export default function OrderModal({ isOpen, onClose, selectedColor, selectedSize }: OrderModalProps) {
+export default function OrderModal({
+  isOpen,
+  onClose,
+  productName,
+  selectedColor,
+  selectedSize,
+  priceFormatted,
+  whatsappNumber,
+}: OrderModalProps) {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -72,10 +82,10 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
           secondaryAddress: secondaryAddress.trim(),
           landmark: landmark.trim(),
           notes: notes.trim(),
-          productName: siteContent.product.name,
+          productName,
           selectedColor,
           selectedSize,
-          priceFormatted: siteContent.product.priceFormatted,
+          priceFormatted,
         }),
       });
 
@@ -95,10 +105,13 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
     }
   };
 
-  // Construct automated WhatsApp message for optional instant verification
+  // Construct automated WhatsApp message for instant verification
   const openWhatsAppVerification = () => {
-    const text = `Hi ROVE Studio! I just placed an order on the website.\n\n*Order ID:* ${confirmedOrderId}\n*Item:* ${siteContent.product.name}\n*Color:* ${selectedColor}\n*Size:* ${selectedSize}\n*Price:* ${siteContent.product.priceFormatted}\n*Name:* ${fullName}\n*Phone:* ${phone}\n*City:* ${city}\n*Address:* ${primaryAddress} ${secondaryAddress ? `(${secondaryAddress})` : ""} ${landmark ? `[Near ${landmark}]` : ""}\n\nPlease confirm my Cash on Delivery allocation!`;
-    const whatsappUrl = `https://wa.me/923000000000?text=${encodeURIComponent(text)}`; // Update with your studio WhatsApp phone number if desired!
+    const text = `Hi ROVE Studio! I just placed an order on the website.\n\n*Order ID:* ${confirmedOrderId}\n*Item:* ${productName}\n*Color:* ${selectedColor}\n*Size:* ${selectedSize}\n*Price:* ${priceFormatted} (COD)\n*Name:* ${fullName}\n*Phone:* ${phone}\n*City:* ${city}\n*Address:* ${primaryAddress} ${secondaryAddress ? `(${secondaryAddress})` : ""} ${landmark ? `[Near ${landmark}]` : ""}\n\nPlease confirm my Cash on Delivery allocation!`;
+    
+    // Format number cleanly (removing + or leading zero if present)
+    const cleanNumber = whatsappNumber.replace(/[^0-9]/g, "").replace(/^0/, "92");
+    const whatsappUrl = `https://wa.me/${cleanNumber || "923000000000"}?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, "_blank");
   };
 
@@ -130,7 +143,7 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
               <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#D4AF37] block">
-                  Drop 001 Allocation
+                  Studio Allocation
                 </span>
                 <h3 className="text-lg font-serif tracking-wide text-white">
                   Direct Order Placement
@@ -151,20 +164,20 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
             
             {status === "success" ? (
               // --------------------------------------------------------------
-              // SUCCESS / ORDER CONFIDENCE RECEIPT
+              // SUCCESS / ORDER CONFIDENCE RECEIPT & WHATSAPP LINK
               // --------------------------------------------------------------
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center py-8 space-y-6"
+                className="text-center py-6 space-y-6"
               >
-                <div className="w-16 h-16 bg-[#D4AF37]/15 border border-[#D4AF37] rounded-full flex items-center justify-center mx-auto text-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                <div className="w-16 h-16 bg-[#25D366]/15 border border-[#25D366] rounded-full flex items-center justify-center mx-auto text-[#25D366] shadow-[0_0_25px_rgba(37,211,102,0.25)]">
                   <Check className="w-8 h-8" />
                 </div>
 
                 <div>
                   <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37]">
-                    Order Successfully Dispatched
+                    Order Recorded Successfully
                   </span>
                   <h4 className="text-2xl md:text-3xl font-serif text-white mt-2">
                     Thank You, {fullName}
@@ -174,42 +187,51 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
                   </p>
                 </div>
 
-                <div className="p-6 bg-[#0D0D0D] border border-white/10 max-w-md mx-auto text-left font-mono text-xs space-y-3">
+                <div className="p-5 bg-[#0D0D0D] border border-white/10 max-w-md mx-auto text-left font-mono text-xs space-y-3 shadow-inner">
                   <div className="flex justify-between pb-2 border-b border-white/10">
                     <span className="text-white/60">Item:</span>
-                    <span className="text-white font-semibold">{siteContent.product.name}</span>
+                    <span className="text-white font-semibold">{productName}</span>
                   </div>
                   <div className="flex justify-between pb-2 border-b border-white/10">
-                    <span className="text-white/60">Allocation:</span>
-                    <span className="text-[#D4AF37]">{selectedColor} • {selectedSize}</span>
+                    <span className="text-white/60">Colorway:</span>
+                    <span className="text-[#D4AF37]">{selectedColor}</span>
                   </div>
                   <div className="flex justify-between pb-2 border-b border-white/10">
-                    <span className="text-white/60">Total Amount:</span>
-                    <span className="text-white font-bold">{siteContent.product.priceFormatted} (COD)</span>
+                    <span className="text-white/60">Size Grade:</span>
+                    <span className="text-white/90">{selectedSize}</span>
+                  </div>
+                  <div className="flex justify-between pb-2 border-b border-white/10">
+                    <span className="text-white/60">Total Valuation:</span>
+                    <span className="text-[#D4AF37] font-bold text-sm">{priceFormatted} (COD)</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/60">Shipping City:</span>
+                    <span className="text-white/60">Shipping To:</span>
                     <span className="text-white">{city}</span>
                   </div>
                 </div>
 
-                <p className="text-xs text-white/80 max-w-md mx-auto leading-relaxed font-light font-sans">
-                  Your order details have been securely logged and emailed directly to our fulfillment studio. Our logistics team will call or WhatsApp you at <strong className="text-white">{phone}</strong> to confirm dispatch.
-                </p>
+                <div className="p-4 bg-[#25D366]/10 border border-[#25D366]/40 max-w-md mx-auto text-left space-y-2">
+                  <strong className="text-xs font-mono text-[#25D366] uppercase tracking-wider block flex items-center gap-1.5">
+                    <MessageCircle className="w-4 h-4 fill-[#25D366] text-black" /> Step 2: Instant WhatsApp Confirmation
+                  </strong>
+                  <p className="text-xs text-white/80 leading-relaxed font-sans font-light">
+                    Click below to open WhatsApp with our fulfillment team ({whatsappNumber}). Your order details will be automatically attached for fastest dispatch!
+                  </p>
+                </div>
 
-                <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <button
                     onClick={openWhatsAppVerification}
-                    className="w-full sm:w-auto px-6 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-[#000000] font-mono font-bold text-xs tracking-[0.15em] uppercase flex items-center justify-center gap-2 shadow-lg transition-all"
+                    className="w-full sm:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-[#000000] font-mono font-bold text-xs tracking-[0.15em] uppercase flex items-center justify-center gap-2 shadow-2xl transform hover:scale-105 transition-all"
                   >
                     <MessageCircle className="w-4 h-4 fill-black" />
-                    <span>Verify On WhatsApp Now</span>
+                    <span>Send WhatsApp Confirmation</span>
                   </button>
                   <button
                     onClick={handleClose}
                     className="w-full sm:w-auto px-6 py-4 bg-[#0D0D0D] border border-white/20 hover:border-[#D4AF37] text-white font-mono text-xs tracking-[0.2em] uppercase transition-colors"
                   >
-                    Return to Showcase
+                    Close
                   </button>
                 </div>
               </motion.div>
@@ -224,19 +246,19 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
                   <div>
                     <span className="text-[10px] text-[#D4AF37] uppercase tracking-[0.2em] block mb-1">Selected Allocation</span>
                     <span className="text-base text-white font-serif tracking-wide block">
-                      {siteContent.product.name}
+                      {productName}
                     </span>
-                    <span className="text-white/70 block mt-0.5">
-                      {selectedColor} &nbsp;|&nbsp; Size: {selectedSize}
+                    <span className="text-white/80 block mt-1 font-semibold">
+                      {selectedColor} &nbsp;|&nbsp; {selectedSize.split("(")[0]}
                     </span>
                   </div>
                   <div className="sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-white/10">
                     <span className="text-[10px] text-white/50 uppercase block">Valuation</span>
-                    <span className="text-lg text-[#D4AF37] font-bold tracking-wider block">
-                      {siteContent.product.priceFormatted}
+                    <span className="text-xl text-[#D4AF37] font-bold tracking-wider block my-0.5">
+                      {priceFormatted}
                     </span>
                     <span className="text-[10px] text-[#25D366] font-sans font-medium block">
-                      ✔ Free Nationwide Express COD
+                      ✔ Complimentary Express COD
                     </span>
                   </div>
                 </div>
@@ -276,13 +298,13 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
                         className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
                       />
                       <span className="text-[10px] text-white/40 font-mono block mt-1">
-                        For courier rider coordination & verification
+                        For courier rider & WhatsApp verification
                       </span>
                     </div>
 
                     <div className="sm:col-span-2">
                       <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                        Email Address <span className="text-white/40 font-normal">(Optional for order receipt)</span>
+                        Email Address <span className="text-white/40 font-normal">(Optional for receipt)</span>
                       </label>
                       <input
                         type="email"
@@ -370,7 +392,7 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
                         rows={2}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        placeholder="e.g. Please deliver after 4 PM, or note about athletic shoulder fit."
+                        placeholder="e.g. Please deliver after 4 PM, or note about athletic fit."
                         disabled={status === "submitting"}
                         className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none resize-none"
                       />
@@ -398,7 +420,7 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
                     disabled={status === "submitting"}
                     className="w-full sm:w-auto px-10 py-4 bg-[#D4AF37] hover:bg-[#D4AF37]/90 disabled:opacity-50 text-[#0D0D0D] font-mono font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 flex items-center justify-center gap-3 whitespace-nowrap shadow-xl"
                   >
-                    <span>{status === "submitting" ? "Transmitting..." : `Confirm Order (${siteContent.product.priceFormatted})`}</span>
+                    <span>{status === "submitting" ? "Transmitting..." : `Confirm Order (${priceFormatted})`}</span>
                   </button>
                 </div>
               </form>
@@ -414,7 +436,7 @@ export default function OrderModal({ isOpen, onClose, selectedColor, selectedSiz
             </div>
             <div className="flex items-center gap-2">
               <PhoneCall className="w-3.5 h-3.5 text-[#D4AF37]" />
-              <span>Direct Studio Fulfillments</span>
+              <span>Direct Studio WhatsApp Verification</span>
             </div>
           </div>
         </motion.div>

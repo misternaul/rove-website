@@ -1,33 +1,54 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Sparkles, Shield, RefreshCw, ChevronDown, ChevronUp, ShoppingBag, ArrowRight } from "lucide-react";
-import { siteContent } from "@/config/siteContent";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, Shield, RefreshCw, ChevronDown, ChevronUp, ShoppingBag, ArrowRight, Layers } from "lucide-react";
+import { siteContent, DropItem, SiteConfig } from "@/config/siteContent";
 import OrderModal from "@/components/OrderModal";
 
 export default function ProductShowcase() {
+  const [config, setConfig] = useState<SiteConfig>(siteContent);
+  const [activeDropIndex, setActiveDropIndex] = useState(0);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
-  const [selectedSizeIndex, setSelectedSizeIndex] = useState(1); // Default to M / L
+  const [selectedSizeIndex, setSelectedSizeIndex] = useState(0); // Default to Medium (0) or Large (1)
   const [activeView, setActiveView] = useState<"front" | "back">("front");
   const [openAccordion, setOpenAccordion] = useState<string | null>("materials");
   
   // Order Modal State
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
-  const selectedColor = siteContent.product.colors[selectedColorIndex];
-  const selectedSize = siteContent.product.sizes[selectedSizeIndex];
+  useEffect(() => {
+    // Automatically retrieve any live updates or new drops saved via Vercel /admin studio
+    fetch("/api/cms")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.success && data.data) {
+          setConfig(data.data);
+        }
+      })
+      .catch((err) => console.warn("Using default codex for product showcase:", err));
+  }, []);
+
+  const currentDrop: DropItem = config.drops[activeDropIndex] || config.drops[0] || siteContent.drops[0];
+  const selectedColor = currentDrop.colors[selectedColorIndex] || currentDrop.colors[0];
+  const selectedSize = currentDrop.sizes[selectedSizeIndex] || currentDrop.sizes[0];
 
   const currentImage = activeView === "front" ? selectedColor.frontImage : selectedColor.backImage;
 
-  // Secondary waitlist scrolling action
+  // Reset color and size index if switching between different product drops
+  const handleSwitchDrop = (newIndex: number) => {
+    setActiveDropIndex(newIndex);
+    setSelectedColorIndex(0);
+    setSelectedSizeIndex(0);
+  };
+
   const handleReserveAllocation = () => {
     const waitlistElement = document.getElementById("waitlist");
     if (waitlistElement) {
       waitlistElement.scrollIntoView({ behavior: "smooth" });
       const event = new CustomEvent("rove-select-product", {
-        detail: { color: selectedColor.name, size: selectedSize.id },
+        detail: { color: selectedColor.name, size: selectedSize.id, price: selectedColor.priceFormatted, drop: currentDrop.name },
       });
       window.dispatchEvent(event);
     }
@@ -42,18 +63,43 @@ export default function ProductShowcase() {
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 md:mb-24">
+        <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#D4AF37] block mb-3">
-            {siteContent.product.badge}
+            {currentDrop.badge}
           </span>
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-light font-serif tracking-tight text-white mb-4">
-            {siteContent.product.name}
+            {currentDrop.name}
           </h2>
           <div className="w-16 h-[1px] bg-[#D4AF37] mx-auto my-6" />
           <p className="text-sm md:text-base text-[#CDBFA6]/90 font-light max-w-xl mx-auto leading-relaxed font-sans">
-            {siteContent.product.shortDescription}
+            {currentDrop.shortDescription}
           </p>
         </div>
+
+        {/* RELEASES / MULTI-DROP TAB SWITCHER (Displayed cleanly when catalog grows!) */}
+        {config.drops.length > 1 && (
+          <div className="mb-16 flex flex-col items-center">
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/50 mb-3 flex items-center gap-2">
+              <Layers className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Select Studio Release</span>
+            </span>
+            <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-[#141414] border border-white/15 max-w-2xl">
+              {config.drops.map((drop, i) => (
+                <button
+                  key={drop.id}
+                  onClick={() => handleSwitchDrop(i)}
+                  className={`px-6 py-3 text-xs font-mono uppercase tracking-[0.2em] transition-all ${
+                    activeDropIndex === i
+                      ? "bg-[#D4AF37] text-[#0D0D0D] font-bold shadow-md"
+                      : "text-white/70 hover:text-white bg-transparent"
+                  }`}
+                >
+                  {drop.name.split(" ").slice(0, 3).join(" ")}...
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Main Product Dual View Grid (Sticky Showcase Architecture) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
@@ -89,22 +135,25 @@ export default function ProductShowcase() {
             <div className="relative w-full max-w-xl aspect-[3/4] bg-[#141414] border border-white/10 overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
               
               {/* Animated image transition on color / view change */}
-              <motion.div
-                key={`${selectedColor.id}-${activeView}`}
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute inset-0 w-full h-full"
-              >
-                <Image
-                  src={currentImage}
-                  alt={`${siteContent.product.name} — ${selectedColor.name} (${activeView})`}
-                  fill
-                  priority
-                  className="object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
-                  sizes="(max-width: 1024px) 100vw, 600px"
-                />
-              </motion.div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${selectedColor.id}-${activeView}`}
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute inset-0 w-full h-full"
+                >
+                  <Image
+                    src={currentImage}
+                    alt={`${currentDrop.name} — ${selectedColor.name} (${activeView})`}
+                    fill
+                    priority
+                    className="object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 1024px) 100vw, 600px"
+                  />
+                </motion.div>
+              </AnimatePresence>
 
               {/* Decorative Frame Overlay */}
               <div className="absolute inset-0 border-[12px] border-[#0D0D0D]/40 pointer-events-none" />
@@ -112,8 +161,8 @@ export default function ProductShowcase() {
                 <span className="px-3 py-1.5 bg-[#0D0D0D]/90 backdrop-blur-md border border-[#D4AF37]/30 text-[10px] font-mono text-[#D4AF37] uppercase tracking-[0.2em]">
                   {selectedColor.name}
                 </span>
-                <span className="px-3 py-1.5 bg-[#0D0D0D]/90 backdrop-blur-md border border-[#D4AF37]/30 text-[10px] font-mono text-white/80 uppercase tracking-[0.2em]">
-                  {activeView.toUpperCase()} PLATE
+                <span className="px-3 py-1.5 bg-[#0D0D0D]/90 backdrop-blur-md border border-[#D4AF37]/30 text-[10px] font-mono text-white/90 uppercase tracking-[0.2em] font-semibold">
+                  {selectedColor.priceFormatted}
                 </span>
               </div>
             </div>
@@ -155,19 +204,24 @@ export default function ProductShowcase() {
             <div className="p-8 md:p-10 bg-[#141414] border border-white/10 shadow-2xl relative">
               <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#D4AF37]" />
               
-              {/* Pricing Display in PKR */}
+              {/* Dynamic Pricing Display in PKR based on selected color */}
               <div className="flex flex-col mb-8 pb-8 border-b border-white/10">
                 <div className="flex items-baseline justify-between mb-2">
                   <span className="text-xs font-mono uppercase tracking-[0.2em] text-white/50">
-                    Valuation
+                    Valuation ({selectedColor.name.split(" ")[0]})
                   </span>
-                  <span className="text-2xl sm:text-3xl font-mono font-medium text-[#D4AF37] tracking-tight">
-                    {siteContent.product.priceFormatted}
-                  </span>
+                  <motion.span
+                    key={selectedColor.priceFormatted}
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-2xl sm:text-3xl font-mono font-bold text-[#D4AF37] tracking-tight"
+                  >
+                    {selectedColor.priceFormatted}
+                  </motion.span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-sans text-white/70">
                   <span className="inline-block w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
-                  <span>{siteContent.product.shippingNote}</span>
+                  <span>{currentDrop.shippingNote}</span>
                 </div>
               </div>
 
@@ -175,67 +229,73 @@ export default function ProductShowcase() {
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] font-semibold">
-                    1. Colorway
+                    1. Colorway & Price
                   </span>
                   <span className="text-xs font-mono text-white/80">
                     Selected: <strong className="text-white font-medium">{selectedColor.name}</strong>
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  {siteContent.product.colors.map((c, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {currentDrop.colors.map((c, i) => (
                     <button
                       key={c.id}
                       onClick={() => setSelectedColorIndex(i)}
-                      className={`p-3 border flex items-center gap-3 transition-all ${
+                      className={`p-3.5 border flex flex-col gap-2 transition-all ${
                         selectedColorIndex === i
-                          ? "border-[#D4AF37] bg-[#D4AF37]/10"
+                          ? "border-[#D4AF37] bg-[#D4AF37]/15 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
                           : "border-white/15 hover:border-white/40 bg-[#0D0D0D]"
                       }`}
                     >
-                      <span
-                        className="w-5 h-5 rounded-full border border-white/30 flex-shrink-0"
-                        style={{ backgroundColor: c.hex }}
-                      />
-                      <span className="text-xs font-mono uppercase tracking-wider text-left text-white leading-tight">
-                        {c.name.split(" ")[0]} {c.name.split(" ")[1]}
-                      </span>
+                      <div className="flex items-center gap-2.5 w-full">
+                        <span
+                          className="w-4 h-4 rounded-full border border-white/40 flex-shrink-0"
+                          style={{ backgroundColor: c.hex }}
+                        />
+                        <span className="text-xs font-mono uppercase tracking-wider text-left text-white leading-tight font-semibold truncate">
+                          {c.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between w-full pt-1 border-t border-white/10">
+                        <span className="text-[10px] font-mono text-white/50 uppercase">Price:</span>
+                        <span className="text-xs font-mono font-bold text-[#D4AF37]">{c.priceFormatted}</span>
+                      </div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* 2. Size Selection State */}
+              {/* 2. Size Selection State (Medium & Large standard) */}
               <div className="mb-10">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] font-semibold">
-                    2. Sizing Grade
+                    2. Sizing Grade (Medium & Large)
                   </span>
                   <span className="text-[11px] font-mono text-white/60 hover:text-white underline cursor-pointer">
-                    View Size Codex
+                    Tailored Fit
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  {siteContent.product.sizes.map((s, idx) => (
+                <div className="grid grid-cols-2 gap-4">
+                  {currentDrop.sizes.map((s, idx) => (
                     <button
                       key={s.id}
                       onClick={() => setSelectedSizeIndex(idx)}
-                      className={`py-3 px-2 border text-xs font-mono uppercase tracking-wider transition-all ${
+                      className={`py-4 px-3 border text-xs font-mono uppercase tracking-wider transition-all flex flex-col items-center gap-1 ${
                         selectedSizeIndex === idx
-                          ? "border-[#D4AF37] bg-[#D4AF37]/15 text-[#D4AF37] font-bold"
+                          ? "border-[#D4AF37] bg-[#D4AF37]/15 text-[#D4AF37] font-bold shadow-md"
                           : "border-white/15 text-white/70 hover:border-white/50 hover:text-white bg-[#0D0D0D]"
                       }`}
                     >
-                      {s.id}
+                      <span className="text-sm font-semibold">{s.name} ({s.id})</span>
                     </button>
                   ))}
                 </div>
 
-                {/* Size Specs Feedback */}
-                <div className="mt-3 p-3 bg-[#0D0D0D] border border-white/10 text-[11px] font-mono text-white/60 text-center">
-                  <span>{selectedSize.name}: </span>
-                  <span className="text-[#CDBFA6]">{selectedSize.details}</span>
+                {/* Size Exact Measurements Feedback */}
+                <div className="mt-3 p-3.5 bg-[#0D0D0D] border border-white/10 text-xs font-mono text-white/80 text-center shadow-inner">
+                  <span className="text-[#D4AF37] font-semibold">{selectedSize.name} Specs: </span>
+                  <span className="text-[#FFFFFF]">{selectedSize.details}</span>
                 </div>
               </div>
 
@@ -246,7 +306,7 @@ export default function ProductShowcase() {
                   className="w-full py-5 bg-[#D4AF37] hover:bg-[#c49f27] text-[#0D0D0D] font-mono font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 flex items-center justify-center gap-3 shadow-xl transform hover:-translate-y-0.5"
                 >
                   <ShoppingBag className="w-4 h-4 text-[#0D0D0D]" />
-                  <span>{siteContent.product.orderButtonText} ({siteContent.product.priceFormatted})</span>
+                  <span>{currentDrop.orderButtonText} ({selectedColor.priceFormatted})</span>
                   <ArrowRight className="w-4 h-4 text-[#0D0D0D]" />
                 </button>
 
@@ -255,7 +315,7 @@ export default function ProductShowcase() {
                   className="w-full py-3.5 bg-[#0D0D0D] border border-white/20 hover:border-[#D4AF37] text-white/80 hover:text-white font-mono text-[11px] tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>{siteContent.product.secondaryActionText}</span>
+                  <span>{currentDrop.secondaryActionText}</span>
                 </button>
               </div>
 
@@ -263,7 +323,7 @@ export default function ProductShowcase() {
               <div className="mt-8 pt-6 border-t border-white/10 space-y-3">
                 <div className="flex items-center gap-3 text-xs text-white/70 font-light">
                   <Shield className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
-                  <span>{siteContent.product.guaranteeText}</span>
+                  <span>{currentDrop.guaranteeText}</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-white/70 font-light">
                   <RefreshCw className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
@@ -279,7 +339,7 @@ export default function ProductShowcase() {
                 Garment Specifications & Codex
               </span>
               
-              {siteContent.product.accordions.map((acc) => {
+              {currentDrop.accordions.map((acc) => {
                 const isOpen = openAccordion === acc.id;
                 return (
                   <div
@@ -324,8 +384,11 @@ export default function ProductShowcase() {
       <OrderModal
         isOpen={isOrderModalOpen}
         onClose={() => setIsOrderModalOpen(false)}
+        productName={currentDrop.name}
         selectedColor={selectedColor.name}
-        selectedSize={selectedSize.id}
+        selectedSize={`${selectedSize.name} (${selectedSize.details})`}
+        priceFormatted={selectedColor.priceFormatted}
+        whatsappNumber={config.brand.whatsappNumber || siteContent.brand.whatsappNumber}
       />
     </section>
   );

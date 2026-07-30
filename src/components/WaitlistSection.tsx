@@ -7,16 +7,23 @@ import { siteContent } from "@/config/siteContent";
 
 export default function WaitlistSection() {
   const [email, setEmail] = useState("");
-  const [reservedProduct, setReservedProduct] = useState<{ color: string; size: string } | null>({
-    color: siteContent.product.colors[0]?.name || "Jet Black Obsidian",
-    size: siteContent.product.sizes[1]?.id || "M / L",
+  const primaryDrop = siteContent.drops[0];
+  const defaultColor = primaryDrop?.colors[0]?.name || "Jet Black Obsidian";
+  const defaultSize = primaryDrop?.sizes[0]?.id || "M";
+  const defaultPrice = primaryDrop?.colors[0]?.priceFormatted || "PKR 2,299";
+
+  const [reservedProduct, setReservedProduct] = useState<{ color: string; size: string; price?: string; drop?: string } | null>({
+    color: defaultColor,
+    size: defaultSize,
+    price: defaultPrice,
+    drop: primaryDrop?.name || "Drop 001",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const handleProductSelect = (e: Event) => {
-      const customEvent = e as CustomEvent<{ color: string; size: string }>;
+      const customEvent = e as CustomEvent<{ color: string; size: string; price?: string; drop?: string }>;
       if (customEvent.detail) {
         setReservedProduct(customEvent.detail);
       }
@@ -37,14 +44,15 @@ export default function WaitlistSection() {
     setErrorMessage("");
 
     try {
-      // POST to our serverless API route
       const response = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
+          drop: reservedProduct?.drop || "Unspecified Release",
           color: reservedProduct?.color || "Unspecified",
           size: reservedProduct?.size || "Unspecified",
+          price: reservedProduct?.price || defaultPrice,
         }),
       });
 
@@ -99,11 +107,14 @@ export default function WaitlistSection() {
 
           {/* Reserved product indicator badge if forwarded from Product Showcase CTA */}
           {reservedProduct && (
-            <div className="mb-8 p-3 bg-[#0D0D0D]/90 border border-white/15 max-w-sm mx-auto flex items-center justify-between text-xs font-mono text-left">
+            <div className="mb-8 p-4 bg-[#0D0D0D]/90 border border-white/15 max-w-sm mx-auto flex items-center justify-between text-xs font-mono text-left">
               <div>
-                <span className="text-[9px] uppercase tracking-[0.2em] text-[#D4AF37] block">Selected Allocation</span>
+                <span className="text-[9px] uppercase tracking-[0.2em] text-[#D4AF37] block">{reservedProduct.drop || "Studio Release"}</span>
                 <span className="text-white font-medium block mt-0.5">
-                  {reservedProduct.color} • Size {reservedProduct.size} ({siteContent.product.priceFormatted})
+                  {reservedProduct.color} • Size {reservedProduct.size}
+                </span>
+                <span className="text-[#D4AF37] text-[11px] font-bold block mt-0.5">
+                  Valuation: {reservedProduct.price || defaultPrice}
                 </span>
               </div>
               <button

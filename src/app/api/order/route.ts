@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { siteContent } from "@/config/siteContent";
+import { getLiveSiteContent } from "@/lib/cms";
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +19,6 @@ export async function POST(request: Request) {
       email,
     } = body;
 
-    // Validate required fields for fulfillment
     if (!fullName || !phone || !city || !primaryAddress) {
       return NextResponse.json(
         { error: "Full Name, Phone Number, City, and Primary Address are required to complete your order." },
@@ -30,15 +29,18 @@ export async function POST(request: Request) {
     const orderId = `ROVE-${Math.floor(100000 + Math.random() * 900000)}`;
     const timestamp = new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" });
 
+    const liveConfig = await getLiveSiteContent();
+    const adminEmail = process.env.ADMIN_EMAIL || liveConfig.brand.founderEmail || "orders@rovepresence.com";
+
     // Construct the formatted notification text for the founder
     const orderSummaryText = `
-🛍️ NEW ORDER RECEIVED: ${orderId} (Drop 001 Allocation)
+🛍️ NEW ORDER RECEIVED: ${orderId} (${productName})
 ===================================================================
 Time: ${timestamp}
-Item: ${productName || siteContent.product.name}
-Color: ${selectedColor}
-Size: ${selectedSize}
-Price / Valuation: ${priceFormatted || siteContent.product.priceFormatted} (COD / Direct Fulfillment)
+Item: ${productName}
+Colorway: ${selectedColor}
+Size Grade & Specs: ${selectedSize}
+Total Valuation: ${priceFormatted} (COD / Direct Fulfillment)
 
 📋 CUSTOMER SHIPPING INFORMATION
 -------------------------------------------------------------------
@@ -54,28 +56,20 @@ Nearest Landmark: ${landmark || "N/A"}
 ${notes || "None"}
 
 ===================================================================
-Please contact the customer via WhatsApp or Phone (${phone}) to verify fulfillment.
+👉 Customer can also verify instantly via WhatsApp directly to: ${liveConfig.brand.whatsappNumber}
     `;
 
     console.log("=========================================");
-    console.log("🔥 NEW ROVE ORDER LOGGED ON SERVER 🔥");
+    console.log("🔥 NEW ROVE ORDER RECEIVED ON SERVER 🔥");
     console.log(orderSummaryText);
     console.log("=========================================");
 
     // ------------------------------------------------------------------------
-    // RESEND EMAIL GATEWAY INTEGRATION
-    // ------------------------------------------------------------------------
-    // To enable instant email delivery directly to your personal inbox:
-    // 1. Sign up for free at https://resend.com
-    // 2. Get your free API key
-    // 3. In your Vercel Project Dashboard -> Settings -> Environment Variables:
-    //    Add variable Name: RESEND_API_KEY | Value: re_your_api_key_here
-    //    Add variable Name: ADMIN_EMAIL    | Value: your_email@example.com
+    // RESEND EMAIL DELIVERY INTEGRATION & DIAGNOSTIC LOGGING
     // ------------------------------------------------------------------------
     const resendApiKey = process.env.RESEND_API_KEY;
-    const adminEmail = process.env.ADMIN_EMAIL || siteContent.brand.founderEmail || "orders@rovepresence.com";
 
-    if (resendApiKey && adminEmail) {
+    if (resendApiKey) {
       try {
         const resendResponse = await fetch("https://api.resend.com/emails", {
           method: "POST",
@@ -84,29 +78,32 @@ Please contact the customer via WhatsApp or Phone (${phone}) to verify fulfillme
             Authorization: `Bearer ${resendApiKey}`,
           },
           body: JSON.stringify({
-            from: "ROVE Studio Orders <onboarding@resend.dev>", // Or your custom verified domain on Resend
+            from: "ROVE Studio Orders <onboarding@resend.dev>",
             to: [adminEmail],
-            subject: `🚨 New Order ${orderId} - ${selectedColor} (${selectedSize}) - ${priceFormatted}`,
+            subject: `🚨 Order ${orderId} - ${selectedColor} (${selectedSize}) - ${priceFormatted}`,
             text: orderSummaryText,
           }),
         });
 
+        const resendData = await resendResponse.json();
+
         if (!resendResponse.ok) {
-          const resendError = await resendResponse.json();
-          console.warn("Resend API warning (order saved locally):", resendError);
+          console.warn(
+            "🚨 Resend API rejected email delivery. Note: On Resend Free trial, you can ONLY send emails TO THE EXACT EMAIL used when registering your Resend account. Ensure ADMIN_EMAIL matches your signup email in Vercel!",
+            resendData
+          );
         } else {
-          console.log(`Order notification successfully dispatched to ${adminEmail}`);
+          console.log(`✅ Order notification successfully dispatched via Resend to ${adminEmail}`);
         }
       } catch (emailErr) {
-        console.error("Failed to transmit email via Resend:", emailErr);
+        console.error("❌ Failed to transmit email via Resend:", emailErr);
       }
     } else {
       console.log(
-        `Notice: RESEND_API_KEY or ADMIN_EMAIL environment variables not found. Order ${orderId} stored safely in logs.`
+        `ℹ️ Notice: RESEND_API_KEY environment variable not found on Vercel. Order ${orderId} logged safely above. Customer WhatsApp confirmation workflow remains active.`
       );
     }
 
-    // Return success to the client interface
     return NextResponse.json({
       success: true,
       orderId,
@@ -115,7 +112,7 @@ Please contact the customer via WhatsApp or Phone (${phone}) to verify fulfillme
         orderId,
         fullName,
         phone,
-        priceFormatted: priceFormatted || siteContent.product.priceFormatted,
+        priceFormatted,
         selectedColor,
         selectedSize,
       },

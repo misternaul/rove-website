@@ -1,0 +1,46 @@
+import { NextResponse } from "next/server";
+import { getLiveSiteContent, saveLiveSiteContent } from "@/lib/cms";
+import { siteContent } from "@/config/siteContent";
+
+export async function GET() {
+  try {
+    const data = await getLiveSiteContent();
+    return NextResponse.json({ success: true, data });
+  } catch (error) {
+    console.error("GET /api/cms Error:", error);
+    return NextResponse.json({ success: false, data: siteContent, error: "Using default file codex" }, { status: 200 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { action, updatedData, adminSecret } = body;
+
+    // Optional lightweight password check for admin security (defaults to 'rove2026' if not set in environment)
+    const expectedPin = process.env.STUDIO_ADMIN_PIN || "rove2026";
+    if (!adminSecret || adminSecret !== expectedPin) {
+      return NextResponse.json({ error: "Invalid Studio Admin PIN / Authorization" }, { status: 401 });
+    }
+
+    if (action === "reset") {
+      const result = await saveLiveSiteContent(siteContent);
+      return NextResponse.json(result);
+    }
+
+    if (!updatedData) {
+      return NextResponse.json({ error: "Missing payload to update" }, { status: 400 });
+    }
+
+    const result = await saveLiveSiteContent(updatedData);
+    if (!result.success) {
+      return NextResponse.json({ error: result.message }, { status: 503 });
+    }
+
+    return NextResponse.json(result);
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.error("POST /api/cms Error:", error);
+    return NextResponse.json({ error: error.message || "Server error while updating CMS data" }, { status: 500 });
+  }
+}

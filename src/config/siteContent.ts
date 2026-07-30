@@ -1,23 +1,126 @@
 // ============================================================================
-// ROVE STUDIO CODEX — MAIN CONTENT & CONFIGURATION FILE
+// ROVE STUDIO CODEX — MAIN CONTENT & MULTI-DROP CONFIGURATION FILE
 // ============================================================================
-// Edit this file to instantly change any text, prices, images, or settings
-// across your live website! When you save and push to GitHub, Vercel will
-// automatically re-build and publish your updates within seconds.
+// Edit this file to instantly change any text, prices, measurements, or images
+// across your live website! You can also manage everything visually via your
+// /admin Dashboard once linked with Upstash Redis on Vercel!
 // ============================================================================
 
-export const siteContent = {
+export interface ColorOption {
+  id: string;
+  name: string;
+  hex: string;
+  priceFormatted: string;
+  priceNumeric: number;
+  frontImage: string;
+  backImage: string;
+  caption: string;
+}
+
+export interface SizeOption {
+  id: string;
+  name: string;
+  details: string;
+}
+
+export interface AccordionItem {
+  id: string;
+  title: string;
+  content: string;
+}
+
+export interface DropItem {
+  id: string;
+  badge: string;
+  name: string;
+  shortDescription: string;
+  shippingNote: string;
+  colors: ColorOption[];
+  sizes: SizeOption[];
+  accordions: AccordionItem[];
+  orderButtonText: string;
+  secondaryActionText: string;
+  guaranteeText: string;
+}
+
+export interface SiteConfig {
+  brand: {
+    name: string;
+    tagline: string;
+    description: string;
+    logoText: string;
+    logoIconImage: string;
+    founderEmail: string;
+    whatsappNumber: string; // Enter your full WhatsApp number with country code without + (e.g., "923001234567")
+    defaultCurrency: string;
+  };
+  nav: {
+    links: { name: string; href: string }[];
+    ctaText: string;
+  };
+  hero: {
+    badge: string;
+    titleLine1: string;
+    titleLine2: string;
+    subtitle: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
+    scrollText: string;
+    specItems: { label: string; value: string }[];
+    images: {
+      leftFramed: { src: string; caption: string };
+      rightFramed: { src: string; caption: string };
+    };
+  };
+  manifesto: {
+    title: string;
+    paragraph1: string;
+    paragraph2: string;
+    quote: string;
+    pillars: { title: string; subtitle: string }[];
+  };
+  // DYNAMIC MULTI-DROP CATALOG: Add as many future drops here as you want!
+  drops: DropItem[];
+  craft: {
+    badge: string;
+    title: string;
+    description: string;
+    quote: string;
+    items: { title: string; subtitle: string; description: string; image: string }[];
+  };
+  gallery: {
+    badge: string;
+    title: string;
+    images: { src: string; title: string; caption: string; aspect: string; tag: string }[];
+  };
+  waitlist: {
+    badge: string;
+    title: string;
+    description: string;
+    buttonText: string;
+    privacyNote: string;
+  };
+  footer: {
+    slogan: string;
+    aboutText: string;
+    copyrightText: string;
+    instagramUrl: string;
+    inquiries: { label: string; email: string }[];
+  };
+}
+
+export const siteContent: SiteConfig = {
   // --------------------------------------------------------------------------
-  // 1. GENERAL BRAND & SEO SETTINGS
+  // 1. GENERAL BRAND, EMAIL & WHATSAPP SETTINGS
   // --------------------------------------------------------------------------
   brand: {
     name: "ROVE",
     tagline: "Less Noise. More Presence.",
-    description:
-      "An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.",
+    description: "An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.",
     logoText: "ROVE",
     logoIconImage: "/images/logo-icon.jpg",
-    founderEmail: "orders@rovepresence.com", // Your admin email to receive orders! (Configured in /api/order)
+    founderEmail: "orders@rovepresence.com", // Your recipient email address for orders!
+    whatsappNumber: "923000000000", // 👉 REPLACE THIS with your real WhatsApp number (e.g. 923001234567)
     defaultCurrency: "PKR",
   },
 
@@ -27,7 +130,7 @@ export const siteContent = {
   nav: {
     links: [
       { name: "Manifesto", href: "#manifesto" },
-      { name: "The Polo", href: "#showcase" },
+      { name: "Releases & Drops", href: "#showcase" },
       { name: "Craftsmanship", href: "#craft" },
       { name: "Lookbook", href: "#gallery" },
       { name: "Allocation & Orders", href: "#waitlist" },
@@ -42,15 +145,14 @@ export const siteContent = {
     badge: "Drop 001 — Essential Edition",
     titleLine1: "LESS NOISE.",
     titleLine2: "MORE PRESENCE.",
-    subtitle:
-      "A discipline of perspective. Everyday foundational essentials engineered with uncompromised comfort, durability, and quiet architectural presence.",
-    ctaPrimary: "Explore The Polo",
+    subtitle: "A discipline of perspective. Everyday foundational essentials engineered with uncompromised comfort, durability, and quiet architectural presence.",
+    ctaPrimary: "Explore Releases",
     ctaSecondary: "Read The Manifesto",
     scrollText: "Scroll For Specification",
     specItems: [
-      { label: "Edition", value: "Drop 001: The Rove Polo" },
-      { label: "Composition", value: "200 GSM Premium PK Cotton" },
-      { label: "Palette", value: "Obsidian Black / Sand Dune" },
+      { label: "Current Release", value: "Drop 001: The Rove Polo" },
+      { label: "Valuation Range", value: "PKR 2,299 — PKR 2,499" },
+      { label: "Sizing Grading", value: "Medium & Large Custom Fit" },
     ],
     images: {
       leftFramed: {
@@ -71,10 +173,8 @@ export const siteContent = {
     title: "The Rove Manifesto",
     paragraph1:
       "ROVE is built on a singular belief: true luxury has no need to shout. We craft foundational everyday garments with uncompromised intent—where comfort meets durability, and subtlety commands attention.",
-    paragraph2:
-      "Stripped of excess, every stitch is calibrated to ground your movement and elevate your poise with quiet strength.",
-    quote:
-      "“It is not merely apparel; it is a discipline of perspective. Less noise. More presence.”",
+    paragraph2: "Stripped of excess, every stitch is calibrated to ground your movement and elevate your poise with quiet strength.",
+    quote: "“It is not merely apparel; it is a discipline of perspective. Less noise. More presence.”",
     pillars: [
       { title: "Calm", subtitle: "Clarity in mind" },
       { title: "Perspective", subtitle: "Stay grounded" },
@@ -84,71 +184,82 @@ export const siteContent = {
   },
 
   // --------------------------------------------------------------------------
-  // 5. PRODUCT SHOWCASE (THE POLO) & PKR PRICING
+  // 5. MULTI-DROP CATALOG (ADD CURRENT & FUTURE DROPS HERE OR VIA /admin)
   // --------------------------------------------------------------------------
-  product: {
-    badge: "Release 001 — Direct Allocation",
-    name: "The Rove Horizon Polo",
-    // YOU CAN EDIT THE PKR PRICE RIGHT HERE:
-    priceFormatted: "PKR 14,500",
-    priceNumeric: 14500,
-    shippingNote: "Complimentary Express Courier Nationwide in Pakistan",
-    shortDescription:
-      "Engineered from luxury heavyweight 200 GSM PK cotton. Features bespoke laser-engraved matte black buttons, reinforced neck structure to prevent collar sag, and our signature asymmetrical right-sleeve three-line gold embroidery.",
-    
-    // Editable Colors and associated Image Paths
-    colors: [
-      {
-        id: "black",
-        name: "Jet Black Obsidian",
-        hex: "#0D0D0D",
-        frontImage: "/images/polo-black-front.jpg",
-        backImage: "/images/polo-black-back.jpg",
-        caption: "Deep obsidian canvas with high-density gold horizon embroidery.",
-      },
-      {
-        id: "sand",
-        name: "Sand Beige Dune",
-        hex: "#CDBFA6",
-        frontImage: "/images/polo-sand-front.jpg",
-        backImage: "/images/polo-sand-back.jpg",
-        caption: "Tactile embossed texture inspired by wind-swept desert dunes.",
-      },
-    ],
+  drops: [
+    {
+      id: "drop-001",
+      badge: "Release 001 — Direct Allocation",
+      name: "The Rove Horizon Polo",
+      shippingNote: "Complimentary Express Courier Nationwide in Pakistan",
+      shortDescription:
+        "Engineered from luxury heavyweight 200 GSM PK cotton. Features bespoke laser-engraved matte black buttons, reinforced neck structure to prevent collar sag, and our signature asymmetrical right-sleeve three-line gold embroidery.",
+      
+      // Different customizable prices per colorway!
+      colors: [
+        {
+          id: "black",
+          name: "Jet Black Obsidian",
+          hex: "#0D0D0D",
+          priceFormatted: "PKR 2,299",
+          priceNumeric: 2299,
+          frontImage: "/images/polo-black-front.jpg",
+          backImage: "/images/polo-black-back.jpg",
+          caption: "Deep obsidian canvas with high-density gold horizon embroidery.",
+        },
+        {
+          id: "sand",
+          name: "Sand Beige Dune",
+          hex: "#CDBFA6",
+          priceFormatted: "PKR 2,499",
+          priceNumeric: 2499,
+          frontImage: "/images/polo-sand-front.jpg",
+          backImage: "/images/polo-sand-back.jpg",
+          caption: "Tactile embossed texture inspired by wind-swept desert dunes.",
+        },
+      ],
 
-    // Editable Sizing (Add or adjust sizes here!)
-    sizes: [
-      { id: "S / M", name: "Small / Medium", details: "Chest: 40\" | Length: 28\" | Shoulder: 17.5\"" },
-      { id: "M / L", name: "Medium / Large", details: "Chest: 42.5\" | Length: 29.5\" | Shoulder: 18.5\"" },
-      { id: "L / XL", name: "Large / X-Large", details: "Chest: 45\" | Length: 31\" | Shoulder: 19.5\"" },
-    ],
+      // Exact two sizing specifications requested!
+      sizes: [
+        {
+          id: "M",
+          name: "Medium",
+          details: "Chest: 20\" | Length: 27.5\" | Shoulder: 17.5\"",
+        },
+        {
+          id: "L",
+          name: "Large",
+          details: "Chest: 21\" | Length: 28.5\" | Shoulder: 18\"",
+        },
+      ],
 
-    orderButtonText: "Place Direct Order",
-    secondaryActionText: "Reserve Allocation Spot",
-    guaranteeText: "Verified Cash on Delivery (COD) & Direct Fulfillment across Pakistan. Easy size exchange policy.",
-    
-    // Accordion Technical Specifications
-    accordions: [
-      {
-        id: "materials",
-        title: "Fabric composition & structural feel",
-        content:
-          "Authored in premium 200 GSM PK structural cotton. Breathable enough for peak daytime heat while maintaining architectural poise. Pre-shrunk via enzyme bio-wash to ensure permanent sizing durability after repeated washing.",
-      },
-      {
-        id: "hallmarks",
-        title: "Signature hallmarks & embroidery",
-        content:
-          "Features our hallmark Horizon Rising 'R' logo embroidered in high-density metallic gold on the left chest. The right sleeve carries three distinct parallel gold bars—an asymmetrical signature of quiet distinction.",
-      },
-      {
-        id: "care",
-        title: "Garment care & protection codex",
-        content:
-          "Machine wash cold inside out with mild detergents on a gentle cycle. Hang dry in shade to protect natural structural elasticity and gold thread luster. Do not iron directly over embossed embroidery or engraved buttons.",
-      },
-    ],
-  },
+      orderButtonText: "Place Direct Order",
+      secondaryActionText: "Reserve Allocation Spot",
+      guaranteeText: "Verified Cash on Delivery (COD) & Direct Studio Fulfillment across Pakistan.",
+
+      accordions: [
+        {
+          id: "materials",
+          title: "Fabric composition & structural feel",
+          content:
+            "Authored in premium 200 GSM PK structural cotton. Breathable enough for peak daytime heat while maintaining architectural poise. Pre-shrunk via enzyme bio-wash to ensure permanent sizing durability after repeated washing.",
+        },
+        {
+          id: "hallmarks",
+          title: "Signature hallmarks & embroidery",
+          content:
+            "Features our hallmark Horizon Rising 'R' logo embroidered in high-density metallic gold on the left chest. The right sleeve carries three distinct parallel gold bars—an asymmetrical signature of quiet distinction.",
+        },
+        {
+          id: "care",
+          title: "Garment care & protection codex",
+          content:
+            "Machine wash cold inside out with mild detergents on a gentle cycle. Hang dry in shade to protect natural structural elasticity and gold thread luster. Do not iron directly over embossed embroidery or engraved buttons.",
+        },
+      ],
+    },
+    // Example of how future drops can sit right here!
+  ],
 
   // --------------------------------------------------------------------------
   // 6. CRAFT & ARCHITECTURAL DETAILS SECTION
@@ -158,42 +269,36 @@ export const siteContent = {
     title: "An Anatomy of Quiet Poise",
     description:
       "Every millimeter of the Rove Polo is deliberately calculated. From bespoke matte hardware to signature right-sleeve gold embroidery, explore the tactile hallmarks that separate ephemeral trends from everyday heirlooms.",
-    quote:
-      "“We reject decorative chatter. Every gold thread and piped contour exists solely to enhance durability, structure, and the quiet assurance of the individual wearing it.”",
+    quote: "“We reject decorative chatter. Every gold thread and piped contour exists solely to enhance durability, structure, and the quiet assurance of the individual wearing it.”",
     items: [
       {
         title: "Three-Line Sleeve Signature",
         subtitle: "Right Arm Distinction",
-        description:
-          "Three bold gold lines meticulously embroidered exclusively on the right sleeve. An asymmetrical hallmark of intent and elevated presence.",
+        description: "Three bold gold lines meticulously embroidered exclusively on the right sleeve. An asymmetrical hallmark of intent and elevated presence.",
         image: "/images/detail-black-sleeve.jpg",
       },
       {
         title: "Slowing Dune Texture",
         subtitle: "Tactile Embossment",
-        description:
-          "A sophisticated, subtle embossed pattern inspired by wind-swept sand dunes. Visible when catching natural light, deeply felt in everyday wearing quality.",
+        description: "A sophisticated, subtle embossed pattern inspired by wind-swept sand dunes. Visible when catching natural light, deeply felt in everyday wearing quality.",
         image: "/images/detail-sand-texture.jpg",
       },
       {
         title: "Matte Black Engraved Button",
         subtitle: "Custom Bespoke Hardware",
-        description:
-          "Custom matte black tactile buttons laser-engraved with the ROVE insignia. Set above reinforced woven neck tape designed to prevent collar droop over years of wear.",
+        description: "Custom matte black tactile buttons laser-engraved with the ROVE insignia. Set above reinforced woven neck tape designed to prevent collar droop over years of wear.",
         image: "/images/detail-black-button.jpg",
       },
       {
         title: "Gold Shoulder Piping",
         subtitle: "Architectural Lines",
-        description:
-          "Precision gold piping running gracefully from the collar edge along the shoulder seam—imbuing a regular fit with sharp, athletic architecture.",
+        description: "Precision gold piping running gracefully from the collar edge along the shoulder seam—imbuing a regular fit with sharp, athletic architecture.",
         image: "/images/detail-sand-piping.jpg",
       },
       {
         title: "Horizon Mark Embroidery",
         subtitle: "Left Chest Insignia",
-        description:
-          "High-density gold embroidery on the left chest. The rising R emerging above the horizon line symbolizes perspective, confidence, and quiet momentum.",
+        description: "High-density gold embroidery on the left chest. The rising R emerging above the horizon line symbolizes perspective, confidence, and quiet momentum.",
         image: "/images/detail-black-logo.jpg",
       },
     ],
@@ -248,7 +353,7 @@ export const siteContent = {
   // 8. ALLOCATION WAITLIST & NEWSLETTER SECTION
   // --------------------------------------------------------------------------
   waitlist: {
-    badge: "Drop 001 — Private Allocation",
+    badge: "Drop 001 & Future Releases",
     title: "Join The Private Allocation List",
     description:
       "Our productions are intentional and limited. Register your email to gain priority notification and secure access before future seasonal releases open to the public.",
@@ -261,8 +366,7 @@ export const siteContent = {
   // --------------------------------------------------------------------------
   footer: {
     slogan: "Less Noise. More Presence.",
-    aboutText:
-      "An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.",
+    aboutText: "An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.",
     copyrightText: `© ${new Date().getFullYear()} ROVE Presence. Crafted with intention for everyday essentials. All rights reserved.`,
     instagramUrl: "https://instagram.com",
     inquiries: [

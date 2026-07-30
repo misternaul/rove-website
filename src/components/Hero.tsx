@@ -21,6 +21,9 @@ export default function Hero() {
     }
   };
 
+  const currentDrop = siteContent.drops[0] || { name: "Drop 001", colors: [{ priceFormatted: "PKR 2,299" }] };
+  const basePrice = currentDrop.colors[0]?.priceFormatted || "PKR 2,299";
+
   return (
     <section className="relative w-full min-h-screen bg-[#0D0D0D] text-white flex flex-col justify-between pt-24 pb-12 md:pb-20 overflow-hidden border-b border-[#D4AF37]/20">
       
@@ -40,7 +43,7 @@ export default function Hero() {
           <div className="h-[1px] w-12 bg-[#D4AF37]" />
           <span className="text-[11px] md:text-xs font-mono uppercase tracking-[0.3em] text-[#D4AF37] flex items-center gap-2">
             <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-            {siteContent.hero.badge} — {siteContent.product.priceFormatted}
+            {siteContent.hero.badge} — Starting at {basePrice}
           </span>
         </motion.div>
 
