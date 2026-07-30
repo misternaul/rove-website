@@ -368,11 +368,11 @@ export const siteContent: SiteConfig = {
     slogan: "Less Noise. More Presence.",
     aboutText: "An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.",
     copyrightText: `© ${new Date().getFullYear()} ROVE Presence. Crafted with intention for everyday essentials. All rights reserved.`,
-    instagramUrl: "https://instagram.com",
+    instagramUrl: "https://www.instagram.com/rovepresence/",
     inquiries: [
-      { label: "Press & Editorial", email: "press@rovepresence.com" },
-      { label: "Client Services", email: "support@rovepresence.com" },
-      { label: "Bespoke Fitting", email: "concierge@rovepresence.com" },
+      { label: "Press & Editorial", email: "rovepresence@gmail.com" },
+      { label: "Client Services", email: "rovepresence@gmail.com" },
+      { label: "Bespoke Fitting", email: "rovepresence@gmail.com" },
     ],
   },
 };
