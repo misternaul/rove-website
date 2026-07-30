@@ -9,7 +9,7 @@ export default function WaitlistSection() {
   const [email, setEmail] = useState("");
   const primaryDrop = siteContent.drops[0];
   const defaultColor = primaryDrop?.colors[0]?.name || "Jet Black Obsidian";
-  const defaultSize = primaryDrop?.sizes[0]?.id || "M";
+  const defaultSize = primaryDrop?.colors[0]?.sizes?.[0]?.id || "M";
   const defaultPrice = primaryDrop?.colors[0]?.priceFormatted || "PKR 2,299";
 
   const [reservedProduct, setReservedProduct] = useState<{ color: string; size: string; price?: string; drop?: string } | null>({

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock,
   Save,
@@ -14,8 +14,12 @@ import {
   HelpCircle,
   Smartphone,
   ExternalLink,
+  Copy,
+  Layers,
+  Ruler,
+  Image as ImageIcon,
 } from "lucide-react";
-import { SiteConfig, siteContent } from "@/config/siteContent";
+import { SiteConfig, siteContent, ColorOption, SizeOption } from "@/config/siteContent";
 
 export default function StudioAdminPage() {
   const [pin, setPin] = useState("");
@@ -27,9 +31,9 @@ export default function StudioAdminPage() {
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
   const [selectedDropIndex, setSelectedDropIndex] = useState(0);
+  const [copiedJson, setCopiedJson] = useState(false);
 
   useEffect(() => {
-    // Attempt to load live CMS data from /api/cms on launch
     fetch("/api/cms")
       .then((res) => res.json())
       .then((data) => {
@@ -42,9 +46,9 @@ export default function StudioAdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Default PIN is rove2026 (or matching STUDIO_ADMIN_PIN on Vercel server)
-    if (!pin.trim()) {
-      setPinError("Please enter your Studio PIN");
+    // Updated Studio PIN requested by founder: rovepresence0842
+    if (pin.trim() !== "rovepresence0842" && pin.trim() !== "rove2026") {
+      setPinError("Invalid Studio PIN. Please enter rovepresence0842");
       return;
     }
     setIsAuthenticated(true);
@@ -58,44 +62,51 @@ export default function StudioAdminPage() {
       const res = await fetch("/api/cms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "update", updatedData: config, adminSecret: pin || "rove2026" }),
+        body: JSON.stringify({ action: "update", updatedData: config, adminSecret: "rovepresence0842" }),
       });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Failed to commit updates to Vercel storage.");
       }
       setStatus("success");
-      setStatusMessage(data.message || "Successfully deployed updates to your live storefront!");
-      setTimeout(() => setStatus("idle"), 5000);
+      setStatusMessage(data.message || "✅ Successfully deployed updates to your live storefront!");
+      setTimeout(() => setStatus("idle"), 6000);
     } catch (err: unknown) {
       const error = err as Error;
       setStatus("error");
-      setStatusMessage(error.message || "Unable to save directly to cloud. Make sure Vercel Upstash Redis is connected!");
+      setStatusMessage(error.message || "Upstash Redis database not linked in Vercel yet. Check instructions in Tab 3 below!");
     }
   };
 
+  const handleCopyConfig = () => {
+    navigator.clipboard.writeText(JSON.stringify(config, null, 2));
+    setCopiedJson(true);
+    setTimeout(() => setCopiedJson(false), 3000);
+  };
+
+  // --- DROP OPERATIONS ---
   const addNewDrop = () => {
     const newDrop = {
       id: `drop-00${config.drops.length + 1}`,
-      badge: `Release 00${config.drops.length + 1} — Future Edition`,
+      badge: `Release 00${config.drops.length + 1} — Seasonal Edition`,
       name: `New Product Release 00${config.drops.length + 1}`,
-      shortDescription: "Enter product specification, fabric weight (e.g. 250 GSM), and architectural hallmarks here.",
+      shortDescription: "Enter architectural notes, fabric GSM, and quality hallmarks for this product release.",
       shippingNote: "Complimentary Express Courier Nationwide in Pakistan",
       colors: [
         {
-          id: "primary-color",
-          name: "Signature Dark Colorway",
+          id: `item-1-${Date.now()}`,
+          name: "Primary Color / Item 1",
           hex: "#0D0D0D",
-          priceFormatted: "PKR 3,499",
-          priceNumeric: 3499,
+          priceFormatted: "PKR 2,499",
+          priceNumeric: 2499,
           frontImage: "/images/polo-black-front.jpg",
           backImage: "/images/polo-black-back.jpg",
           caption: "Primary colorway description.",
+          sizes: [
+            { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },
+            { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"' },
+          ],
         },
-      ],
-      sizes: [
-        { id: "M", name: "Medium", details: "Chest: 20\" | Length: 27.5\" | Shoulder: 17.5\"" },
-        { id: "L", name: "Large", details: "Chest: 21\" | Length: 28.5\" | Shoulder: 18\"" },
       ],
       orderButtonText: "Place Direct Order",
       secondaryActionText: "Reserve Allocation Spot",
@@ -103,21 +114,75 @@ export default function StudioAdminPage() {
       accordions: config.drops[0]?.accordions || [],
     };
 
-    setConfig({
-      ...config,
-      drops: [...config.drops, newDrop],
-    });
+    setConfig({ ...config, drops: [...config.drops, newDrop] });
     setSelectedDropIndex(config.drops.length);
   };
 
   const removeDrop = (index: number) => {
     if (config.drops.length <= 1) {
-      alert("You must keep at least one active product release in your catalog.");
+      alert("You must keep at least one active release in your catalog.");
       return;
     }
     const updated = config.drops.filter((_, i) => i !== index);
     setConfig({ ...config, drops: updated });
     setSelectedDropIndex(Math.max(0, index - 1));
+  };
+
+  // --- PRODUCT / ITEM (COLORWAY) OPERATIONS ---
+  const addNewItemToCurrentDrop = () => {
+    const copy = [...config.drops];
+    const current = copy[selectedDropIndex];
+    const newItem: ColorOption = {
+      id: `item-${Date.now()}`,
+      name: `New Item Option ${current.colors.length + 1}`,
+      hex: "#787878",
+      priceFormatted: "PKR 2,499",
+      priceNumeric: 2499,
+      frontImage: "/images/polo-sand-front.jpg", // Image 1
+      backImage: "/images/polo-sand-back.jpg",   // Image 2
+      caption: "Describe this variation's tone and texture.",
+      sizes: [
+        { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },
+        { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"' },
+      ],
+    };
+    current.colors.push(newItem);
+    setConfig({ ...config, drops: copy });
+  };
+
+  const removeItemFromCurrentDrop = (itemIndex: number) => {
+    const copy = [...config.drops];
+    if (copy[selectedDropIndex].colors.length <= 1) {
+      alert("A product drop must contain at least 1 item or colorway.");
+      return;
+    }
+    copy[selectedDropIndex].colors.splice(itemIndex, 1);
+    setConfig({ ...config, drops: copy });
+  };
+
+  // --- SIZE OPERATIONS PER INDIVIDUAL ITEM ---
+  const addSizeToItem = (itemIndex: number) => {
+    const copy = [...config.drops];
+    const targetItem = copy[selectedDropIndex].colors[itemIndex];
+    const newSize: SizeOption = {
+      id: `XL`,
+      name: `Extra Large`,
+      details: 'Chest: 22" | Length: 29.5" | Shoulder: 18.5"',
+    };
+    targetItem.sizes = targetItem.sizes || [];
+    targetItem.sizes.push(newSize);
+    setConfig({ ...config, drops: copy });
+  };
+
+  const removeSizeFromItem = (itemIndex: number, sizeIndex: number) => {
+    const copy = [...config.drops];
+    const targetItem = copy[selectedDropIndex].colors[itemIndex];
+    if (targetItem.sizes && targetItem.sizes.length <= 1) {
+      alert("Each product item should have at least 1 selectable size option.");
+      return;
+    }
+    targetItem.sizes.splice(sizeIndex, 1);
+    setConfig({ ...config, drops: copy });
   };
 
   // Login Screen
@@ -127,8 +192,8 @@ export default function StudioAdminPage() {
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-md bg-[#141414] border border-[#D4AF37]/30 p-8 shadow-2xl">
           <div className="text-center mb-6">
             <Lock className="w-8 h-8 text-[#D4AF37] mx-auto mb-3 animate-pulse" />
-            <span className="text-[10px] tracking-[0.3em] text-[#D4AF37] uppercase block">Studio Control Vault</span>
-            <h1 className="text-2xl font-serif text-white mt-1">ROVE Live Admin Engine</h1>
+            <span className="text-[10px] tracking-[0.3em] text-[#D4AF37] uppercase block">Studio Vault Security</span>
+            <h1 className="text-2xl font-serif text-white mt-1">ROVE Store Controller</h1>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
@@ -138,17 +203,17 @@ export default function StudioAdminPage() {
                 type="password"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                placeholder="Enter PIN (default: rove2026)"
-                className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-[#D4AF37] text-center tracking-widest"
+                placeholder="Enter PIN (rovepresence0842)"
+                className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3.5 text-sm text-white font-mono focus:outline-none focus:border-[#D4AF37] text-center tracking-[0.2em]"
               />
-              {pinError && <span className="text-red-400 text-[11px] block mt-2">{pinError}</span>}
+              {pinError && <span className="text-red-400 text-xs block mt-2">{pinError}</span>}
             </div>
             <button type="submit" className="w-full py-4 bg-[#D4AF37] text-[#0D0D0D] font-bold text-xs tracking-[0.25em] uppercase hover:bg-[#c49f27] transition-all">
               Unlock Studio Management
             </button>
           </form>
           <div className="mt-6 text-[11px] text-white/40 text-center leading-relaxed">
-            Configure future product drops, adjust live PKR pricing per colorway, and control order verification settings without writing code.
+            Manage future releases, customize any number of products, assign 2 photos & specific sizes per item, and adjust PKR pricing in real-time.
           </div>
         </motion.div>
       </div>
@@ -158,27 +223,35 @@ export default function StudioAdminPage() {
   const currentDrop = config.drops[selectedDropIndex] || config.drops[0];
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white font-mono pb-20">
+    <div className="min-h-screen bg-[#0D0D0D] text-white font-mono pb-24">
       
       {/* Top Bar */}
       <header className="bg-[#141414] border-b border-[#D4AF37]/20 py-5 px-6 md:px-12 sticky top-0 z-50 flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center gap-3">
           <Package className="w-6 h-6 text-[#D4AF37]" />
           <div>
-            <span className="text-[10px] tracking-[0.3em] uppercase text-[#D4AF37] block">No-Code Live Studio</span>
-            <h1 className="text-lg font-serif tracking-wide text-white">ROVE Presence — Store Controller</h1>
+            <span className="text-[10px] tracking-[0.3em] uppercase text-[#D4AF37] block">No-Code Live Studio (PIN Validated)</span>
+            <h1 className="text-lg font-serif tracking-wide text-white">ROVE Presence — Admin Storefront Controller</h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <a href="/" target="_blank" className="px-4 py-2 border border-white/20 hover:border-[#D4AF37] text-xs text-white/80 hover:text-white flex items-center gap-2 transition-colors">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleCopyConfig}
+            className="px-4 py-2.5 bg-[#0D0D0D] border border-white/20 hover:border-[#D4AF37] text-xs text-white/80 hover:text-white flex items-center gap-2 transition-colors"
+            title="Copy entire store configuration as JSON to clipboard"
+          >
+            <Copy className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>{copiedJson ? "Copied JSON!" : "Backup JSON"}</span>
+          </button>
+          <a href="/" target="_blank" className="px-4 py-2.5 border border-white/20 hover:border-[#D4AF37] text-xs text-white/80 hover:text-white flex items-center gap-2 transition-colors">
             <span>View Live Store</span>
             <ExternalLink className="w-3.5 h-3.5 text-[#D4AF37]" />
           </a>
           <button
             onClick={handleSaveToCloud}
             disabled={status === "saving"}
-            className="px-6 py-3 bg-[#D4AF37] hover:bg-[#c49f27] disabled:opacity-50 text-[#0D0D0D] font-bold text-xs tracking-[0.2em] uppercase flex items-center gap-2 shadow-lg transition-transform transform hover:-translate-y-0.5"
+            className="px-7 py-3 bg-[#D4AF37] hover:bg-[#c49f27] disabled:opacity-50 text-[#0D0D0D] font-bold text-xs tracking-[0.2em] uppercase flex items-center gap-2 shadow-xl transition-transform transform hover:-translate-y-0.5"
           >
             <Save className="w-4 h-4" />
             <span>{status === "saving" ? "Publishing..." : "Publish Live Updates"}</span>
@@ -188,9 +261,16 @@ export default function StudioAdminPage() {
 
       {/* Status Banner */}
       {statusMessage && (
-        <div className={`p-4 px-6 md:px-12 flex items-center gap-3 text-xs font-mono transition-all ${status === "success" ? "bg-green-950/90 text-green-300 border-b border-green-500/30" : "bg-red-950/90 text-red-300 border-b border-red-500/30"}`}>
-          {status === "success" ? <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />}
-          <span>{statusMessage}</span>
+        <div className={`p-4 px-6 md:px-12 flex items-center justify-between gap-3 text-xs font-mono transition-all ${status === "success" ? "bg-green-950/90 text-green-300 border-b border-green-500/30" : "bg-red-950/90 text-red-300 border-b border-red-500/40"}`}>
+          <div className="flex items-center gap-3">
+            {status === "success" ? <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />}
+            <span className="leading-relaxed font-sans">{statusMessage}</span>
+          </div>
+          {status === "error" && (
+            <button onClick={() => setActiveTab("storage")} className="px-3 py-1 bg-red-800 hover:bg-red-700 text-white font-mono text-[11px] uppercase tracking-wider whitespace-nowrap">
+              See Fix Instructions &rarr;
+            </button>
+          )}
         </div>
       )}
 
@@ -203,19 +283,19 @@ export default function StudioAdminPage() {
             onClick={() => setActiveTab("drops")}
             className={`px-6 py-3 text-xs uppercase tracking-[0.2em] flex items-center gap-2 border-b-2 font-mono whitespace-nowrap transition-all ${activeTab === "drops" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10 font-bold" : "border-transparent text-white/60 hover:text-white"}`}
           >
-            <Package className="w-4 h-4" /> 1. Releases & Product Drops ({config.drops.length})
+            <Layers className="w-4 h-4" /> 1. Releases & Products ({config.drops.length})
           </button>
           <button
             onClick={() => setActiveTab("brand")}
             className={`px-6 py-3 text-xs uppercase tracking-[0.2em] flex items-center gap-2 border-b-2 font-mono whitespace-nowrap transition-all ${activeTab === "brand" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10 font-bold" : "border-transparent text-white/60 hover:text-white"}`}
           >
-            <Settings className="w-4 h-4" /> 2. WhatsApp & Email Setup
+            <Settings className="w-4 h-4" /> 2. WhatsApp & Email Routing
           </button>
           <button
             onClick={() => setActiveTab("storage")}
             className={`px-6 py-3 text-xs uppercase tracking-[0.2em] flex items-center gap-2 border-b-2 font-mono whitespace-nowrap transition-all ${activeTab === "storage" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10 font-bold" : "border-transparent text-white/60 hover:text-white"}`}
           >
-            <HelpCircle className="w-4 h-4" /> 3. How to Add Images & Fix Emails
+            <HelpCircle className="w-4 h-4" /> 3. ☁️ Fix Cloud Saving & Image Uploads
           </button>
         </div>
 
@@ -223,26 +303,26 @@ export default function StudioAdminPage() {
         {activeTab === "drops" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {/* Left Column: List of Drops */}
-            <div className="lg:col-span-4 bg-[#141414] border border-white/10 p-6 space-y-4">
+            {/* Left Column: List of Releases */}
+            <div className="lg:col-span-4 bg-[#141414] border border-white/10 p-6 space-y-4 sticky top-28">
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37]">Active Catalog Drops</span>
-                <button onClick={addNewDrop} className="px-3 py-1.5 bg-[#D4AF37] text-[#0D0D0D] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                  <Plus className="w-3.5 h-3.5" /> Add Drop
+                <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37]">Active Releases</span>
+                <button onClick={addNewDrop} className="px-3 py-1.5 bg-[#D4AF37] text-[#0D0D0D] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 hover:bg-white transition-colors">
+                  <Plus className="w-3.5 h-3.5" /> + New Drop
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {config.drops.map((drop, idx) => (
                   <div
                     key={drop.id}
                     onClick={() => setSelectedDropIndex(idx)}
-                    className={`p-4 border cursor-pointer flex items-center justify-between transition-all ${selectedDropIndex === idx ? "border-[#D4AF37] bg-[#D4AF37]/10" : "border-white/10 hover:border-white/30 bg-[#0D0D0D]"}`}
+                    className={`p-4 border cursor-pointer flex items-center justify-between transition-all ${selectedDropIndex === idx ? "border-[#D4AF37] bg-[#D4AF37]/15 shadow-[0_0_15px_rgba(212,175,55,0.1)]" : "border-white/10 hover:border-white/30 bg-[#0D0D0D]"}`}
                   >
                     <div>
-                      <span className="text-[10px] text-[#D4AF37] block uppercase">{drop.badge.split("—")[0]}</span>
-                      <strong className="text-sm text-white font-serif tracking-wide block">{drop.name}</strong>
-                      <span className="text-[10px] text-white/50">{drop.colors.length} Colorways • {drop.sizes.length} Sizes</span>
+                      <span className="text-[10px] text-[#D4AF37] block uppercase font-mono">{drop.badge.split("—")[0]}</span>
+                      <strong className="text-base text-white font-serif tracking-wide block my-0.5">{drop.name}</strong>
+                      <span className="text-[11px] text-white/60 font-sans">{drop.colors.length} {drop.colors.length === 1 ? "Product Item" : "Product Items"}</span>
                     </div>
                     {config.drops.length > 1 && (
                       <button onClick={(e) => { e.stopPropagation(); removeDrop(idx); }} title="Delete Drop" className="p-2 text-white/40 hover:text-red-400 transition-colors">
@@ -258,14 +338,14 @@ export default function StudioAdminPage() {
             {currentDrop && (
               <div className="lg:col-span-8 bg-[#141414] border border-white/10 p-6 md:p-8 space-y-8">
                 <div>
-                  <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] block mb-1">Editing Drop Profile</span>
-                  <h3 className="text-2xl font-serif text-white">{currentDrop.name}</h3>
+                  <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] block mb-1 font-mono">Editing Selected Release</span>
+                  <h3 className="text-2xl md:text-3xl font-serif text-white">{currentDrop.name}</h3>
                 </div>
 
                 {/* Drop General Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Drop Name / Title</label>
+                    <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Release Title / Name</label>
                     <input
                       type="text"
                       value={currentDrop.name}
@@ -274,11 +354,11 @@ export default function StudioAdminPage() {
                         copy[selectedDropIndex].name = e.target.value;
                         setConfig({ ...config, drops: copy });
                       }}
-                      className="w-full bg-[#0D0D0D] border border-white/20 p-3 text-sm text-white font-mono focus:border-[#D4AF37]"
+                      className="w-full bg-[#0D0D0D] border border-white/20 p-3 text-sm text-white font-mono focus:border-[#D4AF37] rounded-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Release Badge / Tag</label>
+                    <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Badge / Collection Tag</label>
                     <input
                       type="text"
                       value={currentDrop.badge}
@@ -287,103 +367,220 @@ export default function StudioAdminPage() {
                         copy[selectedDropIndex].badge = e.target.value;
                         setConfig({ ...config, drops: copy });
                       }}
-                      className="w-full bg-[#0D0D0D] border border-white/20 p-3 text-sm text-white font-mono focus:border-[#D4AF37]"
+                      className="w-full bg-[#0D0D0D] border border-white/20 p-3 text-sm text-white font-mono focus:border-[#D4AF37] rounded-none"
                     />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Product Description</label>
                     <textarea
-                      rows={2}
+                      rows={3}
                       value={currentDrop.shortDescription}
                       onChange={(e) => {
                         const copy = [...config.drops];
                         copy[selectedDropIndex].shortDescription = e.target.value;
                         setConfig({ ...config, drops: copy });
                       }}
-                      className="w-full bg-[#0D0D0D] border border-white/20 p-3 text-sm text-white font-mono focus:border-[#D4AF37] resize-none"
+                      className="w-full bg-[#0D0D0D] border border-white/20 p-3 text-sm text-white font-sans focus:border-[#D4AF37] resize-none rounded-none leading-relaxed"
                     />
                   </div>
                 </div>
 
-                {/* Colorways & Per-Color PKR Pricing */}
-                <div className="border-t border-white/10 pt-6">
-                  <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] block mb-4">Colorways & Per-Color PKR Valuation</span>
-                  <div className="space-y-6">
-                    {currentDrop.colors.map((color, colorIdx) => (
-                      <div key={color.id} className="p-4 bg-[#0D0D0D] border border-white/15 space-y-4">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="w-4 h-4 rounded-full border border-white/30" style={{ backgroundColor: color.hex }} />
-                            <strong className="text-sm text-white">{color.name}</strong>
+                {/* ITEMS / VARIATIONS UNDER THIS DROP (ANY NUMBER OF ITEMS!) */}
+                <div className="border-t border-white/10 pt-8">
+                  <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                    <div>
+                      <span className="text-sm font-mono uppercase tracking-[0.2em] text-[#D4AF37] font-bold block">
+                        Product Items & Colorways ({currentDrop.colors.length})
+                      </span>
+                      <p className="text-xs text-white/60 font-sans mt-0.5">
+                        Add as many or as few items as you need. Each item controls its own PKR price, two images, and custom sizes!
+                      </p>
+                    </div>
+                    <button
+                      onClick={addNewItemToCurrentDrop}
+                      className="px-4 py-2.5 bg-[#D4AF37] text-[#0D0D0D] font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:bg-white transition-colors"
+                    >
+                      <Plus className="w-4 h-4" /> + Add Another Item
+                    </button>
+                  </div>
+
+                  <div className="space-y-8">
+                    {currentDrop.colors.map((item, itemIdx) => (
+                      <div key={item.id} className="p-6 bg-[#0D0D0D] border border-white/20 space-y-6 relative shadow-2xl">
+                        
+                        {/* Item Header */}
+                        <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
+                          <div className="flex items-center gap-3">
+                            <span className="w-5 h-5 rounded-full border border-white/40 shadow-sm" style={{ backgroundColor: item.hex }} />
+                            <strong className="text-base text-white font-serif">{item.name || `Item ${itemIdx + 1}`}</strong>
+                            <span className="px-2.5 py-0.5 bg-[#141414] text-[#D4AF37] text-xs font-mono font-bold">{item.priceFormatted}</span>
                           </div>
-                          <span className="text-xs font-mono text-[#D4AF37] font-bold">{color.priceFormatted}</span>
+                          <button
+                            onClick={() => removeItemFromCurrentDrop(itemIdx)}
+                            className="px-3 py-1.5 border border-red-500/30 hover:border-red-500 text-red-400 hover:text-white hover:bg-red-500/20 text-xs flex items-center gap-1.5 transition-all"
+                            title="Delete this item"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" /> Remove Item
+                          </button>
                         </div>
+
+                        {/* Item Basic Details (Name & Price) */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div>
-                            <label className="block text-[10px] text-white/60 mb-1">Colorway Name</label>
+                            <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1.5">Item / Colorway Name</label>
                             <input
                               type="text"
-                              value={color.name}
+                              value={item.name}
                               onChange={(e) => {
                                 const copy = [...config.drops];
-                                copy[selectedDropIndex].colors[colorIdx].name = e.target.value;
+                                copy[selectedDropIndex].colors[itemIdx].name = e.target.value;
                                 setConfig({ ...config, drops: copy });
                               }}
-                              className="w-full bg-[#141414] border border-white/20 p-2 text-xs text-white"
+                              placeholder="e.g. Jet Black Obsidian"
+                              className="w-full bg-[#141414] border border-white/20 p-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                             />
                           </div>
                           <div>
-                            <label className="block text-[10px] text-white/60 mb-1">Price (Formatted Text)</label>
+                            <label className="block text-[11px] uppercase tracking-wider text-[#D4AF37] font-bold mb-1.5">Price (PKR)</label>
                             <input
                               type="text"
-                              value={color.priceFormatted}
+                              value={item.priceFormatted}
                               onChange={(e) => {
                                 const copy = [...config.drops];
-                                copy[selectedDropIndex].colors[colorIdx].priceFormatted = e.target.value;
+                                copy[selectedDropIndex].colors[itemIdx].priceFormatted = e.target.value;
                                 setConfig({ ...config, drops: copy });
                               }}
-                              placeholder="e.g. PKR 2,299"
-                              className="w-full bg-[#141414] border border-white/20 p-2 text-xs text-[#D4AF37] font-bold"
+                              placeholder="e.g. PKR 2,299 or PKR 2,499"
+                              className="w-full bg-[#141414] border border-white/20 p-3 text-sm text-[#D4AF37] font-mono font-bold focus:border-[#D4AF37]"
                             />
                           </div>
                           <div>
-                            <label className="block text-[10px] text-white/60 mb-1">Front Image File Path or Web URL</label>
-                            <input
-                              type="text"
-                              value={color.frontImage}
-                              onChange={(e) => {
-                                const copy = [...config.drops];
-                                copy[selectedDropIndex].colors[colorIdx].frontImage = e.target.value;
-                                setConfig({ ...config, drops: copy });
-                              }}
-                              placeholder="/images/your-image.jpg"
-                              className="w-full bg-[#141414] border border-white/20 p-2 text-xs text-white/80"
-                            />
+                            <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1.5">Color Tint (Hex Code)</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={item.hex}
+                                onChange={(e) => {
+                                  const copy = [...config.drops];
+                                  copy[selectedDropIndex].colors[itemIdx].hex = e.target.value;
+                                  setConfig({ ...config, drops: copy });
+                                }}
+                                className="w-12 h-11 bg-transparent border-0 cursor-pointer"
+                              />
+                              <input
+                                type="text"
+                                value={item.hex}
+                                onChange={(e) => {
+                                  const copy = [...config.drops];
+                                  copy[selectedDropIndex].colors[itemIdx].hex = e.target.value;
+                                  setConfig({ ...config, drops: copy });
+                                }}
+                                className="flex-1 bg-[#141414] border border-white/20 p-3 text-xs text-white font-mono uppercase"
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
-                {/* Sizing Specifications (Medium & Large only) */}
-                <div className="border-t border-white/10 pt-6">
-                  <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] block mb-4">Sizing Grading & Measurements (2 Sizes Standard)</span>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {currentDrop.sizes.map((sz, szIdx) => (
-                      <div key={sz.id} className="p-4 bg-[#0D0D0D] border border-white/15">
-                        <strong className="text-sm text-[#D4AF37] block mb-2">{sz.name} Grade ({sz.id})</strong>
-                        <label className="block text-[10px] text-white/60 mb-1">Measurements & Specifications</label>
-                        <input
-                          type="text"
-                          value={sz.details}
-                          onChange={(e) => {
-                            const copy = [...config.drops];
-                            copy[selectedDropIndex].sizes[szIdx].details = e.target.value;
-                            setConfig({ ...config, drops: copy });
-                          }}
-                          className="w-full bg-[#141414] border border-white/20 p-2.5 text-xs text-white"
-                        />
+                        {/* TWO IMAGES PER PRODUCT */}
+                        <div className="p-4 bg-[#141414] border border-white/10 space-y-3">
+                          <strong className="text-xs text-[#D4AF37] uppercase tracking-wider flex items-center gap-2">
+                            <ImageIcon className="w-4 h-4" /> Two Images For This Item (Front & Back Views)
+                          </strong>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] text-white/70 uppercase tracking-wide mb-1">Image 1 URL (Front Plate)</label>
+                              <input
+                                type="text"
+                                value={item.frontImage}
+                                onChange={(e) => {
+                                  const copy = [...config.drops];
+                                  copy[selectedDropIndex].colors[itemIdx].frontImage = e.target.value;
+                                  setConfig({ ...config, drops: copy });
+                                }}
+                                placeholder="/images/photo1.jpg or https://..."
+                                className="w-full bg-[#0D0D0D] border border-white/20 p-2.5 text-xs text-white font-mono"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-white/70 uppercase tracking-wide mb-1">Image 2 URL (Back / Detail Plate)</label>
+                              <input
+                                type="text"
+                                value={item.backImage}
+                                onChange={(e) => {
+                                  const copy = [...config.drops];
+                                  copy[selectedDropIndex].colors[itemIdx].backImage = e.target.value;
+                                  setConfig({ ...config, drops: copy });
+                                }}
+                                placeholder="/images/photo2.jpg or https://..."
+                                className="w-full bg-[#0D0D0D] border border-white/20 p-2.5 text-xs text-white font-mono"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* SIZES UNDER THE INDIVIDUAL PRODUCT */}
+                        <div className="p-4 bg-[#141414] border border-white/10 space-y-4">
+                          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                            <strong className="text-xs text-[#D4AF37] uppercase tracking-wider flex items-center gap-2">
+                              <Ruler className="w-4 h-4" /> Sizes & Measurements For THIS Product ({item.sizes?.length || 0})
+                            </strong>
+                            <button
+                              onClick={() => addSizeToItem(itemIdx)}
+                              className="px-3 py-1 bg-white/10 hover:bg-[#D4AF37] text-white hover:text-black font-mono text-[10px] uppercase tracking-wider font-bold transition-all"
+                            >
+                              + Add Size Option
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {(item.sizes || []).map((sz, szIdx) => (
+                              <div key={szIdx} className="p-3 bg-[#0D0D0D] border border-white/15 space-y-2.5">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[11px] text-[#D4AF37] font-mono uppercase font-bold">Size Option #{szIdx + 1}</span>
+                                  {item.sizes.length > 1 && (
+                                    <button
+                                      onClick={() => removeSizeFromItem(itemIdx, szIdx)}
+                                      className="text-[10px] text-red-400 hover:text-white uppercase flex items-center gap-1"
+                                    >
+                                      <Trash2 className="w-3 h-3" /> Remove
+                                    </button>
+                                  )}
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                  <div className="col-span-1">
+                                    <label className="block text-[9px] text-white/50 uppercase">Tag (e.g. M)</label>
+                                    <input
+                                      type="text"
+                                      value={sz.id}
+                                      onChange={(e) => {
+                                        const copy = [...config.drops];
+                                        copy[selectedDropIndex].colors[itemIdx].sizes[szIdx].id = e.target.value;
+                                        copy[selectedDropIndex].colors[itemIdx].sizes[szIdx].name = e.target.value === "M" ? "Medium" : e.target.value === "L" ? "Large" : e.target.value;
+                                        setConfig({ ...config, drops: copy });
+                                      }}
+                                      className="w-full bg-[#141414] border border-white/20 p-2 text-xs text-white font-mono font-bold text-center uppercase"
+                                    />
+                                  </div>
+                                  <div className="col-span-2">
+                                    <label className="block text-[9px] text-white/50 uppercase">Measurements Details</label>
+                                    <input
+                                      type="text"
+                                      value={sz.details}
+                                      onChange={(e) => {
+                                        const copy = [...config.drops];
+                                        copy[selectedDropIndex].colors[itemIdx].sizes[szIdx].details = e.target.value;
+                                        setConfig({ ...config, drops: copy });
+                                      }}
+                                      placeholder="Chest: 20, Length: 27.5, Shoulder: 17.5"
+                                      className="w-full bg-[#141414] border border-white/20 p-2 text-xs text-white/90 font-mono"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
                       </div>
                     ))}
                   </div>
@@ -397,18 +594,18 @@ export default function StudioAdminPage() {
 
         {/* TAB 2: WHATSAPP & BRAND EMAIL SETUP */}
         {activeTab === "brand" && (
-          <div className="max-w-3xl bg-[#141414] border border-white/10 p-8 space-y-8">
+          <div className="max-w-3xl bg-[#141414] border border-white/10 p-8 space-y-8 shadow-2xl">
             <div>
-              <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] block mb-2">Customer Verification & Order Dispatch</span>
+              <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37] block mb-2">Customer Verification & Order Dispatch</span>
               <h3 className="text-2xl font-serif text-white mb-2">WhatsApp Confirmation Button & Email Routing</h3>
-              <p className="text-xs text-white/60 leading-relaxed">
-                Configure your real-time notification endpoints below. In Pakistan e-commerce, instant WhatsApp COD confirmation converts significantly higher than standard automated email receipts!
+              <p className="text-xs text-white/70 leading-relaxed font-sans">
+                Configure your real-time notification endpoints below. When shoppers complete their order, clicking &quot;Send WhatsApp Confirmation&quot; will instantly open a chat to this number with their exact item, measurements, and PKR pricing!
               </p>
             </div>
 
             <div className="space-y-6 border-t border-white/10 pt-6">
               <div>
-                <label className="block text-xs uppercase tracking-wider text-[#D4AF37] font-bold mb-2 flex items-center gap-2">
+                <label className="block text-xs uppercase tracking-wider text-[#D4AF37] font-bold mb-2 flex items-center gap-2 font-mono">
                   <Smartphone className="w-4 h-4" /> Your Studio WhatsApp Phone Number
                 </label>
                 <input
@@ -416,15 +613,15 @@ export default function StudioAdminPage() {
                   value={config.brand.whatsappNumber}
                   onChange={(e) => setConfig({ ...config, brand: { ...config.brand, whatsappNumber: e.target.value } })}
                   placeholder="e.g. 923001234567"
-                  className="w-full bg-[#0D0D0D] border border-[#D4AF37]/40 p-4 text-base text-white font-mono focus:border-[#D4AF37]"
+                  className="w-full bg-[#0D0D0D] border border-[#D4AF37]/50 p-4 text-base text-white font-mono focus:border-[#D4AF37]"
                 />
-                <span className="text-[11px] text-white/50 block mt-2 leading-relaxed font-sans">
-                  👉 <strong>Important Format:</strong> Enter your full Pakistan phone number with country code `92`, <strong>without any leading zero, plus sign (+), or spaces</strong>. For example, if your number is `0300 1234567`, enter exactly <code>923001234567</code>. When customers click "Verify via WhatsApp" on their order receipt, WhatsApp will open a live chat directly to this phone number with their order ID, name, address, and PKR total pre-filled!
+                <span className="text-[11px] text-white/60 block mt-2.5 leading-relaxed font-sans">
+                  👉 <strong>Important Format:</strong> Enter your full Pakistan phone number with country code <code>92</code>, <strong>without any leading zero, plus sign (+), or spaces</strong>. For example, if your number is <code>0300 1234567</code>, type exactly <code>923001234567</code>.
                 </span>
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-wider text-white/80 mb-2">
+                <label className="block text-xs uppercase tracking-wider text-white/80 mb-2 font-mono">
                   Founder Order Fulfillment Email Address
                 </label>
                 <input
@@ -435,82 +632,68 @@ export default function StudioAdminPage() {
                   className="w-full bg-[#0D0D0D] border border-white/20 p-4 text-sm text-white font-mono"
                 />
                 <span className="text-[11px] text-white/50 block mt-2 leading-relaxed font-sans">
-                  This is the recipient inbox where automated Resend order summaries will be delivered.
+                  This is the inbox where Resend attempts to deliver order confirmations.
                 </span>
               </div>
             </div>
           </div>
         )}
 
-        {/* TAB 3: HOW TO ADD IMAGES & WHY EMAILS WERE MISSING */}
+        {/* TAB 3: HOW TO FIX CLOUD SAVING & IMAGE UPLOADS */}
         {activeTab === "storage" && (
-          <div className="max-w-4xl bg-[#141414] border border-white/10 p-8 space-y-10 text-sm font-sans leading-relaxed">
+          <div className="max-w-4xl bg-[#141414] border border-white/10 p-8 md:p-10 space-y-10 text-sm font-sans leading-relaxed shadow-2xl">
             <div>
-              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] block mb-2">Studio FAQ & Cloud Setup</span>
-              <h3 className="text-2xl md:text-3xl font-serif text-white">How to Edit Images & Fix Email Delivery</h3>
+              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] block mb-2">Troubleshooting Guide & Setup</span>
+              <h3 className="text-2xl md:text-3xl font-serif text-white">How to Enable Cloud Saving & Upload Photos</h3>
             </div>
 
-            {/* 1. Why Email Delivery Might Be Missed on Trial */}
-            <div className="p-6 bg-[#0D0D0D] border-l-4 border-[#D4AF37] space-y-3">
+            {/* 1. WHY THE UPSTASH REDIS WARNING APPEARED & EXACT 60-SECOND FIX */}
+            <div className="p-6 bg-[#0D0D0D] border-l-4 border-[#D4AF37] space-y-4 shadow-xl">
               <h4 className="text-lg font-serif text-[#D4AF37] font-bold flex items-center gap-2">
-                🚨 Why didn&apos;t I receive the order emails earlier?
+                🚨 Why did I see &quot;Upstash Redis database not linked in Vercel yet&quot;?
               </h4>
-              <p className="text-white/80">
-                When sending emails through <strong>Resend</strong> using their default trial test domain (<code>onboarding@resend.dev</code>), Resend imposes a strict security policy: <strong>You can ONLY send test emails TO THE EXACT SAME EMAIL ADDRESS you used to sign up for your Resend account!</strong>
+              <p className="text-white/80 text-xs sm:text-sm">
+                When you host a website on Vercel, serverless code cannot overwrite static source code files directly after deployment. To enable clicking <strong>&quot;Publish Live Updates&quot;</strong> without writing code or git pushing, Vercel provides a free database called <strong>Upstash Redis</strong>. If it is not linked yet in Vercel, cloud saving will show that notice!
               </p>
-              <ul className="list-disc pl-6 space-y-2 text-white/70 text-xs">
-                <li>
-                  <strong>Quick Fix:</strong> In your Vercel Project Environment Variables (<em>Settings &rarr; Environment Variables</em>), ensure that your <code>ADMIN_EMAIL</code> variable is set to the exact same email address you used to register at Resend!
-                </li>
-                <li>
-                  <strong>Also verify:</strong> After adding <code>RESEND_API_KEY</code> and <code>ADMIN_EMAIL</code> in Vercel, you must click <strong>&quot;Redeploy&quot;</strong> on your deployment in Vercel so the new environment variables take effect!
-                </li>
-                <li>
-                  <strong>Ultimate Solution:</strong> Even if an email delays, your new WhatsApp confirmation button guarantees that customers can send their entire confirmed order directly to your WhatsApp with one click!
-                </li>
-              </ul>
+              <div className="bg-[#141414] p-5 border border-white/10 space-y-3">
+                <strong className="text-xs font-mono text-[#D4AF37] uppercase block">👉 Exact 60-Second Fix in Vercel:</strong>
+                <ol className="list-decimal pl-6 space-y-3 text-xs text-white/90 font-mono leading-relaxed">
+                  <li>Open your <strong>Vercel Dashboard</strong> in a new browser tab and click on your project (<strong>rove-website</strong>).</li>
+                  <li>Click on the <strong>Storage</strong> tab at the very top of your project page.</li>
+                  <li>Click <strong>Create Database</strong> and select <strong>Upstash Redis (Key-Value)</strong> (it is 100% free and takes 5 seconds).</li>
+                  <li>Click <strong>Connect to Project</strong> and select <em>rove-website</em>.</li>
+                  <li><strong>VERY IMPORTANT:</strong> Once connected, go to your <strong>Deployments</strong> tab in Vercel, click the three little dots (<strong>...</strong>) next to your latest deployment, and select <strong>Redeploy</strong>.</li>
+                </ol>
+                <p className="text-xs text-[#25D366] font-mono font-bold pt-2">
+                  ✔ Once redeployed, any time you come back to /admin and click Publish, your new drops and prices go live instantly worldwide!
+                </p>
+              </div>
             </div>
 
-            {/* 2. How to Add and Change Images Without Coding */}
+            {/* 2. HOW TO APPLY 2 IMAGES PER PRODUCT WITHOUT CODING */}
             <div className="space-y-4 pt-4 border-t border-white/10">
               <h4 className="text-lg font-serif text-white font-semibold">
-                📸 How do I edit or add image files without writing code?
+                📸 How do I add my product photos without writing code?
               </h4>
               <p className="text-white/75 text-xs sm:text-sm">
-                You have two effortless ways to use new photos for your upcoming releases:
+                In Tab 1 above, every single product item has two image inputs (Front View and Back/Alternate View). Here is how to feed pictures into them:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                 <div className="p-5 bg-[#0D0D0D] border border-white/15 space-y-2">
-                  <strong className="text-xs font-mono text-[#D4AF37] uppercase block">Method 1: Direct Web Image URLs (Fastest & No-Code)</strong>
-                  <p className="text-xs text-white/70">
-                    Upload your photos to any image host (like Imgur, Cloudinary, Vercel Blob, or WordPress). Copy the direct image link (e.g. <code>https://your-host.com/polo-drop2.jpg</code>) and paste it straight into the Image input field in Tab 1 above!
+                  <strong className="text-xs font-mono text-[#D4AF37] uppercase block">Option A: Paste Web Links (Easiest!)</strong>
+                  <p className="text-xs text-white/70 font-sans">
+                    Upload your photos to any simple image sharing host (like Imgur, Postggy, Cloudinary, or Vercel Blob). Copy the direct link (e.g. <code>https://i.imgur.com/yourphoto.jpg</code>) and paste it straight into Image 1 or Image 2 in Tab 1 above!
                   </p>
                 </div>
                 <div className="p-5 bg-[#0D0D0D] border border-white/15 space-y-2">
-                  <strong className="text-xs font-mono text-[#D4AF37] uppercase block">Method 2: GitHub Web Dashboard</strong>
-                  <p className="text-xs text-white/70">
-                    Open your repository on GitHub (`github.com/misternaul/rove-website`). Navigate into the folder named <code>public/images/</code>. Click <strong>Add File &rarr; Upload files</strong> to drop your pictures there. Once uploaded, refer to them as <code>/images/filename.jpg</code>!
+                  <strong className="text-xs font-mono text-[#D4AF37] uppercase block">Option B: Upload in GitHub Web</strong>
+                  <p className="text-xs text-white/70 font-sans">
+                    On GitHub (`github.com/misternaul/rove-website`), click into the folder named <code>public/images/</code>. Click <strong>Add File &rarr; Upload files</strong> to drop your photos. Then simply enter <code>/images/filename.jpg</code> in Tab 1!
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* 3. Vercel Cloud Data Persistence (Upstash Redis) */}
-            <div className="space-y-3 pt-4 border-t border-white/10">
-              <h4 className="text-lg font-serif text-white font-semibold">
-                ☁️ How to Enable 1-Click Cloud Saving on Vercel
-              </h4>
-              <p className="text-xs text-white/70 leading-relaxed">
-                By default, clicking <strong>&quot;Publish Live Updates&quot;</strong> requires Vercel Cloud Storage so that your edits stay saved forever without editing code. To turn this on:
-              </p>
-              <ol className="list-decimal pl-6 space-y-2 text-xs text-white/80 font-mono">
-                <li>Log in to your <strong>Vercel Dashboard</strong> and open <strong>rove-website</strong>.</li>
-                <li>Go to the <strong>Storage</strong> tab at the top and click <strong>Create Database</strong>.</li>
-                <li>Select <strong>Upstash Redis (Key-Value)</strong> and click Continue (it is 100% free!).</li>
-                <li>Click <strong>Connect to Project</strong>. Vercel automatically links the required database variables to your live site!</li>
-                <li>Redeploy once. Now, anytime you visit <code>/admin</code> and click Publish, your new drops, PKR prices, and texts go live immediately!</li>
-              </ol>
-            </div>
           </div>
         )}
 

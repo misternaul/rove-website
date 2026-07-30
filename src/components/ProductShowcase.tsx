@@ -4,14 +4,19 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Shield, RefreshCw, ChevronDown, ChevronUp, ShoppingBag, ArrowRight, Layers } from "lucide-react";
-import { siteContent, DropItem, SiteConfig } from "@/config/siteContent";
+import { siteContent, DropItem, SiteConfig, SizeOption } from "@/config/siteContent";
 import OrderModal from "@/components/OrderModal";
+
+const fallbackSizes: SizeOption[] = [
+  { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },
+  { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"' },
+];
 
 export default function ProductShowcase() {
   const [config, setConfig] = useState<SiteConfig>(siteContent);
   const [activeDropIndex, setActiveDropIndex] = useState(0);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
-  const [selectedSizeIndex, setSelectedSizeIndex] = useState(0); // Default to Medium (0) or Large (1)
+  const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
   const [activeView, setActiveView] = useState<"front" | "back">("front");
   const [openAccordion, setOpenAccordion] = useState<string | null>("materials");
   
@@ -19,7 +24,7 @@ export default function ProductShowcase() {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   useEffect(() => {
-    // Automatically retrieve any live updates or new drops saved via Vercel /admin studio
+    // Automatically retrieve live updates saved via /admin Studio or Vercel Upstash Redis
     fetch("/api/cms")
       .then((res) => res.json())
       .then((data) => {
@@ -32,14 +37,27 @@ export default function ProductShowcase() {
 
   const currentDrop: DropItem = config.drops[activeDropIndex] || config.drops[0] || siteContent.drops[0];
   const selectedColor = currentDrop.colors[selectedColorIndex] || currentDrop.colors[0];
-  const selectedSize = currentDrop.sizes[selectedSizeIndex] || currentDrop.sizes[0];
+
+  // 👉 Size options are now dynamically managed directly under EACH individual product / item!
+  const availableSizes: SizeOption[] = selectedColor.sizes && selectedColor.sizes.length > 0
+    ? selectedColor.sizes
+    : fallbackSizes;
+
+  const validSizeIndex = Math.min(selectedSizeIndex, Math.max(0, availableSizes.length - 1));
+  const selectedSize = availableSizes[validSizeIndex] || availableSizes[0];
 
   const currentImage = activeView === "front" ? selectedColor.frontImage : selectedColor.backImage;
 
-  // Reset color and size index if switching between different product drops
+  // Reset product item and size index if switching between different product drops
   const handleSwitchDrop = (newIndex: number) => {
     setActiveDropIndex(newIndex);
     setSelectedColorIndex(0);
+    setSelectedSizeIndex(0);
+  };
+
+  // Reset size selection when switching between individual product items in a drop
+  const handleSwitchColor = (newIdx: number) => {
+    setSelectedColorIndex(newIdx);
     setSelectedSizeIndex(0);
   };
 
@@ -76,7 +94,7 @@ export default function ProductShowcase() {
           </p>
         </div>
 
-        {/* RELEASES / MULTI-DROP TAB SWITCHER (Displayed cleanly when catalog grows!) */}
+        {/* RELEASES / MULTI-DROP TAB SWITCHER */}
         {config.drops.length > 1 && (
           <div className="mb-16 flex flex-col items-center">
             <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/50 mb-3 flex items-center gap-2">
@@ -94,20 +112,20 @@ export default function ProductShowcase() {
                       : "text-white/70 hover:text-white bg-transparent"
                   }`}
                 >
-                  {drop.name.split(" ").slice(0, 3).join(" ")}...
+                  {drop.name}
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* Main Product Dual View Grid (Sticky Showcase Architecture) */}
+        {/* Main Product Dual View Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
-          {/* LEFT: Sticky Visual Presentation Stage (Columns 1 to 7) */}
+          {/* LEFT: Visual Presentation Stage (Columns 1 to 7) */}
           <div className="lg:col-span-7 lg:sticky lg:top-28 flex flex-col items-center">
             
-            {/* View Selector Tabs (Front / Back) */}
+            {/* View Selector Tabs (Image 1 / Image 2) */}
             <div className="flex items-center justify-center gap-2 mb-6 w-full max-w-md">
               <button
                 onClick={() => setActiveView("front")}
@@ -117,7 +135,7 @@ export default function ProductShowcase() {
                     : "border-white/15 text-white/60 hover:text-white bg-[#141414]"
                 }`}
               >
-                Front View
+                Image 1 (Front View)
               </button>
               <button
                 onClick={() => setActiveView("back")}
@@ -127,14 +145,13 @@ export default function ProductShowcase() {
                     : "border-white/15 text-white/60 hover:text-white bg-[#141414]"
                 }`}
               >
-                Back Elevation
+                Image 2 (Back View)
               </button>
             </div>
 
             {/* Main Photography Canvas */}
             <div className="relative w-full max-w-xl aspect-[3/4] bg-[#141414] border border-white/10 overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
               
-              {/* Animated image transition on color / view change */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={`${selectedColor.id}-${activeView}`}
@@ -177,7 +194,7 @@ export default function ProductShowcase() {
               >
                 <Image src={selectedColor.frontImage} alt="Front Thumbnail" fill className="object-cover object-top" />
                 <div className="absolute inset-0 bg-black/30 flex items-end p-1.5">
-                  <span className="text-[9px] font-mono tracking-wider uppercase text-white bg-black/80 px-1.5 py-0.5">Front</span>
+                  <span className="text-[9px] font-mono tracking-wider uppercase text-white bg-black/80 px-1.5 py-0.5">Image 1</span>
                 </div>
               </button>
               <button
@@ -188,7 +205,7 @@ export default function ProductShowcase() {
               >
                 <Image src={selectedColor.backImage} alt="Back Thumbnail" fill className="object-cover object-top" />
                 <div className="absolute inset-0 bg-black/30 flex items-end p-1.5">
-                  <span className="text-[9px] font-mono tracking-wider uppercase text-white bg-black/80 px-1.5 py-0.5">Back</span>
+                  <span className="text-[9px] font-mono tracking-wider uppercase text-white bg-black/80 px-1.5 py-0.5">Image 2</span>
                 </div>
               </button>
             </div>
@@ -204,7 +221,7 @@ export default function ProductShowcase() {
             <div className="p-8 md:p-10 bg-[#141414] border border-white/10 shadow-2xl relative">
               <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#D4AF37]" />
               
-              {/* Dynamic Pricing Display in PKR based on selected color */}
+              {/* Dynamic Pricing Display in PKR based on selected product item */}
               <div className="flex flex-col mb-8 pb-8 border-b border-white/10">
                 <div className="flex items-baseline justify-between mb-2">
                   <span className="text-xs font-mono uppercase tracking-[0.2em] text-white/50">
@@ -225,22 +242,22 @@ export default function ProductShowcase() {
                 </div>
               </div>
 
-              {/* 1. Color Selection State */}
+              {/* 1. Item / Color Selection State (Supports any number of products!) */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] font-semibold">
-                    1. Colorway & Price
+                    1. Select Item / Colorway
                   </span>
                   <span className="text-xs font-mono text-white/80">
-                    Selected: <strong className="text-white font-medium">{selectedColor.name}</strong>
+                    Active: <strong className="text-white font-medium">{selectedColor.name}</strong>
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {currentDrop.colors.map((c, i) => (
                     <button
-                      key={c.id}
-                      onClick={() => setSelectedColorIndex(i)}
+                      key={c.id || i}
+                      onClick={() => handleSwitchColor(i)}
                       className={`p-3.5 border flex flex-col gap-2 transition-all ${
                         selectedColorIndex === i
                           ? "border-[#D4AF37] bg-[#D4AF37]/15 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
@@ -250,7 +267,7 @@ export default function ProductShowcase() {
                       <div className="flex items-center gap-2.5 w-full">
                         <span
                           className="w-4 h-4 rounded-full border border-white/40 flex-shrink-0"
-                          style={{ backgroundColor: c.hex }}
+                          style={{ backgroundColor: c.hex || "#777777" }}
                         />
                         <span className="text-xs font-mono uppercase tracking-wider text-left text-white leading-tight font-semibold truncate">
                           {c.name}
@@ -265,24 +282,24 @@ export default function ProductShowcase() {
                 </div>
               </div>
 
-              {/* 2. Size Selection State (Medium & Large standard) */}
+              {/* 2. Sizing Options Under Individual Product */}
               <div className="mb-10">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] font-semibold">
-                    2. Sizing Grade (Medium & Large)
+                    2. Select Sizing Grade
                   </span>
                   <span className="text-[11px] font-mono text-white/60 hover:text-white underline cursor-pointer">
-                    Tailored Fit
+                    Tailored Fit Specs
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  {currentDrop.sizes.map((s, idx) => (
+                  {availableSizes.map((s, idx) => (
                     <button
-                      key={s.id}
+                      key={s.id || idx}
                       onClick={() => setSelectedSizeIndex(idx)}
                       className={`py-4 px-3 border text-xs font-mono uppercase tracking-wider transition-all flex flex-col items-center gap-1 ${
-                        selectedSizeIndex === idx
+                        validSizeIndex === idx
                           ? "border-[#D4AF37] bg-[#D4AF37]/15 text-[#D4AF37] font-bold shadow-md"
                           : "border-white/15 text-white/70 hover:border-white/50 hover:text-white bg-[#0D0D0D]"
                       }`}
@@ -292,7 +309,7 @@ export default function ProductShowcase() {
                   ))}
                 </div>
 
-                {/* Size Exact Measurements Feedback */}
+                {/* Size Exact Measurements Feedback for active size */}
                 <div className="mt-3 p-3.5 bg-[#0D0D0D] border border-white/10 text-xs font-mono text-white/80 text-center shadow-inner">
                   <span className="text-[#D4AF37] font-semibold">{selectedSize.name} Specs: </span>
                   <span className="text-[#FFFFFF]">{selectedSize.details}</span>

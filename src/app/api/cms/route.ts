@@ -17,10 +17,10 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { action, updatedData, adminSecret } = body;
 
-    // Optional lightweight password check for admin security (defaults to 'rove2026' if not set in environment)
-    const expectedPin = process.env.STUDIO_ADMIN_PIN || "rove2026";
+    // Secure Studio Admin PIN requested by founder
+    const expectedPin = process.env.STUDIO_ADMIN_PIN || "rovepresence0842";
     if (!adminSecret || adminSecret !== expectedPin) {
-      return NextResponse.json({ error: "Invalid Studio Admin PIN / Authorization" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid Studio PIN / Authorization. Please enter rovepresence0842" }, { status: 401 });
     }
 
     if (action === "reset") {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     const result = await saveLiveSiteContent(updatedData);
     if (!result.success) {
-      return NextResponse.json({ error: result.message }, { status: 503 });
+      return NextResponse.json({ error: result.message, code: result.code }, { status: 503 });
     }
 
     return NextResponse.json(result);

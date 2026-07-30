@@ -6,21 +6,22 @@
 // /admin Dashboard once linked with Upstash Redis on Vercel!
 // ============================================================================
 
+export interface SizeOption {
+  id: string;
+  name: string;
+  details: string;
+}
+
 export interface ColorOption {
   id: string;
   name: string;
   hex: string;
   priceFormatted: string;
   priceNumeric: number;
-  frontImage: string;
-  backImage: string;
+  frontImage: string; // Image 1 (Front View)
+  backImage: string;  // Image 2 (Back / Alternate View)
   caption: string;
-}
-
-export interface SizeOption {
-  id: string;
-  name: string;
-  details: string;
+  sizes: SizeOption[]; // 👉 Each individual product/colorway now controls its own sizes & measurements!
 }
 
 export interface AccordionItem {
@@ -35,8 +36,7 @@ export interface DropItem {
   name: string;
   shortDescription: string;
   shippingNote: string;
-  colors: ColorOption[];
-  sizes: SizeOption[];
+  colors: ColorOption[]; // Can contain 1, 2, 3, or any number of items/products in this release!
   accordions: AccordionItem[];
   orderButtonText: string;
   secondaryActionText: string;
@@ -79,7 +79,7 @@ export interface SiteConfig {
     quote: string;
     pillars: { title: string; subtitle: string }[];
   };
-  // DYNAMIC MULTI-DROP CATALOG: Add as many future drops here as you want!
+  // DYNAMIC MULTI-DROP CATALOG: Add as many current or future drops here as you want!
   drops: DropItem[];
   craft: {
     badge: string;
@@ -109,6 +109,19 @@ export interface SiteConfig {
   };
 }
 
+const standardTwoSizes: SizeOption[] = [
+  {
+    id: "M",
+    name: "Medium",
+    details: "Chest: 20\" | Length: 27.5\" | Shoulder: 17.5\"",
+  },
+  {
+    id: "L",
+    name: "Large",
+    details: "Chest: 21\" | Length: 28.5\" | Shoulder: 18\"",
+  },
+];
+
 export const siteContent: SiteConfig = {
   // --------------------------------------------------------------------------
   // 1. GENERAL BRAND, EMAIL & WHATSAPP SETTINGS
@@ -119,7 +132,7 @@ export const siteContent: SiteConfig = {
     description: "An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.",
     logoText: "ROVE",
     logoIconImage: "/images/logo-icon.jpg",
-    founderEmail: "orders@rovepresence.com", // Your recipient email address for orders!
+    founderEmail: "orders@rovepresence.com",
     whatsappNumber: "923000000000", // 👉 REPLACE THIS with your real WhatsApp number (e.g. 923001234567)
     defaultCurrency: "PKR",
   },
@@ -195,7 +208,7 @@ export const siteContent: SiteConfig = {
       shortDescription:
         "Engineered from luxury heavyweight 200 GSM PK cotton. Features bespoke laser-engraved matte black buttons, reinforced neck structure to prevent collar sag, and our signature asymmetrical right-sleeve three-line gold embroidery.",
       
-      // Different customizable prices per colorway!
+      // Each drop can now contain any number of products/items, each with 2 photos, custom price, and specific size options!
       colors: [
         {
           id: "black",
@@ -203,9 +216,10 @@ export const siteContent: SiteConfig = {
           hex: "#0D0D0D",
           priceFormatted: "PKR 2,299",
           priceNumeric: 2299,
-          frontImage: "/images/polo-black-front.jpg",
-          backImage: "/images/polo-black-back.jpg",
+          frontImage: "/images/polo-black-front.jpg", // Image 1
+          backImage: "/images/polo-black-back.jpg",   // Image 2
           caption: "Deep obsidian canvas with high-density gold horizon embroidery.",
+          sizes: JSON.parse(JSON.stringify(standardTwoSizes)), // Exact measurements for Medium and Large!
         },
         {
           id: "sand",
@@ -213,23 +227,10 @@ export const siteContent: SiteConfig = {
           hex: "#CDBFA6",
           priceFormatted: "PKR 2,499",
           priceNumeric: 2499,
-          frontImage: "/images/polo-sand-front.jpg",
-          backImage: "/images/polo-sand-back.jpg",
+          frontImage: "/images/polo-sand-front.jpg", // Image 1
+          backImage: "/images/polo-sand-back.jpg",   // Image 2
           caption: "Tactile embossed texture inspired by wind-swept desert dunes.",
-        },
-      ],
-
-      // Exact two sizing specifications requested!
-      sizes: [
-        {
-          id: "M",
-          name: "Medium",
-          details: "Chest: 20\" | Length: 27.5\" | Shoulder: 17.5\"",
-        },
-        {
-          id: "L",
-          name: "Large",
-          details: "Chest: 21\" | Length: 28.5\" | Shoulder: 18\"",
+          sizes: JSON.parse(JSON.stringify(standardTwoSizes)), // Exact measurements for Medium and Large!
         },
       ],
 
@@ -258,7 +259,6 @@ export const siteContent: SiteConfig = {
         },
       ],
     },
-    // Example of how future drops can sit right here!
   ],
 
   // --------------------------------------------------------------------------
