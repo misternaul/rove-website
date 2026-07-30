@@ -92,13 +92,16 @@ export default function StudioAdminPage() {
 
   const runEmailDiagnosticTest = async () => {
     setTestEmailStatus("testing");
-    setTestEmailMessage("Transmitting test dispatch through Vercel servers...");
+    setTestEmailMessage("Transmitting test dispatch through Vercel servers using your pasted access key...");
     
     try {
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isTestEmail: true }),
+        body: JSON.stringify({ 
+          isTestEmail: true,
+          customWeb3FormsKey: config.brand.web3formsAccessKey // Immediately transmit whatever is inside the box!
+        }),
       });
       const data = await res.json();
       
@@ -631,22 +634,8 @@ export default function StudioAdminPage() {
               <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37] block mb-2">Order Dispatch & Real-Time Notifications</span>
               <h3 className="text-2xl sm:text-3xl font-serif text-white mb-2">Fix Email Delivery & WhatsApp Setup</h3>
               <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-sans">
-                Below you can configure both WhatsApp automatic order routing and choose between two bulletproof email gateways!
+                Below you can configure both WhatsApp automatic order routing and test your Web3Forms key instantly!
               </p>
-            </div>
-
-            {/* WHY DID RESEND SHOW 'FAILED' IN THE DASHBOARD? */}
-            <div className="p-6 bg-[#0D0D0D] border-l-4 border-red-500 space-y-4 shadow-xl">
-              <h4 className="text-base sm:text-lg font-serif text-red-400 font-bold flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 flex-shrink-0" /> Why did Resend show &quot;Failed&quot; when sending to rovepresence@gmail.com?
-              </h4>
-              <p className="text-white/80 text-xs sm:text-sm leading-relaxed font-sans">
-                In your Resend dashboard screenshot, your website <strong>successfully sent the API requests</strong> to Resend, but Resend failed to deliver them to Gmail! This happens for two common reasons:
-              </p>
-              <ol className="list-decimal pl-5 text-xs sm:text-sm text-white/90 space-y-2 font-sans">
-                <li><strong>Suppression List Block (Most Likely!):</strong> Look in the top right corner of your Resend dashboard screenshot. Click the button named <strong>&quot;Suppression list&quot;</strong>. If <code>rovepresence@gmail.com</code> bounced even once during testing, Resend permanently blocks all future emails until you click Delete/Remove in that Suppression List!</li>
-                <li><strong>Gmail Strict Spam Rules:</strong> When using Resend&apos;s test domain (<code>onboarding@resend.dev</code>), Gmail&apos;s anti-spam servers often reject unauthenticated test emails.</li>
-              </ol>
             </div>
 
             {/* SOLUTION 1: WEB3FORMS (100% FREE, ZERO-CONFIG GMAIL WORKAROUND) */}
@@ -659,7 +648,7 @@ export default function StudioAdminPage() {
               </div>
               
               <p className="text-xs sm:text-sm text-white/85 font-sans leading-relaxed">
-                Want your orders delivered straight to your Gmail instantly without ever fighting Resend spam filters or checking Suppression Lists? We built native support for <strong>Web3Forms</strong>!
+                Want your orders delivered straight to your Gmail instantly without ever fighting Resend spam filters or checking Suppression Lists?
               </p>
               
               <div className="space-y-3 bg-[#141414] p-5 border border-white/10 font-mono text-xs">
@@ -668,7 +657,7 @@ export default function StudioAdminPage() {
                   <li>Go to <a href="https://web3forms.com/#start" target="_blank" rel="noreferrer" className="text-[#D4AF37] underline font-bold">https://web3forms.com</a> in your browser.</li>
                   <li>Type in <code>rovepresence@gmail.com</code> and click <strong>Create Access Key</strong>.</li>
                   <li>Open your email inbox, copy the free Access Key they just sent you, and paste it into the box below!</li>
-                  <li>Click <strong>&quot;Publish Live Updates&quot;</strong> above, and your store will instantly send all future order notifications directly through Web3Forms!</li>
+                  <li><strong>Click &quot;Send Test Order Email&quot; at the bottom of this page right now!</strong> We will immediately transmit a live order using whatever key is typed in the box below!</li>
                 </ol>
               </div>
 
@@ -706,7 +695,7 @@ export default function StudioAdminPage() {
 
               <div>
                 <label className="block text-xs uppercase tracking-wider text-white/80 mb-2 font-mono">
-                  Founder Order Fulfillment Email Address (For Resend)
+                  Founder Order Fulfillment Email Address
                 </label>
                 <input
                   type="email"
@@ -725,7 +714,7 @@ export default function StudioAdminPage() {
                       <AlertCircle className="w-4 h-4" /> Test Your Order Email Delivery Live
                     </h4>
                     <p className="text-xs text-white/60 font-sans mt-1">
-                      After pasting a Web3Forms key above or cleaning your Resend Suppression List, click below to send a live test order!
+                      After pasting your Web3Forms key above, click below to send a live test order instantly!
                     </p>
                   </div>
                   <button

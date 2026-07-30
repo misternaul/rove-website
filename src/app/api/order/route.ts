@@ -17,7 +17,8 @@ export async function POST(request: Request) {
       selectedSize,
       priceFormatted,
       email,
-      isTestEmail, // Special flag from Admin Dashboard to test email delivery!
+      isTestEmail,
+      customWeb3FormsKey, // Directly test whatever key is currently typed in the admin textbox!
     } = body;
 
     if (!isTestEmail && (!fullName || !phone || !city || !primaryAddress)) {
@@ -68,12 +69,12 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
     let emailDeliveryStatus = "NOT_ATTEMPTED";
     let emailErrorMessage = "";
     const resendApiKey = process.env.RESEND_API_KEY;
-    const web3formsKey = process.env.WEB3FORMS_ACCESS_KEY || liveConfig.brand.web3formsAccessKey;
+    const web3formsKey = customWeb3FormsKey || process.env.WEB3FORMS_ACCESS_KEY || liveConfig.brand.web3formsAccessKey;
 
     // ------------------------------------------------------------------------
     // OPTION A: WEB3FORMS (Zero-Config, Bypass Resend Gmail Sandbox & Suppression)
     // ------------------------------------------------------------------------
-    if (web3formsKey && web3formsKey.trim() !== "") {
+    if (web3formsKey && typeof web3formsKey === "string" && web3formsKey.trim() !== "") {
       try {
         const web3Res = await fetch("https://api.web3forms.com/submit", {
           method: "POST",
@@ -86,16 +87,17 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
           }),
         });
         const web3Data = await web3Res.json();
-        if (web3Data.success) {
+        if (web3Data && web3Data.success) {
           emailDeliveryStatus = "SUCCESS_WEB3FORMS";
           console.log("✅ Order notification successfully dispatched via Web3Forms!");
         } else {
           console.warn("⚠️ Web3Forms delivery unsuccessful:", web3Data);
-          emailErrorMessage += `Web3Forms Error: ${web3Data.message || "Failed to submit"}. `;
+          emailErrorMessage += `Web3Forms Server Rejected Key: "${web3Data?.message || "Invalid Access Key or server error"}". Please make sure your Web3Forms key is copied exactly without extra spaces! `;
         }
       } catch (e: unknown) {
         const err = e as Error;
         console.error("❌ Web3Forms network exception:", err);
+        emailErrorMessage += `Web3Forms Network Exception: ${err.message}. `;
       }
     }
 
@@ -105,8 +107,10 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
     if (emailDeliveryStatus !== "SUCCESS_WEB3FORMS") {
       if (!resendApiKey) {
         emailDeliveryStatus = "FAILED_MISSING_CREDENTIALS";
-        emailErrorMessage +=
-          "Neither RESEND_API_KEY nor Web3Forms Access Key is set! To receive free reliable emails immediately without domain rules, enter a Web3Forms Access Key in Admin Tab #2 (get one completely free at web3forms.com).";
+        if (!web3formsKey || web3formsKey.trim() === "") {
+          emailErrorMessage +=
+            "No Web3Forms key detected and RESEND_API_KEY is missing! To test email delivery immediately: Paste your Web3Forms access key into the box in Tab #2 and click Test again!";
+        }
         console.warn(`🚨 ${emailErrorMessage}`);
       } else {
         try {
@@ -128,7 +132,7 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
 
           if (!resendResponse.ok) {
             emailDeliveryStatus = "FAILED_RESEND_REJECTED";
-            emailErrorMessage += `Resend API rejected transmission: "${resendData.message || JSON.stringify(resendData)}". NOTE: If your emails show as 'Failed' in Resend's dashboard, Gmail's DMARC filters may have rejected onboarding@resend.dev or placed rovepresence@gmail.com in Resend's Suppression List. Check Tab #2 in Admin for the simple 2-minute Web3Forms free workaround!`;
+            emailErrorMessage += `Resend API rejected transmission to (${targetEmail}): "${resendData.message || JSON.stringify(resendData)}". SOLUTION: Resend blocked delivery because onboarding@resend.dev is a sandbox domain. Use Web3Forms by pasting your access key into Tab #2 to bypass this completely!`;
             console.warn("🚨 Resend Delivery Error:", resendData);
           } else {
             emailDeliveryStatus = "SUCCESS_RESEND";
@@ -158,7 +162,7 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
       } else {
         return NextResponse.json({
           success: true,
-          message: `✅ Verification test email successfully delivered via ${emailDeliveryStatus === "SUCCESS_WEB3FORMS" ? "Web3Forms" : "Resend"}! Check your inbox at ${targetEmail} (and spam/promotions folder).`,
+          message: `✅ SUCCESS! Your test order email was instantly delivered via ${emailDeliveryStatus === "SUCCESS_WEB3FORMS" ? "Web3Forms" : "Resend"}! Please check your inbox at ${targetEmail} right now (IMPORTANT: Also check your Spam, Junk, or Promotions tab!)`,
           targetEmail,
         });
       }
