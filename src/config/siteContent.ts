@@ -134,7 +134,7 @@ export const siteContent: SiteConfig = {
     logoText: "ROVE",
     logoIconImage: "/images/logo-icon.jpg",
     founderEmail: "rovepresence@gmail.com",
-    whatsappNumber: "923000000000", // 👉 REPLACE THIS with your real WhatsApp number (e.g. 923001234567)
+    whatsappNumber: "923346758496", // 👉 REPLACE THIS with your real WhatsApp number (e.g. 923001234567)
     web3formsAccessKey: "b0a8ee37-de57-4314-acee-4c65d60c8580", // Permanently embedded Web3Forms access key for rovepresence@gmail.com!
     defaultCurrency: "PKR",
   },
@@ -280,28 +280,16 @@ export const siteContent: SiteConfig = {
         image: "/images/detail-black-sleeve.jpg",
       },
       {
-        title: "Slowing Dune Texture",
+        title: "Back Wordmark Embroidery",
         subtitle: "Tactile Embossment",
-        description: "A sophisticated, subtle embossed pattern inspired by wind-swept sand dunes. Visible when catching natural light, deeply felt in everyday wearing quality.",
-        image: "/images/detail-sand-texture.jpg",
-      },
-      {
-        title: "Matte Black Engraved Button",
-        subtitle: "Custom Bespoke Hardware",
-        description: "Custom matte black tactile buttons laser-engraved with the ROVE insignia. Set above reinforced woven neck tape designed to prevent collar droop over years of wear.",
-        image: "/images/detail-black-button.jpg",
-      },
-      {
-        title: "Gold Shoulder Piping",
-        subtitle: "Architectural Lines",
-        description: "Precision gold piping running gracefully from the collar edge along the shoulder seam—imbuing a regular fit with sharp, athletic architecture.",
-        image: "/images/detail-sand-piping.jpg",
+        description: "High-density gold embroidery on the back below collar. A representation of the lifestyle ROVE has built",
+        image: "/images/detail-back-wordmark.jpg",
       },
       {
         title: "Horizon Mark Embroidery",
         subtitle: "Left Chest Insignia",
         description: "High-density gold embroidery on the left chest. The rising R emerging above the horizon line symbolizes perspective, confidence, and quiet momentum.",
-        image: "/images/detail-black-logo.jpg",
+        image: "/images/detail-sand-logo.jpg",
       },
     ],
   },
@@ -328,21 +316,14 @@ export const siteContent: SiteConfig = {
         tag: "Lifestyle Portrait",
       },
       {
-        src: "/images/spec-black.jpg",
-        title: "Anatomy of Jet Black",
-        caption: "Technical Blueprint & Hallmark Embroidery",
-        aspect: "aspect-[2/3]",
-        tag: "Specification Sheet",
-      },
-      {
-        src: "/images/spec-sand.jpg",
-        title: "Anatomy of Sand Dune",
+        src: "/images/editorial-detail.jpg",
+        title: "Textile Details",
         caption: "Embossed Texture & Shoulder Architecture",
         aspect: "aspect-[2/3]",
-        tag: "Specification Sheet",
+        tag: "Texture Display",
       },
       {
-        src: "/images/brand-identity.jpg",
+        src: "/images/editorial-acessories.jpg",
         title: "The Horizon Principle",
         caption: "Rove Brand Values & Typography Systems",
         aspect: "aspect-[2/3]",
@@ -370,11 +351,11 @@ export const siteContent: SiteConfig = {
     slogan: "Less Noise. More Presence.",
     aboutText: "An independent label dedicated to everyday essentials engineered with calm, clarity, and uncompromising distinction.",
     copyrightText: `© ${new Date().getFullYear()} ROVE Presence. Crafted with intention for everyday essentials. All rights reserved.`,
-    instagramUrl: "https://instagram.com",
+    instagramUrl: "https://instagram.com/rovepresence",
     inquiries: [
-      { label: "Press & Editorial", email: "press@rovepresence.com" },
-      { label: "Client Services", email: "support@rovepresence.com" },
-      { label: "Bespoke Fitting", email: "concierge@rovepresence.com" },
+      { label: "Press & Editorial", email: "rovepresence@gmail.com" },
+      { label: "Client Services", email: "rovepresence@gmail.com" },
+      { label: "Bespoke Fitting", email: "rovepresence@gmail.com" },
     ],
   },
 };
