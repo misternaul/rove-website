@@ -153,8 +153,8 @@ export default function StudioAdminPage() {
           hex: "#0D0D0D",
           priceFormatted: "PKR 2,499",
           priceNumeric: 2499,
-          frontImage: "/images/polo-black-front.jpg",
-          backImage: "/images/polo-black-back.jpg",
+          frontImage: "/images/polo-black-front.png",
+          backImage: "/images/polo-black-back.png",
           caption: "Primary colorway description.",
           sizes: [
             { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },
@@ -192,8 +192,8 @@ export default function StudioAdminPage() {
       hex: "#787878",
       priceFormatted: "PKR 2,499",
       priceNumeric: 2499,
-      frontImage: "/images/polo-sand-front.jpg",
-      backImage: "/images/polo-sand-back.jpg",
+      frontImage: "/images/polo-sand-front.png",
+      backImage: "/images/polo-sand-back.png",
       caption: "Describe this variation's tone and texture.",
       sizes: [
         { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },

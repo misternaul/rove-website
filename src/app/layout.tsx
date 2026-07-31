@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "ROVE Presence",
     images: [
       {
-        url: "/images/editorial-rocks.jpg",
+        url: "/images/editorial-rocks.png",
         width: 768,
         height: 1024,
         alt: "ROVE Drop 001 — Jet Black Premium Polo",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: "ROVE — Less Noise. More Presence.",
     description:
       "Every piece is crafted with intention to deliver comfort, durability and understated elegance for everyday essentials.",
-    images: ["/images/editorial-rocks.jpg"],
+    images: ["/images/editorial-rocks.png"],
   },
   robots: {
     index: true,
