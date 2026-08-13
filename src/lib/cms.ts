@@ -57,7 +57,7 @@ export async function getLiveSiteContent(): Promise<SiteConfig> {
         const raw = fs.readFileSync(cachePath, "utf-8");
         return { ...siteContent, ...JSON.parse(raw) };
       }
-    } catch (e) {
+    } catch {
       // Ignore cache error in dev
     }
   }

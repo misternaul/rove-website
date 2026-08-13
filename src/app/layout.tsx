@@ -44,6 +44,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { CartProvider } from "@/components/CartProvider";
+import CheckoutModal from "@/components/CheckoutModal";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -52,9 +55,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased dark scroll-smooth">
       <body className="min-h-full flex flex-col bg-[#0D0D0D] text-white selection:bg-[#D4AF37] selection:text-[#0D0D0D]">
-        <SmoothScrollProvider>
-          {children}
-        </SmoothScrollProvider>
+        <CartProvider>
+          <SmoothScrollProvider>
+            {children}
+          </SmoothScrollProvider>
+          <CheckoutModal />
+        </CartProvider>
       </body>
     </html>
   );

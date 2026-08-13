@@ -1,5 +1,18 @@
 import { NextResponse } from "next/server";
-import { getLiveSiteContent } from "@/lib/cms";
+import { getLiveSiteContent, saveLiveSiteContent } from "@/lib/cms";
+
+interface CartItemPayload {
+  id: string;
+  dropId: string;
+  dropName: string;
+  colorId: string;
+  colorName: string;
+  sizeId: string;
+  sizeName: string;
+  quantity: number;
+  priceFormatted: string;
+  priceNumeric: number;
+}
 
 export async function POST(request: Request) {
   try {
@@ -12,18 +25,19 @@ export async function POST(request: Request) {
       secondaryAddress,
       landmark,
       notes,
-      productName,
-      selectedColor,
-      selectedSize,
-      priceFormatted,
       email,
       isTestEmail,
-      customWeb3FormsKey, // Directly test whatever key is currently typed in the admin textbox!
+      customWeb3FormsKey,
+      cartItems = [],
+      formattedTotalPrice,
     } = body;
 
-    if (!isTestEmail && (!fullName || !phone || !city || !primaryAddress)) {
+    // Handle backward compatibility or specific test email structures if they don't send cart items
+    const hasCartItems = Array.isArray(cartItems) && cartItems.length > 0;
+    
+    if (!isTestEmail && (!fullName || !phone || !city || !primaryAddress || !hasCartItems)) {
       return NextResponse.json(
-        { error: "Full Name, Phone Number, City, and Primary Address are required to complete your order." },
+        { error: "Full Name, Phone Number, City, Primary Address, and Cart Items are required to complete your order." },
         { status: 400 }
       );
     }
@@ -31,18 +45,56 @@ export async function POST(request: Request) {
     const orderId = isTestEmail ? `TEST-ROVE-001` : `ROVE-${Math.floor(100000 + Math.random() * 900000)}`;
     const timestamp = new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" });
 
+    // 1. Load Live Content Config
     const liveConfig = await getLiveSiteContent();
     const targetEmail = process.env.ADMIN_EMAIL || liveConfig.brand.founderEmail || "rovepresence@gmail.com";
 
-    // Construct the formatted notification text for the founder
+    // 2. Perform Stock Decrement for every purchased item
+    if (!isTestEmail && hasCartItems) {
+      let stockWasModified = false;
+      cartItems.forEach((purchasedItem: CartItemPayload) => {
+        // Find drop
+        const dropIndex = liveConfig.drops.findIndex((d) => d.id === purchasedItem.dropId);
+        if (dropIndex !== -1) {
+          // Find colorway
+          const colorIndex = liveConfig.drops[dropIndex].colors.findIndex((c) => c.id === purchasedItem.colorId);
+          if (colorIndex !== -1) {
+            // Find size
+            const sizeIndex = liveConfig.drops[dropIndex].colors[colorIndex].sizes.findIndex((s) => s.id === purchasedItem.sizeId);
+            if (sizeIndex !== -1) {
+              const currentStock = liveConfig.drops[dropIndex].colors[colorIndex].sizes[sizeIndex].stockQuantity ?? 50;
+              const newStock = Math.max(0, currentStock - purchasedItem.quantity); // Decrement but never go below 0
+              liveConfig.drops[dropIndex].colors[colorIndex].sizes[sizeIndex].stockQuantity = newStock;
+              stockWasModified = true;
+            }
+          }
+        }
+      });
+
+      if (stockWasModified) {
+        // Broadcast stock update back to cloud automatically!
+        await saveLiveSiteContent(liveConfig);
+        console.log(`📦 Order ${orderId}: Successfully decremented live inventory stock.`);
+      }
+    }
+
+    // 3. Construct the formatted notification text for the founder
+    const totalQuantity = hasCartItems ? cartItems.reduce((acc: number, item: CartItemPayload) => acc + item.quantity, 0) : 0;
+    const cartListText = hasCartItems
+      ? cartItems.map((item: CartItemPayload, idx: number) => 
+          `${idx + 1}. ${item.dropName} - ${item.colorName} - Size: ${item.sizeName} | QTY: ${item.quantity} | Total: PKR ${(item.priceNumeric * item.quantity).toLocaleString()}`
+        ).join("\n")
+      : "No items listed (Test Email)";
+
     const orderSummaryText = `
-${isTestEmail ? "🧪 TEST ORDER VERIFICATION VIA STUDIO ADMIN 🧪" : "🛍️ NEW ORDER RECEIVED:"} ${orderId} (${productName || "The Rove Polo"})
+${isTestEmail ? "🧪 TEST ORDER VERIFICATION VIA STUDIO ADMIN 🧪" : "🛍️ NEW CART ORDER RECEIVED:"} ${orderId}
 ===================================================================
 Time: ${timestamp}
-Item: ${productName || "The Rove Polo"}
-Colorway: ${selectedColor || "Jet Black Obsidian"}
-Size Grade & Specs: ${selectedSize || "Medium"}
-Total Valuation: ${priceFormatted || "PKR 2,299"} (COD / Direct Fulfillment)
+Total Items: ${totalQuantity}
+Total Valuation: ${formattedTotalPrice || "PKR 0"} (COD / Direct Fulfillment)
+
+🛒 CART SUMMARY:
+${cartListText}
 
 📋 CUSTOMER SHIPPING INFORMATION
 -------------------------------------------------------------------
@@ -81,7 +133,7 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
           headers: { "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify({
             access_key: web3formsKey.trim(),
-            subject: `🚨 ${isTestEmail ? "[TEST]" : ""} Order ${orderId} - ${selectedColor || "Jet Black"} (${selectedSize || "M"}) - ${priceFormatted || "PKR 2,299"}`,
+            subject: `🚨 ${isTestEmail ? "[TEST]" : ""} Order ${orderId} - ${totalQuantity} Items - ${formattedTotalPrice}`,
             from_name: "ROVE Studio Order Hub",
             message: orderSummaryText,
           }),
@@ -123,7 +175,7 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
             body: JSON.stringify({
               from: "ROVE Studio Orders <onboarding@resend.dev>",
               to: [targetEmail],
-              subject: `🚨 ${isTestEmail ? "[TEST]" : ""} Order ${orderId} - ${selectedColor || "Jet Black"} (${selectedSize || "M"}) - ${priceFormatted || "PKR 2,299"}`,
+              subject: `🚨 ${isTestEmail ? "[TEST]" : ""} Order ${orderId} - ${totalQuantity} Items - ${formattedTotalPrice}`,
               text: orderSummaryText,
             }),
           });
@@ -147,7 +199,7 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
       }
     }
 
-    // If this was an explicit test request from the Admin Dashboard, return the exact diagnostic results
+    // If this was an explicit test request from the Admin Dashboard
     if (isTestEmail) {
       if (!emailDeliveryStatus.startsWith("SUCCESS")) {
         return NextResponse.json(
@@ -179,9 +231,8 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
         orderId,
         fullName,
         phone,
-        priceFormatted,
-        selectedColor,
-        selectedSize,
+        totalItems: totalQuantity,
+        formattedTotalPrice,
       },
     });
   } catch (error: unknown) {

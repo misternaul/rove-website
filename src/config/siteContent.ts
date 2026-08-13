@@ -10,6 +10,7 @@ export interface SizeOption {
   id: string;
   name: string;
   details: string;
+  stockQuantity: number; // 👉 New: Track live inventory stock per size!
 }
 
 export interface ColorOption {
@@ -18,10 +19,13 @@ export interface ColorOption {
   hex: string;
   priceFormatted: string;
   priceNumeric: number;
+  isDiscountActive?: boolean; // 👉 New: Toggle discounts on/off
+  discountedPriceFormatted?: string; // 👉 New: Formatted discount price (e.g. "PKR 1,999")
+  discountedPriceNumeric?: number; // 👉 New: Numeric discount price for calculations
   frontImage: string; // Image 1 (Front View)
   backImage: string;  // Image 2 (Back / Alternate View)
   caption: string;
-  sizes: SizeOption[]; // 👉 Each individual product/colorway now controls its own sizes & measurements!
+  sizes: SizeOption[]; // Each individual product/colorway controls its own sizes, measurements, and stock!
 }
 
 export interface AccordionItem {
@@ -115,11 +119,13 @@ const standardTwoSizes: SizeOption[] = [
     id: "M",
     name: "Medium",
     details: "Chest: 20\" | Length: 27.5\" | Shoulder: 17.5\"",
+    stockQuantity: 50,
   },
   {
     id: "L",
     name: "Large",
     details: "Chest: 21\" | Length: 28.5\" | Shoulder: 18\"",
+    stockQuantity: 50,
   },
 ];
 
@@ -217,6 +223,9 @@ export const siteContent: SiteConfig = {
           hex: "#0D0D0D",
           priceFormatted: "PKR 2,299",
           priceNumeric: 2299,
+          isDiscountActive: false,
+          discountedPriceFormatted: "PKR 1,999",
+          discountedPriceNumeric: 1999,
           frontImage: "/images/polo-black-front.png", // Image 1
           backImage: "/images/polo-black-back.png",   // Image 2
           caption: "Deep obsidian tactile cotton with high-density metallic gold horizon embroidery.",
@@ -228,6 +237,9 @@ export const siteContent: SiteConfig = {
           hex: "#CDBFA6",
           priceFormatted: "PKR 2,499",
           priceNumeric: 2499,
+          isDiscountActive: false,
+          discountedPriceFormatted: "PKR 2,199",
+          discountedPriceNumeric: 2199,
           frontImage: "/images/polo-sand-front.png", // Image 1
           backImage: "/images/polo-sand-back.png",   // Image 2
           caption: "Earthy tactile tone inspired by architectural desert minerals and warm sandstone.",
@@ -235,7 +247,7 @@ export const siteContent: SiteConfig = {
         },
       ],
 
-      orderButtonText: "Place Direct Order",
+      orderButtonText: "Add to Cart Allocation", // Changed text for the Cart flow
       secondaryActionText: "Reserve Allocation Spot",
       guaranteeText: "Verified Cash on Delivery (COD) & Priority Direct Studio Fulfillment across all cities in Pakistan.",
 

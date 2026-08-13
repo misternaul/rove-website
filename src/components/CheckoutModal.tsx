@@ -2,28 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, ShoppingBag, ShieldCheck, Truck, PhoneCall, AlertCircle, MessageCircle } from "lucide-react";
+import { X, Check, ShoppingBag, ShieldCheck, Truck, PhoneCall, AlertCircle, MessageCircle, Trash2, Plus, Minus } from "lucide-react";
 import { siteContent } from "@/config/siteContent";
+import { useCart } from "@/components/CartProvider";
+import Image from "next/image";
 
-interface OrderModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  productName: string;
-  selectedColor: string;
-  selectedSize: string;
-  priceFormatted: string;
-  whatsappNumber: string;
-}
+export default function CheckoutModal() {
+  const { isCartOpen, setIsCartOpen, cartItems, updateQuantity, removeFromCart, clearCart, totalQuantity, totalPriceNumeric } = useCart();
 
-export default function OrderModal({
-  isOpen,
-  onClose,
-  productName,
-  selectedColor,
-  selectedSize,
-  priceFormatted,
-  whatsappNumber,
-}: OrderModalProps) {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -39,13 +25,13 @@ export default function OrderModal({
   const [liveConfig, setLiveConfig] = useState(siteContent);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isCartOpen) {
       fetch("/api/cms")
         .then((r) => r.json())
         .then((d) => { if (d.success && d.data) setLiveConfig(d.data); })
         .catch(() => {});
     }
-  }, [isOpen]);
+  }, [isCartOpen]);
 
   const resetForm = () => {
     setFullName("");
@@ -64,12 +50,21 @@ export default function OrderModal({
   const handleClose = () => {
     if (status === "success") {
       resetForm();
+      clearCart();
     }
-    onClose();
+    setIsCartOpen(false);
   };
+
+  const formattedTotalPrice = `PKR ${totalPriceNumeric.toLocaleString()}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (cartItems.length === 0) {
+      setStatus("error");
+      setErrorMessage("Your cart is empty.");
+      return;
+    }
 
     if (!fullName.trim() || !phone.trim() || !city.trim() || !primaryAddress.trim()) {
       setStatus("error");
@@ -83,14 +78,19 @@ export default function OrderModal({
     const orderId = `ROVE-${Math.floor(100000 + Math.random() * 900000)}`;
     const timestamp = new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" });
 
+    const cartListText = cartItems.map((item, idx) => 
+      `${idx + 1}. ${item.dropName} - ${item.colorName} - Size: ${item.sizeName} | QTY: ${item.quantity} | Total: PKR ${(item.priceNumeric * item.quantity).toLocaleString()}`
+    ).join("\n");
+
     const orderSummaryText = `
-🛍️ NEW ROVE ORDER RECEIVED: ${orderId} (${productName})
+🛍️ NEW ROVE CART ORDER: ${orderId}
 ===================================================================
 Time: ${timestamp}
-Item: ${productName}
-Colorway: ${selectedColor}
-Size Grade & Specs: ${selectedSize}
-Total Valuation: ${priceFormatted} (COD / Direct Fulfillment)
+Total Items: ${totalQuantity}
+Total Valuation: ${formattedTotalPrice} (COD)
+
+🛒 CART ITEMS:
+${cartListText}
 
 📋 CUSTOMER SHIPPING INFORMATION
 -------------------------------------------------------------------
@@ -106,13 +106,13 @@ Nearest Landmark: ${landmark.trim() || "N/A"}
 ${notes.trim() || "None"}
 
 ===================================================================
-👉 WhatsApp Confirmation Routing Available to: ${liveConfig.brand.whatsappNumber || whatsappNumber}
+👉 WhatsApp Confirmation Routing Available to: ${liveConfig.brand.whatsappNumber}
     `;
 
     try {
       const accessKey = liveConfig.brand.web3formsAccessKey || "b0a8ee37-de57-4314-acee-4c65d60c8580";
       
-      // 1. Send DIRECTLY from client browser to Web3Forms to bypass Cloudflare bot detection!
+      // 1. Send DIRECTLY from client browser to Web3Forms
       let web3FormsSuccess = false;
       if (accessKey && accessKey.trim() !== "") {
         try {
@@ -121,7 +121,7 @@ ${notes.trim() || "None"}
             headers: { "Content-Type": "application/json", Accept: "application/json" },
             body: JSON.stringify({
               access_key: accessKey.trim(),
-              subject: `🚨 Order ${orderId} - ${selectedColor} (${selectedSize.split(" ")[0]}) - ${priceFormatted}`,
+              subject: `🚨 Order ${orderId} - ${totalQuantity} Items - ${formattedTotalPrice}`,
               from_name: "ROVE Studio Order Hub",
               message: orderSummaryText,
             }),
@@ -135,7 +135,8 @@ ${notes.trim() || "None"}
         }
       }
 
-      // 2. Transmit to backend API for internal logging and backup Resend delivery
+      // 2. Transmit to backend API for inventory decrement and backup email!
+      // Here we pass the entire `cartItems` array so the backend can decrement stock for all items
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -148,10 +149,8 @@ ${notes.trim() || "None"}
           secondaryAddress: secondaryAddress.trim(),
           landmark: landmark.trim(),
           notes: notes.trim(),
-          productName,
-          selectedColor,
-          selectedSize,
-          priceFormatted,
+          cartItems, // The backend will loop this array to decrement stock!
+          formattedTotalPrice,
           customWeb3FormsKey: accessKey,
         }),
       });
@@ -172,21 +171,19 @@ ${notes.trim() || "None"}
     }
   };
 
-  // Construct automated WhatsApp message for instant verification
   const openWhatsAppVerification = () => {
-    const text = `Hi ROVE Studio! I just placed an order on the website.\n\n*Order ID:* ${confirmedOrderId}\n*Item:* ${productName}\n*Color:* ${selectedColor}\n*Size:* ${selectedSize}\n*Price:* ${priceFormatted} (COD)\n*Name:* ${fullName}\n*Phone:* ${phone}\n*City:* ${city}\n*Address:* ${primaryAddress} ${secondaryAddress ? `(${secondaryAddress})` : ""} ${landmark ? `[Near ${landmark}]` : ""}\n\nPlease confirm my Cash on Delivery allocation!`;
+    const text = `Hi ROVE Studio! I just placed an order on the website.\n\n*Order ID:* ${confirmedOrderId}\n*Total Items:* ${totalQuantity}\n*Total Price:* ${formattedTotalPrice} (COD)\n*Name:* ${fullName}\n*Phone:* ${phone}\n*City:* ${city}\n*Address:* ${primaryAddress} ${secondaryAddress ? `(${secondaryAddress})` : ""} ${landmark ? `[Near ${landmark}]` : ""}\n\nPlease confirm my Cash on Delivery allocation!`;
     
-    const cleanNumber = (liveConfig.brand.whatsappNumber || whatsappNumber).replace(/[^0-9]/g, "").replace(/^0/, "92");
+    const cleanNumber = (liveConfig.brand.whatsappNumber).replace(/[^0-9]/g, "").replace(/^0/, "92");
     const whatsappUrl = `https://wa.me/${cleanNumber || "923000000000"}?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, "_blank");
   };
 
-  if (!isOpen) return null;
+  if (!isCartOpen) return null;
 
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 overflow-y-auto">
-        {/* Backdrop Blur & Overlay */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -195,7 +192,6 @@ ${notes.trim() || "None"}
           className="fixed inset-0 bg-[#000000]/85 backdrop-blur-md transition-opacity"
         />
 
-        {/* Modal Window Container */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -203,7 +199,6 @@ ${notes.trim() || "None"}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="relative w-full max-w-2xl bg-[#141414] border border-[#D4AF37]/30 text-white shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col my-8"
         >
-          {/* Header Bar */}
           <div className="p-6 border-b border-white/10 flex items-center justify-between bg-[#0D0D0D] flex-shrink-0">
             <div className="flex items-center gap-3">
               <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
@@ -212,7 +207,7 @@ ${notes.trim() || "None"}
                   Studio Allocation
                 </span>
                 <h3 className="text-lg font-serif tracking-wide text-white">
-                  Direct Order Placement
+                  Your Cart & Checkout
                 </h3>
               </div>
             </div>
@@ -225,7 +220,6 @@ ${notes.trim() || "None"}
             </button>
           </div>
 
-          {/* Scrollable Body Container */}
           <div className="p-6 md:p-8 overflow-y-auto flex-1 space-y-8">
             
             {status === "success" ? (
@@ -237,7 +231,6 @@ ${notes.trim() || "None"}
                 <div className="w-16 h-16 bg-[#25D366]/15 border border-[#25D366] rounded-full flex items-center justify-center mx-auto text-[#25D366] shadow-[0_0_25px_rgba(37,211,102,0.25)]">
                   <Check className="w-8 h-8" />
                 </div>
-
                 <div>
                   <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37]">
                     Order Recorded Successfully
@@ -249,39 +242,28 @@ ${notes.trim() || "None"}
                     Reference ID: <span className="text-[#D4AF37] font-bold">{confirmedOrderId}</span>
                   </p>
                 </div>
-
                 <div className="p-5 bg-[#0D0D0D] border border-white/10 max-w-md mx-auto text-left font-mono text-xs space-y-3 shadow-inner">
                   <div className="flex justify-between pb-2 border-b border-white/10">
-                    <span className="text-white/60">Item:</span>
-                    <span className="text-white font-semibold">{productName}</span>
-                  </div>
-                  <div className="flex justify-between pb-2 border-b border-white/10">
-                    <span className="text-white/60">Colorway:</span>
-                    <span className="text-[#D4AF37]">{selectedColor}</span>
-                  </div>
-                  <div className="flex justify-between pb-2 border-b border-white/10">
-                    <span className="text-white/60">Size Grade:</span>
-                    <span className="text-white/90">{selectedSize}</span>
+                    <span className="text-white/60">Total Items:</span>
+                    <span className="text-white font-semibold">{totalQuantity}</span>
                   </div>
                   <div className="flex justify-between pb-2 border-b border-white/10">
                     <span className="text-white/60">Total Valuation:</span>
-                    <span className="text-[#D4AF37] font-bold text-sm">{priceFormatted} (COD)</span>
+                    <span className="text-[#D4AF37] font-bold text-sm">{formattedTotalPrice} (COD)</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-white/60">Shipping To:</span>
                     <span className="text-white">{city}</span>
                   </div>
                 </div>
-
                 <div className="p-4 bg-[#25D366]/10 border border-[#25D366]/40 max-w-md mx-auto text-left space-y-2">
                   <strong className="text-xs font-mono text-[#25D366] uppercase tracking-wider block flex items-center gap-1.5">
                     <MessageCircle className="w-4 h-4 fill-[#25D366] text-black" /> Step 2: Instant WhatsApp Confirmation
                   </strong>
                   <p className="text-xs text-white/80 leading-relaxed font-sans font-light">
-                    Click below to open WhatsApp with our fulfillment team ({liveConfig.brand.whatsappNumber || whatsappNumber}). Your order details will be automatically attached for fastest dispatch!
+                    Click below to open WhatsApp with our fulfillment team. Your order details will be automatically attached for fastest dispatch!
                   </p>
                 </div>
-
                 <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <button
                     onClick={openWhatsAppVerification}
@@ -298,35 +280,78 @@ ${notes.trim() || "None"}
                   </button>
                 </div>
               </motion.div>
+            ) : cartItems.length === 0 ? (
+              <div className="text-center py-12 space-y-6">
+                <ShoppingBag className="w-12 h-12 text-white/20 mx-auto" />
+                <div>
+                  <h4 className="text-xl font-serif text-white">Your Cart is Empty</h4>
+                  <p className="text-sm text-white/50 font-mono mt-2">Explore our collections and add items to your cart.</p>
+                </div>
+                <button
+                  onClick={handleClose}
+                  className="px-8 py-3 bg-[#D4AF37] text-black font-mono font-bold text-xs uppercase tracking-widest mt-4 hover:bg-white transition-colors"
+                >
+                  Continue Browsing
+                </button>
+              </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                
-                <div className="p-4 bg-[#0D0D0D] border border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono text-xs">
-                  <div>
-                    <span className="text-[10px] text-[#D4AF37] uppercase tracking-[0.2em] block mb-1">Selected Allocation</span>
-                    <span className="text-base text-white font-serif tracking-wide block">
-                      {productName}
-                    </span>
-                    <span className="text-white/80 block mt-1 font-semibold">
-                      {selectedColor} &nbsp;|&nbsp; {selectedSize.split("(")[0]}
-                    </span>
-                  </div>
-                  <div className="sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-white/10">
-                    <span className="text-[10px] text-white/50 uppercase block">Valuation</span>
-                    <span className="text-xl text-[#D4AF37] font-bold tracking-wider block my-0.5">
-                      {priceFormatted}
-                    </span>
-                    <span className="text-[10px] text-[#25D366] font-sans font-medium block">
-                      ✔ Complimentary Express COD
-                    </span>
+              <>
+                {/* CART ITEMS LIST */}
+                <div className="space-y-4">
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="flex gap-4 p-4 bg-[#0D0D0D] border border-white/10 relative group">
+                      <div className="relative w-20 h-24 bg-[#141414] flex-shrink-0">
+                        <Image src={item.image} alt={item.colorName} fill className="object-cover" />
+                      </div>
+                      <div className="flex-1 flex flex-col justify-between py-1">
+                        <div>
+                          <div className="flex justify-between items-start gap-4">
+                            <h4 className="text-sm font-serif text-white line-clamp-1">{item.dropName}</h4>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="text-white/40 hover:text-red-400 p-1 transition-colors flex-shrink-0"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <p className="text-[10px] text-white/60 font-mono uppercase mt-1">
+                            {item.colorName} | Size: {item.sizeName}
+                          </p>
+                        </div>
+                        <div className="flex items-center justify-between mt-4">
+                          <div className="flex items-center border border-white/20 bg-[#141414]">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="p-1.5 text-white/70 hover:text-white transition-colors"
+                            >
+                              <Minus className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="w-8 text-center text-xs font-mono font-bold">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              disabled={item.quantity >= item.maxStock}
+                              className="p-1.5 text-white/70 hover:text-[#D4AF37] disabled:text-white/20 disabled:cursor-not-allowed transition-colors"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          <span className="text-xs font-mono font-bold text-[#D4AF37]">
+                            PKR {(item.priceNumeric * item.quantity).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="pt-4 border-t border-white/10 flex justify-between items-end">
+                    <span className="text-xs font-mono uppercase text-white/60 tracking-widest">Total Valuation</span>
+                    <span className="text-xl md:text-2xl font-mono font-bold text-[#D4AF37]">{formattedTotalPrice}</span>
                   </div>
                 </div>
 
-                <div className="border-t border-white/10 pt-2">
+                <form onSubmit={handleSubmit} className="space-y-6 pt-6 border-t border-white/10">
                   <h4 className="text-xs font-mono tracking-[0.2em] uppercase text-[#D4AF37] mb-4">
-                    1. Customer Contact & Details
+                    Shipping Details
                   </h4>
-                  
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
@@ -336,13 +361,11 @@ ${notes.trim() || "None"}
                         type="text"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        placeholder="e.g. Haseeb Naul"
                         required
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
                     </div>
-
                     <div>
                       <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
                         Phone / WhatsApp <span className="text-[#D4AF37]">*</span>
@@ -351,38 +374,26 @@ ${notes.trim() || "None"}
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="e.g. 0300 1234567"
                         required
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
-                      <span className="text-[10px] text-white/40 font-mono block mt-1">
-                        For courier rider & WhatsApp verification
-                      </span>
                     </div>
-
                     <div className="sm:col-span-2">
                       <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                        Email Address <span className="text-white/40 font-normal">(Optional for receipt)</span>
+                        Email Address <span className="text-white/40">(Optional)</span>
                       </label>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="your.email@example.com"
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                   </div>
-                </div>
 
-                <div className="border-t border-white/10 pt-4">
-                  <h4 className="text-xs font-mono tracking-[0.2em] uppercase text-[#D4AF37] mb-4">
-                    2. Pakistan Shipping Address
-                  </h4>
-
-                  <div className="space-y-4">
+                  <div className="space-y-4 pt-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
@@ -392,102 +403,89 @@ ${notes.trim() || "None"}
                           type="text"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
-                          placeholder="e.g. Lahore, Punjab"
                           required
                           disabled={status === "submitting"}
-                          className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
+                          className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                         />
                       </div>
-
                       <div>
                         <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                          Nearest Landmark <span className="text-white/40">(Recommended)</span>
+                          Nearest Landmark <span className="text-white/40">(Optional)</span>
                         </label>
                         <input
                           type="text"
                           value={landmark}
                           onChange={(e) => setLandmark(e.target.value)}
-                          placeholder="e.g. Near Al-Fatah Mall, Phase 5"
                           disabled={status === "submitting"}
-                          className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
+                          className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                         />
                       </div>
                     </div>
-
                     <div>
                       <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                        Primary Address (House #, Street, Block/Phase) <span className="text-[#D4AF37]">*</span>
+                        Primary Address (House #, Street) <span className="text-[#D4AF37]">*</span>
                       </label>
                       <input
                         type="text"
                         value={primaryAddress}
                         onChange={(e) => setPrimaryAddress(e.target.value)}
-                        placeholder="e.g. House 42, Street 15, Sector Y, DHA"
                         required
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
                     </div>
-
                     <div>
                       <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                        2nd Address / Apartment / Suite <span className="text-white/40">(Optional)</span>
+                        2nd Address / Apartment <span className="text-white/40">(Optional)</span>
                       </label>
                       <input
                         type="text"
                         value={secondaryAddress}
                         onChange={(e) => setSecondaryAddress(e.target.value)}
-                        placeholder="e.g. Apartment 3B or Gate 2 Entrance"
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
                     </div>
-
                     <div>
                       <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                        Special Instructions / Fitting Notes <span className="text-white/40">(Optional)</span>
+                        Special Instructions <span className="text-white/40">(Optional)</span>
                       </label>
                       <textarea
                         rows={2}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        placeholder="e.g. Please deliver after 4 PM, or note about athletic fit."
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none resize-none"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37] resize-none"
                       />
                     </div>
                   </div>
-                </div>
 
-                {/* Error Banner */}
-                {status === "error" && (
-                  <div className="p-3 bg-red-950/80 border border-red-500/50 flex items-center gap-3 text-red-300 text-xs font-mono">
-                    <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400" />
-                    <span>{errorMessage}</span>
+                  {status === "error" && (
+                    <div className="p-3 bg-red-950/80 border border-red-500/50 flex items-center gap-3 text-red-300 text-xs font-mono">
+                      <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400" />
+                      <span>{errorMessage}</span>
+                    </div>
+                  )}
+
+                  <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 text-white/70 text-xs font-sans font-light">
+                      <ShieldCheck className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />
+                      <span>Verified Cash on Delivery</span>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={status === "submitting"}
+                      className="w-full sm:w-auto px-10 py-4 bg-[#D4AF37] hover:bg-[#D4AF37]/90 disabled:opacity-50 text-[#0D0D0D] font-mono font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 flex items-center justify-center shadow-xl"
+                    >
+                      {status === "submitting" ? "Transmitting..." : `Confirm Order (${formattedTotalPrice})`}
+                    </button>
                   </div>
-                )}
-
-                {/* Submit Action Bar */}
-                <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 text-white/70 text-xs font-sans font-light">
-                    <ShieldCheck className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />
-                    <span>Verified Cash on Delivery & Direct Fulfillment</span>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={status === "submitting"}
-                    className="w-full sm:w-auto px-10 py-4 bg-[#D4AF37] hover:bg-[#D4AF37]/90 disabled:opacity-50 text-[#0D0D0D] font-mono font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 flex items-center justify-center gap-3 whitespace-nowrap shadow-xl"
-                  >
-                    <span>{status === "submitting" ? "Transmitting..." : `Confirm Order (${priceFormatted})`}</span>
-                  </button>
-                </div>
-              </form>
+                </form>
+              </>
             )}
 
           </div>
 
-          {/* Footer Security Badge */}
           <div className="px-6 py-4 bg-[#0D0D0D] border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-[10px] font-mono text-white/40 uppercase">
             <div className="flex items-center gap-2">
               <Truck className="w-3.5 h-3.5 text-[#D4AF37]" />

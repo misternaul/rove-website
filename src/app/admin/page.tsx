@@ -157,9 +157,12 @@ export default function StudioAdminPage() {
           backImage: "/images/polo-black-back.png",
           caption: "Primary colorway description.",
           sizes: [
-            { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },
-            { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"' },
+            { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"', stockQuantity: 50 },
+            { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"', stockQuantity: 50 },
           ],
+          isDiscountActive: false,
+          discountedPriceFormatted: "PKR 1,999",
+          discountedPriceNumeric: 1999,
         },
       ],
       orderButtonText: "Place Direct Order",
@@ -196,9 +199,12 @@ export default function StudioAdminPage() {
       backImage: "/images/polo-sand-back.png",
       caption: "Describe this variation's tone and texture.",
       sizes: [
-        { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },
-        { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"' },
+        { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"', stockQuantity: 50 },
+        { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"', stockQuantity: 50 },
       ],
+      isDiscountActive: false,
+      discountedPriceFormatted: "PKR 1,999",
+      discountedPriceNumeric: 1999,
     };
     current.colors.push(newItem);
     setConfig({ ...config, drops: copy });
@@ -222,6 +228,7 @@ export default function StudioAdminPage() {
       id: `XL`,
       name: `Extra Large`,
       details: 'Chest: 22" | Length: 29.5" | Shoulder: 18.5"',
+      stockQuantity: 50,
     };
     targetItem.sizes = targetItem.sizes || [];
     targetItem.sizes.push(newSize);
@@ -467,7 +474,16 @@ export default function StudioAdminPage() {
                           <div className="flex items-center gap-3">
                             <span className="w-5 h-5 rounded-full border border-white/40 shadow-sm" style={{ backgroundColor: item.hex }} />
                             <strong className="text-base text-white font-serif">{item.name || `Item ${itemIdx + 1}`}</strong>
-                            <span className="px-2.5 py-0.5 bg-[#141414] text-[#D4AF37] text-xs font-mono font-bold">{item.priceFormatted}</span>
+                            <div className="flex gap-2">
+                              {item.isDiscountActive && (
+                                <span className="px-2.5 py-0.5 bg-red-950/50 text-red-400 text-xs font-mono font-bold line-through">
+                                  {item.priceFormatted}
+                                </span>
+                              )}
+                              <span className="px-2.5 py-0.5 bg-[#141414] text-[#D4AF37] text-xs font-mono font-bold">
+                                {item.isDiscountActive ? item.discountedPriceFormatted : item.priceFormatted}
+                              </span>
+                            </div>
                           </div>
                           <button
                             onClick={() => removeItemFromCurrentDrop(itemIdx)}
@@ -479,9 +495,9 @@ export default function StudioAdminPage() {
                         </div>
 
                         {/* Item Basic Details (Name & Price) */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                           <div>
-                            <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1.5">Item / Colorway Name</label>
+                            <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1.5">Colorway Name</label>
                             <input
                               type="text"
                               value={item.name}
@@ -495,7 +511,7 @@ export default function StudioAdminPage() {
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] uppercase tracking-wider text-[#D4AF37] font-bold mb-1.5">Price (PKR)</label>
+                            <label className="block text-[11px] uppercase tracking-wider text-[#D4AF37] font-bold mb-1.5">Original Price</label>
                             <input
                               type="text"
                               value={item.priceFormatted}
@@ -504,11 +520,44 @@ export default function StudioAdminPage() {
                                 copy[selectedDropIndex].colors[itemIdx].priceFormatted = e.target.value;
                                 setConfig({ ...config, drops: copy });
                               }}
-                              placeholder="e.g. PKR 2,299 or PKR 2,499"
+                              placeholder="e.g. PKR 2,499"
                               className="w-full bg-[#141414] border border-white/20 p-3 text-sm text-[#D4AF37] font-mono font-bold focus:border-[#D4AF37]"
                             />
                           </div>
+                          <div className="flex flex-col">
+                            <label className="block text-[11px] uppercase tracking-wider text-red-400 font-bold mb-1.5">Active Discount?</label>
+                            <div className="flex items-center gap-4 flex-1">
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={item.isDiscountActive || false}
+                                  onChange={(e) => {
+                                    const copy = [...config.drops];
+                                    copy[selectedDropIndex].colors[itemIdx].isDiscountActive = e.target.checked;
+                                    setConfig({ ...config, drops: copy });
+                                  }}
+                                  className="w-4 h-4 accent-[#D4AF37]"
+                                />
+                                <span className="text-xs font-mono text-white/80">Enable Sale</span>
+                              </label>
+                            </div>
+                          </div>
                           <div>
+                            <label className={`block text-[11px] uppercase tracking-wider font-bold mb-1.5 ${item.isDiscountActive ? "text-red-400" : "text-white/30"}`}>Discount Price</label>
+                            <input
+                              type="text"
+                              disabled={!item.isDiscountActive}
+                              value={item.discountedPriceFormatted || ""}
+                              onChange={(e) => {
+                                const copy = [...config.drops];
+                                copy[selectedDropIndex].colors[itemIdx].discountedPriceFormatted = e.target.value;
+                                setConfig({ ...config, drops: copy });
+                              }}
+                              placeholder="e.g. PKR 1,999"
+                              className="w-full bg-[#141414] border border-white/20 p-3 text-sm font-mono font-bold focus:border-[#D4AF37] disabled:opacity-30"
+                            />
+                          </div>
+                          <div className="sm:col-span-2 lg:col-span-4">
                             <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1.5">Color Tint (Hex Code)</label>
                             <div className="flex items-center gap-2">
                               <input
@@ -628,6 +677,20 @@ export default function StudioAdminPage() {
                                       placeholder="Chest: 20, Length: 27.5, Shoulder: 17.5"
                                       className="w-full bg-[#141414] border border-white/20 p-2 text-xs text-white/90 font-mono"
                                     />
+                                  </div>
+                                  <div className="col-span-3 mt-3 pt-3 border-t border-white/10">
+                                    <label className="block text-[10px] text-[#D4AF37] uppercase font-bold mb-1 tracking-wider">Live Inventory Stock</label>
+                                    <input
+                                      type="number"
+                                      value={sz.stockQuantity === undefined ? 50 : sz.stockQuantity}
+                                      onChange={(e) => {
+                                        const copy = [...config.drops];
+                                        copy[selectedDropIndex].colors[itemIdx].sizes[szIdx].stockQuantity = Number(e.target.value);
+                                        setConfig({ ...config, drops: copy });
+                                      }}
+                                      className="w-full bg-[#0D0D0D] border border-[#D4AF37]/40 p-2.5 text-sm text-white font-mono font-bold focus:border-[#D4AF37]"
+                                    />
+                                    <span className="text-[9px] text-white/50 block mt-1">Set to 0 to automatically mark as "SOLD OUT".</span>
                                   </div>
                                 </div>
                               </div>

@@ -3,12 +3,14 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, ArrowUpRight, ShoppingBag } from "lucide-react";
 import { siteContent } from "@/config/siteContent";
+import { useCart } from "@/components/CartProvider";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { totalQuantity, setIsCartOpen } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,8 +75,21 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Action Button */}
-          <div className="hidden md:flex items-center">
+          {/* Action Buttons */}
+          <div className="hidden md:flex items-center gap-4">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 text-white/80 hover:text-[#D4AF37] transition-colors"
+              aria-label="Open Cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {totalQuantity > 0 && (
+                <span className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-[#D4AF37] text-[#0D0D0D] text-[9px] font-bold px-1.5 py-0.5 rounded-full font-mono">
+                  {totalQuantity}
+                </span>
+              )}
+            </button>
+
             <a
               href="#showcase"
               className="px-6 py-2.5 bg-[#141414] hover:bg-[#D4AF37] text-[#D4AF37] hover:text-[#0D0D0D] border border-[#D4AF37]/50 hover:border-[#D4AF37] font-mono text-xs uppercase tracking-[0.25em] transition-all duration-500 flex items-center gap-2 group shadow-lg"
@@ -84,8 +99,20 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Mobile Menu Toggle Button */}
-          <div className="md:hidden flex items-center">
+          {/* Mobile Menu Toggle & Cart */}
+          <div className="md:hidden flex items-center gap-4">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 text-white/80 hover:text-[#D4AF37] transition-colors"
+              aria-label="Open Cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {totalQuantity > 0 && (
+                <span className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-[#D4AF37] text-[#0D0D0D] text-[9px] font-bold px-1.5 py-0.5 rounded-full font-mono">
+                  {totalQuantity}
+                </span>
+              )}
+            </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 text-[#D4AF37] focus:outline-none"

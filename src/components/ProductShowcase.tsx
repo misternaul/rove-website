@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Shield, RefreshCw, ChevronDown, ChevronUp, ShoppingBag, ArrowRight, Layers } from "lucide-react";
 import { siteContent, DropItem, SiteConfig, SizeOption } from "@/config/siteContent";
-import OrderModal from "@/components/OrderModal";
+import { useCart } from "@/components/CartProvider";
 
 const fallbackSizes: SizeOption[] = [
   { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },
@@ -20,8 +20,7 @@ export default function ProductShowcase() {
   const [activeView, setActiveView] = useState<"front" | "back">("front");
   const [openAccordion, setOpenAccordion] = useState<string | null>("materials");
   
-  // Order Modal State
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     // Automatically retrieve live updates saved via /admin Studio or Vercel Upstash Redis
@@ -227,14 +226,21 @@ export default function ProductShowcase() {
                   <span className="text-xs font-mono uppercase tracking-[0.2em] text-white/50">
                     Valuation ({selectedColor.name.split(" ")[0]})
                   </span>
-                  <motion.span
-                    key={selectedColor.priceFormatted}
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="text-2xl sm:text-3xl font-mono font-bold text-[#D4AF37] tracking-tight"
-                  >
-                    {selectedColor.priceFormatted}
-                  </motion.span>
+                  <div className="flex items-baseline gap-3">
+                    {selectedColor.isDiscountActive && (
+                      <span className="text-lg sm:text-xl font-mono text-white/40 line-through tracking-tight">
+                        {selectedColor.priceFormatted}
+                      </span>
+                    )}
+                    <motion.span
+                      key={selectedColor.isDiscountActive ? selectedColor.discountedPriceFormatted : selectedColor.priceFormatted}
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="text-2xl sm:text-3xl font-mono font-bold text-[#D4AF37] tracking-tight"
+                    >
+                      {selectedColor.isDiscountActive ? selectedColor.discountedPriceFormatted : selectedColor.priceFormatted}
+                    </motion.span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-sans text-white/70">
                   <span className="inline-block w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
@@ -275,7 +281,9 @@ export default function ProductShowcase() {
                       </div>
                       <div className="flex items-center justify-between w-full pt-1 border-t border-white/10">
                         <span className="text-[10px] font-mono text-white/50 uppercase">Price:</span>
-                        <span className="text-xs font-mono font-bold text-[#D4AF37]">{c.priceFormatted}</span>
+                        <span className="text-xs font-mono font-bold text-[#D4AF37]">
+                          {c.isDiscountActive ? c.discountedPriceFormatted : c.priceFormatted}
+                        </span>
                       </div>
                     </button>
                   ))}
@@ -294,19 +302,37 @@ export default function ProductShowcase() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  {availableSizes.map((s, idx) => (
-                    <button
-                      key={s.id || idx}
-                      onClick={() => setSelectedSizeIndex(idx)}
-                      className={`py-4 px-3 border text-xs font-mono uppercase tracking-wider transition-all flex flex-col items-center gap-1 ${
-                        validSizeIndex === idx
-                          ? "border-[#D4AF37] bg-[#D4AF37]/15 text-[#D4AF37] font-bold shadow-md"
-                          : "border-white/15 text-white/70 hover:border-white/50 hover:text-white bg-[#0D0D0D]"
-                      }`}
-                    >
-                      <span className="text-sm font-semibold">{s.name} ({s.id})</span>
-                    </button>
-                  ))}
+                  {availableSizes.map((s, idx) => {
+                    const isOutOfStock = s.stockQuantity === 0;
+                    const isLowStock = !isOutOfStock && s.stockQuantity !== undefined && s.stockQuantity < 5;
+
+                    return (
+                      <button
+                        key={s.id || idx}
+                        onClick={() => !isOutOfStock && setSelectedSizeIndex(idx)}
+                        disabled={isOutOfStock}
+                        className={`py-4 px-3 border text-xs font-mono uppercase tracking-wider transition-all flex flex-col items-center gap-1 relative ${
+                          isOutOfStock 
+                            ? "border-red-900/30 bg-red-950/10 text-red-500/50 cursor-not-allowed"
+                            : validSizeIndex === idx
+                              ? "border-[#D4AF37] bg-[#D4AF37]/15 text-[#D4AF37] font-bold shadow-md"
+                              : "border-white/15 text-white/70 hover:border-white/50 hover:text-white bg-[#0D0D0D]"
+                        }`}
+                      >
+                        <span className={`text-sm font-semibold ${isOutOfStock ? "line-through" : ""}`}>
+                          {s.name} ({s.id})
+                        </span>
+                        {isOutOfStock && (
+                          <span className="text-[9px] text-red-500 font-bold tracking-widest mt-1">SOLD OUT</span>
+                        )}
+                        {isLowStock && (
+                          <span className="absolute -top-2.5 right-0 bg-[#D4AF37] text-black text-[8px] font-bold px-2 py-0.5 shadow-md">
+                            ONLY {s.stockQuantity} LEFT
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Size Exact Measurements Feedback for active size */}
@@ -316,14 +342,33 @@ export default function ProductShowcase() {
                 </div>
               </div>
 
-              {/* PRIMARY ACTION: DIRECT ORDER PLACEMENT MODAL */}
+              {/* PRIMARY ACTION: ADD TO CART */}
               <div className="space-y-4">
                 <button
-                  onClick={() => setIsOrderModalOpen(true)}
-                  className="w-full py-5 bg-[#D4AF37] hover:bg-[#c49f27] text-[#0D0D0D] font-mono font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 flex items-center justify-center gap-3 shadow-xl transform hover:-translate-y-0.5"
+                  onClick={() => {
+                    addToCart({
+                      id: `${currentDrop.id}_${selectedColor.id}_${selectedSize.id}`,
+                      dropId: currentDrop.id,
+                      dropName: currentDrop.name,
+                      colorId: selectedColor.id,
+                      colorName: selectedColor.name,
+                      sizeId: selectedSize.id,
+                      sizeName: selectedSize.name,
+                      quantity: 1,
+                      priceFormatted: selectedColor.isDiscountActive ? selectedColor.discountedPriceFormatted! : selectedColor.priceFormatted,
+                      priceNumeric: selectedColor.isDiscountActive ? selectedColor.discountedPriceNumeric! : selectedColor.priceNumeric,
+                      image: selectedColor.frontImage,
+                      maxStock: selectedSize.stockQuantity ?? 50
+                    });
+                  }}
+                  disabled={selectedSize.stockQuantity === 0}
+                  className="w-full py-5 bg-[#D4AF37] hover:bg-[#c49f27] disabled:opacity-50 disabled:cursor-not-allowed text-[#0D0D0D] font-mono font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 flex items-center justify-center gap-3 shadow-xl transform hover:-translate-y-0.5"
                 >
                   <ShoppingBag className="w-4 h-4 text-[#0D0D0D]" />
-                  <span>{currentDrop.orderButtonText} ({selectedColor.priceFormatted})</span>
+                  <span>
+                    {selectedSize.stockQuantity === 0 ? "SOLD OUT" : currentDrop.orderButtonText} (
+                    {selectedColor.isDiscountActive ? selectedColor.discountedPriceFormatted : selectedColor.priceFormatted})
+                  </span>
                   <ArrowRight className="w-4 h-4 text-[#0D0D0D]" />
                 </button>
 
@@ -396,17 +441,6 @@ export default function ProductShowcase() {
         </div>
 
       </div>
-
-      {/* Order Placement Modal Triggered via Button */}
-      <OrderModal
-        isOpen={isOrderModalOpen}
-        onClose={() => setIsOrderModalOpen(false)}
-        productName={currentDrop.name}
-        selectedColor={selectedColor.name}
-        selectedSize={`${selectedSize.name} (${selectedSize.details})`}
-        priceFormatted={selectedColor.priceFormatted}
-        whatsappNumber={config.brand.whatsappNumber || siteContent.brand.whatsappNumber}
-      />
     </section>
   );
 }
