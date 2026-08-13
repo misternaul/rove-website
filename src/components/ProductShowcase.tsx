@@ -8,8 +8,8 @@ import { siteContent, DropItem, SiteConfig, SizeOption } from "@/config/siteCont
 import { useCart } from "@/components/CartProvider";
 
 const fallbackSizes: SizeOption[] = [
-  { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"' },
-  { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"' },
+  { id: "M", name: "Medium", details: 'Chest: 20" | Length: 27.5" | Shoulder: 17.5"', stockQuantity: 50 },
+  { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"', stockQuantity: 50 },
 ];
 
 export default function ProductShowcase() {
