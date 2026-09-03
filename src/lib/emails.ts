@@ -37,13 +37,13 @@ export async function sendOrderConfirmation(email: string, orderNumber: string, 
     const data = await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
-      subject: \`ROVE: Order Confirmation [\${orderNumber}]\`,
-      html: \`
+      subject: `ROVE: Order Confirmation [${orderNumber}]`,
+      html: `
         <div style="font-family: monospace; max-width: 600px; margin: 0 auto; padding: 40px; background-color: #FAFAFA; color: #000000; border: 1px solid #EAEAEA;">
           <h2 style="font-family: serif; font-weight: 300; letter-spacing: -0.02em; font-size: 24px;">Acquisition Confirmed.</h2>
           <p style="font-size: 14px; line-height: 1.6; color: #444444;">
-            Order <strong>\${orderNumber}</strong> has been successfully processed. 
-            Your total allocation comes to <strong>PKR \${totalAmount.toLocaleString()}</strong>.
+            Order <strong>${orderNumber}</strong> has been successfully processed. 
+            Your total allocation comes to <strong>PKR ${totalAmount.toLocaleString()}</strong>.
           </p>
           <p style="font-size: 14px; line-height: 1.6; color: #444444;">
             We are preparing your garments for shipment. You will receive another notification with tracking details once dispatched.
@@ -55,7 +55,7 @@ export async function sendOrderConfirmation(email: string, orderNumber: string, 
             </p>
           </div>
         </div>
-      \`
+      `
     });
     return { success: true, data };
   } catch (error) {
