@@ -1,27 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, User, ShoppingBag } from "lucide-react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { Menu, X, ArrowUpRight, ShoppingBag } from "lucide-react";
 import { siteContent } from "@/config/siteContent";
 import { useCart } from "@/components/CartProvider";
-import { ThemeToggle } from "./ThemeToggle";
-
-const NAV_LINKS = [
-  { name: "Shop", href: "/shop" },
-  { name: "Craft", href: "/craftsmanship" },
-  { name: "Lookbook", href: "/lookbook" },
-  { name: "Journal", href: "/journal" },
-  { name: "Community", href: "/community" },
-];
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { totalQuantity, setIsCartOpen } = useCart();
-  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,91 +24,98 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const primaryPrice = siteContent.drops[0]?.colors[0]?.priceFormatted || "PKR 2,299";
+
   return (
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-700 gpu-layer ${
           isScrolled
-            ? "bg-background/95 backdrop-blur-md py-4 border-b border-border shadow-md"
-            : "bg-gradient-to-b from-background/80 to-transparent py-7 border-b border-transparent"
+            ? "bg-[#0D0D0D]/95 backdrop-blur-md py-4 border-b border-[#D4AF37]/20 shadow-2xl"
+            : "bg-transparent py-7 border-b border-transparent"
         }`}
       >
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
           
-          {/* Logo Branding - Left */}
-          <div className="flex justify-start w-1/3">
-            <Link
-              href="/"
-              onClick={(e) => {
-                if (pathname === "/") {
-                  e.preventDefault();
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }
-              }}
-              className="group"
-            >
-              <span className="font-serif font-light text-xl md:text-2xl tracking-[0.35em] uppercase text-foreground group-hover:text-gold transition-colors duration-500">
-                {siteContent.brand.logoText}
-              </span>
-            </Link>
-          </div>
+          {/* Logo Branding */}
+          <a
+            href="#top"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="flex items-center gap-3 group"
+          >
+            <div className="relative w-8 h-8 md:w-10 md:h-10 overflow-hidden transition-transform duration-500 group-hover:scale-105">
+              <Image
+                src={siteContent.brand.logoIconImage}
+                alt={`${siteContent.brand.name} Icon`}
+                fill
+                className="object-contain"
+                priority
+                quality={90}
+              />
+            </div>
+            <span className="font-serif font-light text-xl md:text-2xl tracking-[0.35em] uppercase text-white group-hover:text-[#D4AF37] transition-colors duration-500">
+              {siteContent.brand.logoText}
+            </span>
+          </a>
 
-          {/* Primary Navigation - Center */}
-          <nav className="hidden lg:flex items-center justify-center gap-8 w-1/3">
-            {NAV_LINKS.map((item) => (
-              <Link
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex items-center gap-8 lg:gap-12">
+            {siteContent.nav.links.map((item) => (
+              <a
                 key={item.name}
                 href={item.href}
-                className={`text-[11px] font-mono uppercase tracking-[0.2em] transition-all duration-300 relative py-1 overflow-hidden group ${
-                  pathname.startsWith(item.href) ? "text-gold" : "text-foreground/70 hover:text-foreground"
-                }`}
+                className="text-xs font-mono uppercase tracking-[0.25em] text-[#FFFFFF]/80 hover:text-[#D4AF37] transition-all duration-300 relative py-1 overflow-hidden group"
               >
                 <span>{item.name}</span>
-                <span className={`absolute bottom-0 left-0 w-full h-[1px] bg-gold transform transition-transform duration-500 ${
-                  pathname.startsWith(item.href) ? "translate-x-0" : "-translate-x-full group-hover:translate-x-0"
-                }`} />
-              </Link>
+                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-[#D4AF37] transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+              </a>
             ))}
           </nav>
 
-          {/* Action Icons - Right */}
-          <div className="hidden lg:flex items-center justify-end gap-6 w-1/3">
-            <ThemeToggle />
-            <Link href="/account" className="text-foreground/70 hover:text-gold transition-colors" aria-label="Account">
-              <User className="w-4 h-4" />
-            </Link>
+          {/* Action Buttons */}
+          <div className="hidden md:flex items-center gap-4">
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative text-foreground/70 hover:text-gold transition-colors"
-              aria-label="Open Cart"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              {totalQuantity > 0 && (
-                <span className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-gold text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full font-mono">
-                  {totalQuantity}
-                </span>
-              )}
-            </button>
-          </div>
-
-          {/* Mobile Actions */}
-          <div className="lg:hidden flex items-center gap-5 w-2/3 justify-end">
-            <ThemeToggle />
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative text-foreground/70 hover:text-gold transition-colors"
+              className="relative p-2 text-white/80 hover:text-[#D4AF37] transition-colors"
               aria-label="Open Cart"
             >
               <ShoppingBag className="w-5 h-5" />
               {totalQuantity > 0 && (
-                <span className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-gold text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full font-mono">
+                <span className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-[#D4AF37] text-[#0D0D0D] text-[9px] font-bold px-1.5 py-0.5 rounded-full font-mono">
+                  {totalQuantity}
+                </span>
+              )}
+            </button>
+
+            <a
+              href="#showcase"
+              className="px-6 py-2.5 bg-[#141414] hover:bg-[#D4AF37] text-[#D4AF37] hover:text-[#0D0D0D] border border-[#D4AF37]/50 hover:border-[#D4AF37] font-mono text-xs uppercase tracking-[0.25em] transition-all duration-500 flex items-center gap-2 group shadow-lg"
+            >
+              <span>{siteContent.nav.ctaText}</span>
+              <ArrowUpRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          </div>
+
+          {/* Mobile Menu Toggle & Cart */}
+          <div className="md:hidden flex items-center gap-4">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 text-white/80 hover:text-[#D4AF37] transition-colors"
+              aria-label="Open Cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {totalQuantity > 0 && (
+                <span className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-[#D4AF37] text-[#0D0D0D] text-[9px] font-bold px-1.5 py-0.5 rounded-full font-mono">
                   {totalQuantity}
                 </span>
               )}
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-gold focus:outline-none ml-2"
+              className="p-2 text-[#D4AF37] focus:outline-none"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
@@ -128,56 +124,44 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile Full-Screen Overlay Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: "-100%" }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: "-100%" }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-30 bg-background flex flex-col pt-32 pb-10 px-8 border-b border-border"
-          >
-            <div className="flex-1 flex flex-col justify-center gap-8">
-              {NAV_LINKS.map((item, idx) => (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + idx * 0.05 }}
-                >
-                  <Link
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="text-4xl md:text-5xl font-serif text-left font-light text-foreground tracking-widest hover:text-gold transition-colors block"
-                  >
-                    {item.name}
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="pt-10 border-t border-border flex items-center justify-between"
-            >
-              <Link
-                href="/account"
+      {/* Mobile Overlay Menu */}
+      {mobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed inset-0 z-30 bg-[#0D0D0D]/98 backdrop-blur-xl flex flex-col justify-between px-8 py-28 md:hidden border-b border-[#D4AF37]/20"
+        >
+          <div className="flex flex-col gap-8 mt-10">
+            {siteContent.nav.links.map((item, idx) => (
+              <motion.a
+                key={item.name}
+                href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 text-xs font-mono uppercase tracking-widest text-gold"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="text-2xl font-serif text-left font-light text-white tracking-[0.2em] hover:text-[#D4AF37] uppercase transition-colors block"
               >
-                <User className="w-4 h-4" /> My Account
-              </Link>
-              
-              <span className="text-[10px] font-mono text-muted-foreground tracking-[0.3em] uppercase">
-                {siteContent.brand.tagline}
-              </span>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                0{idx + 1}. {item.name}
+              </motion.a>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <a
+              href="#showcase"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-4 bg-[#D4AF37] text-[#0D0D0D] font-mono text-xs uppercase tracking-[0.3em] font-bold text-center shadow-2xl block"
+            >
+              {siteContent.nav.ctaText} — {primaryPrice}
+            </a>
+            <span className="text-[10px] font-mono text-center text-[#CDBFA6]/60 tracking-[0.3em] uppercase">
+              {siteContent.brand.tagline}
+            </span>
+          </div>
+        </motion.div>
+      )}
     </>
   );
 }

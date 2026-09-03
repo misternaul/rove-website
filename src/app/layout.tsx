@@ -44,13 +44,8 @@ export const metadata: Metadata = {
   },
 };
 
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { CartProvider } from "@/components/CartProvider";
-import { AuthProvider } from "@/components/AuthProvider";
-import Navbar from "@/components/Navbar";
 import CheckoutModal from "@/components/CheckoutModal";
-import { ThemeProvider } from "@/components/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -58,25 +53,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="h-full antialiased scroll-smooth">
-      <body className="antialiased min-h-screen bg-background text-foreground flex flex-col selection:bg-primary selection:text-primary-foreground transition-colors duration-500">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <AuthProvider>
-            <CartProvider>
-              <Navbar />
-              <main className="flex-1 w-full">
-                <SmoothScrollProvider>
-                  {children}
-                </SmoothScrollProvider>
-              </main>
-              <CheckoutModal />
-            </CartProvider>
-          </AuthProvider>
-        </ThemeProvider>
-        
-        {/* Vercel Advanced Analytics (Not AI) */}
-        <Analytics />
-        <SpeedInsights />
+    <html lang="en" className="h-full antialiased dark scroll-smooth">
+      <body className="min-h-full flex flex-col bg-[#0D0D0D] text-white selection:bg-[#D4AF37] selection:text-[#0D0D0D]">
+        <CartProvider>
+          <SmoothScrollProvider>
+            {children}
+          </SmoothScrollProvider>
+          <CheckoutModal />
+        </CartProvider>
       </body>
     </html>
   );

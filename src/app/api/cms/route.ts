@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { getLiveSiteContent, saveLiveSiteContent } from "@/lib/cms";
 import { siteContent } from "@/config/siteContent";
 
-export const dynamic = "force-dynamic";
-
 export async function GET() {
   try {
     const data = await getLiveSiteContent();

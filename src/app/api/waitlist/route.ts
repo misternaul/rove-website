@@ -3,8 +3,6 @@ import { getLiveSiteContent } from "@/lib/cms";
 
 const waitlistStorage: { email: string; drop?: string; size?: string; color?: string; price?: string; createdAt: string }[] = [];
 
-export const dynamic = "force-dynamic";
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -84,9 +82,8 @@ Timestamp: ${new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" })}
           }),
         });
       }
-
     } catch (e) {
-      console.warn("Could not dispatch waitlist notification emails:", e);
+      console.warn("Could not dispatch waitlist notification email:", e);
     }
 
     return NextResponse.json(

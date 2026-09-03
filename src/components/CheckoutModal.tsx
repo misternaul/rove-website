@@ -181,62 +181,6 @@ ${notes.trim() || "None"}
 
   if (!isCartOpen) return null;
 
-  // Success Screen
-  if (status === "success") {
-    return (
-      <AnimatePresence>
-        {isCartOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/95 backdrop-blur-md"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              className="w-full max-w-lg bg-card border border-gold/30 p-12 relative text-center"
-            >
-              <button
-                onClick={() => setIsCartOpen(false)}
-                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="w-16 h-16 mx-auto rounded-full bg-gold/10 flex items-center justify-center mb-8">
-                <Check className="w-8 h-8 text-gold" />
-              </div>
-
-              <h2 className="text-3xl font-serif mb-4 text-gold">WELCOME TO ROVE.</h2>
-              <p className="text-foreground/80 font-light mb-8 leading-relaxed">
-                Your purchase makes you part of something bigger. Become a Rover and join the exclusive ROVE community for free. Participate in polls, share your stories, and access private discussions.
-              </p>
-
-              <div className="space-y-4">
-                <button 
-                  onClick={() => {
-                    setIsCartOpen(false);
-                    window.location.href = "/register"; // Direct to register
-                  }}
-                  className="w-full py-4 bg-gold text-background font-mono text-xs uppercase tracking-[0.3em] font-bold shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all"
-                >
-                  Join the Community
-                </button>
-                <button
-                  onClick={handleClose}
-                  className="w-full py-4 border border-border text-foreground/70 hover:bg-foreground/5 hover:text-foreground font-mono text-xs uppercase tracking-[0.3em] transition-all"
-                >
-                  Maybe Later
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    );
-  }
-
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 overflow-y-auto">
@@ -245,7 +189,7 @@ ${notes.trim() || "None"}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={handleClose}
-          className="fixed inset-0 bg-background/85 backdrop-blur-md transition-opacity"
+          className="fixed inset-0 bg-[#000000]/85 backdrop-blur-md transition-opacity"
         />
 
         <motion.div
@@ -253,23 +197,23 @@ ${notes.trim() || "None"}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-2xl bg-card border border-gold/30 text-foreground shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col my-8"
+          className="relative w-full max-w-2xl bg-[#141414] border border-[#D4AF37]/30 text-white shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col my-8"
         >
-          <div className="p-6 border-b border-border flex items-center justify-between bg-background flex-shrink-0">
+          <div className="p-6 border-b border-white/10 flex items-center justify-between bg-[#0D0D0D] flex-shrink-0">
             <div className="flex items-center gap-3">
-              <ShoppingBag className="w-5 h-5 text-gold" />
+              <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-gold block">
+                <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#D4AF37] block">
                   Studio Allocation
                 </span>
-                <h3 className="text-lg font-serif tracking-wide text-foreground">
+                <h3 className="text-lg font-serif tracking-wide text-white">
                   Your Cart & Checkout
                 </h3>
               </div>
             </div>
             <button
               onClick={handleClose}
-              className="w-10 h-10 border border-border hover:border-gold text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors bg-card"
+              className="w-10 h-10 border border-white/20 hover:border-[#D4AF37] text-white/70 hover:text-white flex items-center justify-center transition-colors bg-[#141414]"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -278,16 +222,74 @@ ${notes.trim() || "None"}
 
           <div className="p-6 md:p-8 overflow-y-auto flex-1 space-y-8">
             
-            {cartItems.length === 0 ? (
-              <div className="text-center py-12 space-y-6">
-                <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto" />
+            {status === "success" ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-6 space-y-6"
+              >
+                <div className="w-16 h-16 bg-[#25D366]/15 border border-[#25D366] rounded-full flex items-center justify-center mx-auto text-[#25D366] shadow-[0_0_25px_rgba(37,211,102,0.25)]">
+                  <Check className="w-8 h-8" />
+                </div>
                 <div>
-                  <h4 className="text-xl font-serif text-foreground">Your Cart is Empty</h4>
-                  <p className="text-sm text-muted-foreground font-mono mt-2">Explore our collections and add items to your cart.</p>
+                  <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37]">
+                    Order Recorded Successfully
+                  </span>
+                  <h4 className="text-2xl md:text-3xl font-serif text-white mt-2">
+                    Thank You, {fullName}
+                  </h4>
+                  <p className="text-xs text-white/70 font-mono mt-2">
+                    Reference ID: <span className="text-[#D4AF37] font-bold">{confirmedOrderId}</span>
+                  </p>
+                </div>
+                <div className="p-5 bg-[#0D0D0D] border border-white/10 max-w-md mx-auto text-left font-mono text-xs space-y-3 shadow-inner">
+                  <div className="flex justify-between pb-2 border-b border-white/10">
+                    <span className="text-white/60">Total Items:</span>
+                    <span className="text-white font-semibold">{totalQuantity}</span>
+                  </div>
+                  <div className="flex justify-between pb-2 border-b border-white/10">
+                    <span className="text-white/60">Total Valuation:</span>
+                    <span className="text-[#D4AF37] font-bold text-sm">{formattedTotalPrice} (COD)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/60">Shipping To:</span>
+                    <span className="text-white">{city}</span>
+                  </div>
+                </div>
+                <div className="p-4 bg-[#25D366]/10 border border-[#25D366]/40 max-w-md mx-auto text-left space-y-2">
+                  <strong className="text-xs font-mono text-[#25D366] uppercase tracking-wider block flex items-center gap-1.5">
+                    <MessageCircle className="w-4 h-4 fill-[#25D366] text-black" /> Step 2: Instant WhatsApp Confirmation
+                  </strong>
+                  <p className="text-xs text-white/80 leading-relaxed font-sans font-light">
+                    Click below to open WhatsApp with our fulfillment team. Your order details will be automatically attached for fastest dispatch!
+                  </p>
+                </div>
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <button
+                    onClick={openWhatsAppVerification}
+                    className="w-full sm:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-[#000000] font-mono font-bold text-xs tracking-[0.15em] uppercase flex items-center justify-center gap-2 shadow-2xl transform hover:scale-105 transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4 fill-black" />
+                    <span>Send WhatsApp Confirmation</span>
+                  </button>
+                  <button
+                    onClick={handleClose}
+                    className="w-full sm:w-auto px-6 py-4 bg-[#0D0D0D] border border-white/20 hover:border-[#D4AF37] text-white font-mono text-xs tracking-[0.2em] uppercase transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            ) : cartItems.length === 0 ? (
+              <div className="text-center py-12 space-y-6">
+                <ShoppingBag className="w-12 h-12 text-white/20 mx-auto" />
+                <div>
+                  <h4 className="text-xl font-serif text-white">Your Cart is Empty</h4>
+                  <p className="text-sm text-white/50 font-mono mt-2">Explore our collections and add items to your cart.</p>
                 </div>
                 <button
                   onClick={handleClose}
-                  className="px-8 py-3 bg-gold text-background font-mono font-bold text-xs uppercase tracking-widest mt-4 hover:bg-foreground hover:text-background transition-colors"
+                  className="px-8 py-3 bg-[#D4AF37] text-black font-mono font-bold text-xs uppercase tracking-widest mt-4 hover:bg-white transition-colors"
                 >
                   Continue Browsing
                 </button>
@@ -297,30 +299,30 @@ ${notes.trim() || "None"}
                 {/* CART ITEMS LIST */}
                 <div className="space-y-4">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex gap-4 p-4 bg-background border border-border relative group">
-                      <div className="relative w-20 h-24 bg-card flex-shrink-0">
+                    <div key={item.id} className="flex gap-4 p-4 bg-[#0D0D0D] border border-white/10 relative group">
+                      <div className="relative w-20 h-24 bg-[#141414] flex-shrink-0">
                         <Image src={item.image} alt={item.colorName} fill className="object-cover" />
                       </div>
                       <div className="flex-1 flex flex-col justify-between py-1">
                         <div>
                           <div className="flex justify-between items-start gap-4">
-                            <h4 className="text-sm font-serif text-foreground line-clamp-1">{item.dropName}</h4>
+                            <h4 className="text-sm font-serif text-white line-clamp-1">{item.dropName}</h4>
                             <button
                               onClick={() => removeFromCart(item.id)}
-                              className="text-muted-foreground hover:text-red-400 p-1 transition-colors flex-shrink-0"
+                              className="text-white/40 hover:text-red-400 p-1 transition-colors flex-shrink-0"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
-                          <p className="text-[10px] text-foreground/60 font-mono uppercase mt-1">
+                          <p className="text-[10px] text-white/60 font-mono uppercase mt-1">
                             {item.colorName} | Size: {item.sizeName}
                           </p>
                         </div>
                         <div className="flex items-center justify-between mt-4">
-                          <div className="flex items-center border border-border bg-card">
+                          <div className="flex items-center border border-white/20 bg-[#141414]">
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="p-1.5 text-foreground/70 hover:text-foreground transition-colors"
+                              className="p-1.5 text-white/70 hover:text-white transition-colors"
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
@@ -328,32 +330,32 @@ ${notes.trim() || "None"}
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               disabled={item.quantity >= item.maxStock}
-                              className="p-1.5 text-foreground/70 hover:text-gold disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors"
+                              className="p-1.5 text-white/70 hover:text-[#D4AF37] disabled:text-white/20 disabled:cursor-not-allowed transition-colors"
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>
                           </div>
-                          <span className="text-xs font-mono font-bold text-gold">
+                          <span className="text-xs font-mono font-bold text-[#D4AF37]">
                             PKR {(item.priceNumeric * item.quantity).toLocaleString()}
                           </span>
                         </div>
                       </div>
                     </div>
                   ))}
-                  <div className="pt-4 border-t border-border flex justify-between items-end">
-                    <span className="text-xs font-mono uppercase text-foreground/60 tracking-widest">Total Valuation</span>
-                    <span className="text-xl md:text-2xl font-mono font-bold text-gold">{formattedTotalPrice}</span>
+                  <div className="pt-4 border-t border-white/10 flex justify-between items-end">
+                    <span className="text-xs font-mono uppercase text-white/60 tracking-widest">Total Valuation</span>
+                    <span className="text-xl md:text-2xl font-mono font-bold text-[#D4AF37]">{formattedTotalPrice}</span>
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6 pt-6 border-t border-border">
-                  <h4 className="text-xs font-mono tracking-[0.2em] uppercase text-gold mb-4">
+                <form onSubmit={handleSubmit} className="space-y-6 pt-6 border-t border-white/10">
+                  <h4 className="text-xs font-mono tracking-[0.2em] uppercase text-[#D4AF37] mb-4">
                     Shipping Details
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
-                        Full Name <span className="text-gold">*</span>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                        Full Name <span className="text-[#D4AF37]">*</span>
                       </label>
                       <input
                         type="text"
@@ -361,12 +363,12 @@ ${notes.trim() || "None"}
                         onChange={(e) => setFullName(e.target.value)}
                         required
                         disabled={status === "submitting"}
-                        className="w-full bg-background border border-border px-4 py-3 text-sm text-foreground font-mono focus:border-gold"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
-                        Phone / WhatsApp <span className="text-gold">*</span>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                        Phone / WhatsApp <span className="text-[#D4AF37]">*</span>
                       </label>
                       <input
                         type="tel"
@@ -374,19 +376,19 @@ ${notes.trim() || "None"}
                         onChange={(e) => setPhone(e.target.value)}
                         required
                         disabled={status === "submitting"}
-                        className="w-full bg-background border border-border px-4 py-3 text-sm text-foreground font-mono focus:border-gold"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
-                        Email Address <span className="text-muted-foreground">(Optional)</span>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                        Email Address <span className="text-white/40">(Optional)</span>
                       </label>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={status === "submitting"}
-                        className="w-full bg-background border border-border px-4 py-3 text-sm text-foreground font-mono focus:border-gold"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                   </div>
@@ -394,8 +396,8 @@ ${notes.trim() || "None"}
                   <div className="space-y-4 pt-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
-                          City / Province <span className="text-gold">*</span>
+                        <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                          City / Province <span className="text-[#D4AF37]">*</span>
                         </label>
                         <input
                           type="text"
@@ -403,25 +405,25 @@ ${notes.trim() || "None"}
                           onChange={(e) => setCity(e.target.value)}
                           required
                           disabled={status === "submitting"}
-                          className="w-full bg-background border border-border px-4 py-3 text-sm text-foreground font-mono focus:border-gold"
+                          className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
-                          Nearest Landmark <span className="text-muted-foreground">(Optional)</span>
+                        <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                          Nearest Landmark <span className="text-white/40">(Optional)</span>
                         </label>
                         <input
                           type="text"
                           value={landmark}
                           onChange={(e) => setLandmark(e.target.value)}
                           disabled={status === "submitting"}
-                          className="w-full bg-background border border-border px-4 py-3 text-sm text-foreground font-mono focus:border-gold"
+                          className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
-                        Primary Address (House #, Street) <span className="text-gold">*</span>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                        Primary Address (House #, Street) <span className="text-[#D4AF37]">*</span>
                       </label>
                       <input
                         type="text"
@@ -429,31 +431,31 @@ ${notes.trim() || "None"}
                         onChange={(e) => setPrimaryAddress(e.target.value)}
                         required
                         disabled={status === "submitting"}
-                        className="w-full bg-background border border-border px-4 py-3 text-sm text-foreground font-mono focus:border-gold"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
-                        2nd Address / Apartment <span className="text-muted-foreground">(Optional)</span>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                        2nd Address / Apartment <span className="text-white/40">(Optional)</span>
                       </label>
                       <input
                         type="text"
                         value={secondaryAddress}
                         onChange={(e) => setSecondaryAddress(e.target.value)}
                         disabled={status === "submitting"}
-                        className="w-full bg-background border border-border px-4 py-3 text-sm text-foreground font-mono focus:border-gold"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
-                        Special Instructions <span className="text-muted-foreground">(Optional)</span>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                        Special Instructions <span className="text-white/40">(Optional)</span>
                       </label>
                       <textarea
                         rows={2}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         disabled={status === "submitting"}
-                        className="w-full bg-background border border-border px-4 py-3 text-sm text-foreground font-mono focus:border-gold resize-none"
+                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37] resize-none"
                       />
                     </div>
                   </div>
@@ -466,14 +468,14 @@ ${notes.trim() || "None"}
                   )}
 
                   <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 text-foreground/70 text-xs font-sans font-light">
-                      <ShieldCheck className="w-5 h-5 text-gold flex-shrink-0" />
+                    <div className="flex items-center gap-3 text-white/70 text-xs font-sans font-light">
+                      <ShieldCheck className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />
                       <span>Verified Cash on Delivery</span>
                     </div>
                     <button
                       type="submit"
                       disabled={status === "submitting"}
-                      className="w-full sm:w-auto px-10 py-4 bg-gold hover:bg-gold/90 disabled:opacity-50 text-background font-mono font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 flex items-center justify-center shadow-xl"
+                      className="w-full sm:w-auto px-10 py-4 bg-[#D4AF37] hover:bg-[#D4AF37]/90 disabled:opacity-50 text-[#0D0D0D] font-mono font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 flex items-center justify-center shadow-xl"
                     >
                       {status === "submitting" ? "Transmitting..." : `Confirm Order (${formattedTotalPrice})`}
                     </button>
@@ -484,13 +486,13 @@ ${notes.trim() || "None"}
 
           </div>
 
-          <div className="px-6 py-4 bg-background border-t border-border flex flex-wrap items-center justify-between gap-4 text-[10px] font-mono text-foreground/40 uppercase">
+          <div className="px-6 py-4 bg-[#0D0D0D] border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-[10px] font-mono text-white/40 uppercase">
             <div className="flex items-center gap-2">
-              <Truck className="w-3.5 h-3.5 text-gold" />
+              <Truck className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Complimentary Courier Across Pakistan</span>
             </div>
             <div className="flex items-center gap-2">
-              <PhoneCall className="w-3.5 h-3.5 text-gold" />
+              <PhoneCall className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Direct Studio WhatsApp Verification</span>
             </div>
           </div>

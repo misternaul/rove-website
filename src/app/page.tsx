@@ -1,5 +1,4 @@
 import React from "react";
-import { getLiveSiteContent } from "@/lib/cms";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Manifesto from "@/components/Manifesto";
@@ -9,38 +8,9 @@ import LookbookGallery from "@/components/LookbookGallery";
 import WaitlistSection from "@/components/WaitlistSection";
 import Footer from "@/components/Footer";
 
-export const dynamic = "force-dynamic";
-
-export default async function Home() {
-  const content = await getLiveSiteContent();
-  
-  // Transform static drops into the format expected by ProductShowcase
-  const products = content.drops.flatMap(drop => 
-    drop.colors.map((color) => ({
-      id: `${drop.id}-${color.id}`,
-      name: `${drop.name} - ${color.name}`,
-      shortDescription: drop.shortDescription,
-      basePrice: color.priceNumeric,
-      images: [
-        { id: `${color.id}-img-1`, url: color.frontImage, isPrimary: true },
-        { id: `${color.id}-img-2`, url: color.backImage, isPrimary: false }
-      ],
-      variants: color.sizes.map(s => ({
-        id: s.id,
-        size: s.name,
-        stock: s.stockQuantity
-      }))
-    }))
-  );
-
-  const lookbookImages = content.gallery.images.map((img, idx) => ({
-    id: `static-lookbook-${idx}`,
-    url: img.src,
-    caption: img.caption || img.title || `Plate 0${idx + 1}`
-  }));
-
+export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-[#0D0D0D] text-white overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#0D0D0D]">
       {/* Editorial Luxury Header & Navigation */}
       <Navbar />
 
@@ -52,14 +22,14 @@ export default async function Home() {
         {/* 2. Brand Manifesto — Philosophy & Values Under 80 Words */}
         <Manifesto />
 
-        {/* 3. Product Showcase — E-Commerce Engine */}
-        <ProductShowcase initialProducts={products} />
+        {/* 3. Product Showcase — Interactive Color & Size Selector + Sticky Viewer */}
+        <ProductShowcase />
 
         {/* 4. Craft & Detailing — High-Definition Closeups & Architectural Hallmarks */}
         <CraftDetails />
 
         {/* 5. Lookbook & Visual Compendium — Smooth Horizontal Scrolling Strip */}
-        <LookbookGallery images={lookbookImages} />
+        <LookbookGallery />
 
         {/* 6. Priority Waitlist & Allocation Access Flow */}
         <WaitlistSection />
