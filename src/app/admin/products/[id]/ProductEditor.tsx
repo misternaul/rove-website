@@ -52,6 +52,41 @@ export default function ProductEditor({ product, variants }: { product: Product,
 
   return (
     <div className="space-y-8">
+      {/* Media Library / Quick Upload */}
+      <div className="bg-[#141414] border border-white/10 p-6 space-y-6">
+        <h2 className="text-sm font-mono uppercase tracking-widest text-[#D4AF37] border-b border-white/10 pb-2">Media Library (Vercel Blob)</h2>
+        <div className="border border-dashed border-white/20 p-8 text-center flex flex-col items-center justify-center">
+          <input 
+            type="file" 
+            id="image-upload" 
+            className="hidden" 
+            accept="image/*"
+            onChange={async (e) => {
+              if (!e.target.files?.length) return;
+              const file = e.target.files[0];
+              try {
+                const response = await fetch(`/api/upload?filename=${file.name}`, {
+                  method: 'POST',
+                  body: file,
+                });
+                const blob = await response.json();
+                if (blob.url) {
+                  alert(`Image uploaded! URL: ${blob.url}\n(Copy this to use anywhere)`);
+                } else {
+                  alert("Upload failed.");
+                }
+              } catch (error) {
+                alert("Upload failed: " + error);
+              }
+            }}
+          />
+          <label htmlFor="image-upload" className="cursor-pointer px-6 py-3 border border-white/20 text-white/70 hover:text-white hover:border-[#D4AF37] transition-colors font-mono text-xs uppercase tracking-widest">
+            Select Image to Upload
+          </label>
+          <p className="mt-4 text-[10px] font-mono text-white/40">Uploads directly to Vercel Blob storage</p>
+        </div>
+      </div>
+
       {/* Pricing Section */}
       <div className="bg-[#141414] border border-white/10 p-6 space-y-6">
         <h2 className="text-sm font-mono uppercase tracking-widest text-[#D4AF37] border-b border-white/10 pb-2">Pricing & Discounts</h2>
