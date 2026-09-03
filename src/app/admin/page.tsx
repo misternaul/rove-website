@@ -83,22 +83,30 @@ export default async function AdminDashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-xs font-mono uppercase tracking-widest text-white/50 mb-4 border-b border-white/10 pb-2">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link href="/admin/products" className="bg-[#1A1A1A] hover:bg-[#D4AF37] group transition-all p-6 border border-white/5 flex justify-between items-center">
+        <h2 className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-4 border-b border-border pb-2">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Link href="/admin/products" className="bg-card hover:bg-gold group transition-all p-6 border border-border flex justify-between items-center">
             <div>
-              <h3 className="font-serif text-lg group-hover:text-black">Manage Products & Stock</h3>
-              <p className="text-xs font-mono text-white/40 group-hover:text-black/60 uppercase tracking-wider mt-1">Update Prices, Discounts, Inventory</p>
+              <h3 className="font-serif text-lg group-hover:text-background">Manage Products & Stock</h3>
+              <p className="text-xs font-mono text-muted-foreground group-hover:text-background/80 uppercase tracking-wider mt-1">Update Prices, Discounts</p>
             </div>
-            <ArrowRight className="text-[#D4AF37] group-hover:text-black" />
+            <ArrowRight className="text-gold group-hover:text-background" />
           </Link>
 
-          <Link href="/admin/orders" className="bg-[#1A1A1A] hover:bg-[#D4AF37] group transition-all p-6 border border-white/5 flex justify-between items-center">
+          <Link href="/admin/orders" className="bg-card hover:bg-gold group transition-all p-6 border border-border flex justify-between items-center">
             <div>
-              <h3 className="font-serif text-lg group-hover:text-black">View Latest Orders</h3>
-              <p className="text-xs font-mono text-white/40 group-hover:text-black/60 uppercase tracking-wider mt-1">Process shipments and statuses</p>
+              <h3 className="font-serif text-lg group-hover:text-background">View Latest Orders</h3>
+              <p className="text-xs font-mono text-muted-foreground group-hover:text-background/80 uppercase tracking-wider mt-1">Process shipments</p>
             </div>
-            <ArrowRight className="text-[#D4AF37] group-hover:text-black" />
+            <ArrowRight className="text-gold group-hover:text-background" />
+          </Link>
+
+          <Link href="/admin/lookbook" className="bg-card hover:bg-gold group transition-all p-6 border border-border flex justify-between items-center">
+            <div>
+              <h3 className="font-serif text-lg group-hover:text-background">Lookbook Magazine</h3>
+              <p className="text-xs font-mono text-muted-foreground group-hover:text-background/80 uppercase tracking-wider mt-1">Upload editorial images</p>
+            </div>
+            <ArrowRight className="text-gold group-hover:text-background" />
           </Link>
         </div>
       </div>

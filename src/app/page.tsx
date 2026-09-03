@@ -1,4 +1,5 @@
 import React from "react";
+import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Manifesto from "@/components/Manifesto";
@@ -8,9 +9,23 @@ import LookbookGallery from "@/components/LookbookGallery";
 import WaitlistSection from "@/components/WaitlistSection";
 import Footer from "@/components/Footer";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const [products, lookbookImages] = await Promise.all([
+    prisma.product.findMany({
+      where: { showOnHomepage: true },
+      include: { images: true, variants: true },
+      orderBy: { orderIndex: 'asc' }
+    }),
+    prisma.lookbookImage.findMany({
+      where: { showOnHomepage: true },
+      orderBy: { createdAt: 'desc' }
+    })
+  ]);
+
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#0D0D0D]">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Editorial Luxury Header & Navigation */}
       <Navbar />
 
@@ -22,14 +37,14 @@ export default function Home() {
         {/* 2. Brand Manifesto — Philosophy & Values Under 80 Words */}
         <Manifesto />
 
-        {/* 3. Product Showcase — Interactive Color & Size Selector + Sticky Viewer */}
-        <ProductShowcase />
+        {/* 3. Product Showcase — E-Commerce Engine */}
+        <ProductShowcase initialProducts={products} />
 
         {/* 4. Craft & Detailing — High-Definition Closeups & Architectural Hallmarks */}
         <CraftDetails />
 
         {/* 5. Lookbook & Visual Compendium — Smooth Horizontal Scrolling Strip */}
-        <LookbookGallery />
+        <LookbookGallery images={lookbookImages} />
 
         {/* 6. Priority Waitlist & Allocation Access Flow */}
         <WaitlistSection />

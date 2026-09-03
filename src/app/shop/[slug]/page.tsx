@@ -3,15 +3,17 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import ProductActions from "@/components/ProductActions";
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const product = await prisma.product.findUnique({ where: { slug: params.slug } });
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const product = await prisma.product.findUnique({ where: { slug } });
   if (!product) return { title: "Not Found | ROVE" };
   return { title: `${product.name} | ROVE`, description: product.shortDescription };
 }
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       images: { orderBy: { isPrimary: 'desc' } },
       variants: true

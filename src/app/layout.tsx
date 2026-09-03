@@ -48,6 +48,7 @@ import { CartProvider } from "@/components/CartProvider";
 import { AuthProvider } from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import CheckoutModal from "@/components/CheckoutModal";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -55,19 +56,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased dark scroll-smooth">
-      <body className="antialiased min-h-screen bg-[#0D0D0D] text-white flex flex-col selection:bg-[#D4AF37] selection:text-black">
-        <AuthProvider>
-          <CartProvider>
-            <Navbar />
-            <main className="flex-1 w-full">
-              <SmoothScrollProvider>
-                {children}
-              </SmoothScrollProvider>
-            </main>
-            <CheckoutModal />
-          </CartProvider>
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning className="h-full antialiased scroll-smooth">
+      <body className="antialiased min-h-screen bg-background text-foreground flex flex-col selection:bg-primary selection:text-primary-foreground transition-colors duration-500">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <AuthProvider>
+            <CartProvider>
+              <Navbar />
+              <main className="flex-1 w-full">
+                <SmoothScrollProvider>
+                  {children}
+                </SmoothScrollProvider>
+              </main>
+              <CheckoutModal />
+            </CartProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
