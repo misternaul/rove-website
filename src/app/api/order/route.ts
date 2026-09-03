@@ -78,28 +78,16 @@ export async function POST(req: Request) {
     });
 
     // Send transactional emails via Resend (fire and forget to not block response)
+    const { sendOrderConfirmation } = await import('@/lib/emails');
+    sendOrderConfirmation(email, order.orderNumber, order.totalAmount).catch(console.error);
+
     if (process.env.RESEND_API_KEY) {
+      // Alert to admin
       import('resend').then(async ({ Resend }) => {
         const resend = new Resend(process.env.RESEND_API_KEY);
         try {
-          // Email to customer
           await resend.emails.send({
-            from: 'ROVE Studio <orders@rove-studio.com>',
-            to: email,
-            subject: `Order Confirmed: ${order.orderNumber}`,
-            html: `<div style="font-family: monospace; color: #000; padding: 20px;">
-              <h1 style="font-family: serif; font-weight: 300;">Order Confirmed.</h1>
-              <p>Thank you for your purchase, ${fullName}.</p>
-              <p>Order Number: <strong>${order.orderNumber}</strong></p>
-              <p>Total: <strong>${formattedTotalPrice}</strong></p>
-              <p>We are currently preparing your items. You will receive another notification when your order ships.</p>
-              <p>- ROVE Studio</p>
-            </div>`
-          });
-          
-          // Alert to admin
-          await resend.emails.send({
-            from: 'ROVE Studio <orders@rove-studio.com>',
+            from: 'ROVE Studio <hello@rovepresence.com>',
             to: 'rovepresence@gmail.com',
             subject: `NEW ORDER: ${order.orderNumber}`,
             html: `<p>New order received for ${formattedTotalPrice} from ${fullName} (${email}).</p>`

@@ -44,6 +44,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { CartProvider } from "@/components/CartProvider";
 import { AuthProvider } from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
@@ -71,6 +73,10 @@ export default function RootLayout({
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>
+        
+        {/* Vercel Advanced Analytics (Not AI) */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

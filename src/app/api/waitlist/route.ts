@@ -84,8 +84,15 @@ Timestamp: ${new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" })}
           }),
         });
       }
+
+      // -------------------------------------------------------------
+      // NEW: Automatically send the confirmation email to the CUSTOMER
+      // -------------------------------------------------------------
+      const { sendWaitlistConfirmation } = await import("@/lib/emails");
+      await sendWaitlistConfirmation(cleanedEmail);
+
     } catch (e) {
-      console.warn("Could not dispatch waitlist notification email:", e);
+      console.warn("Could not dispatch waitlist notification emails:", e);
     }
 
     return NextResponse.json(
