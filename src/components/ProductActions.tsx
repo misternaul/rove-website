@@ -2,7 +2,22 @@
 
 import { useState } from "react";
 import { useCart } from "@/components/CartProvider";
-import { Product, ProductVariant } from "@prisma/client";
+
+type ProductVariant = {
+  id: string;
+  size: string;
+  stock: number;
+  colorName?: string;
+  colorHex?: string;
+};
+
+type Product = {
+  id: string;
+  name: string;
+  basePrice: number;
+  isDiscountActive?: boolean;
+  discountedPrice?: number;
+};
 
 interface ProductActionsProps {
   product: Product;
@@ -72,7 +87,7 @@ export default function ProductActions({ product, variants }: ProductActionsProp
               <button
                 key={colorVariant.colorName}
                 onClick={() => {
-                  setSelectedColor(colorVariant.colorName);
+                  if (colorVariant.colorName) setSelectedColor(colorVariant.colorName);
                   setSelectedSize(""); // reset size on color change
                 }}
                 className={`w-10 h-10 rounded-full border-2 transition-all ${

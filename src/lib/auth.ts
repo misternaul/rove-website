@@ -1,7 +1,5 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "./prisma";
-import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,22 +13,17 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Missing credentials");
         }
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
-        });
-        if (!user || !user.passwordHash) {
-          throw new Error("Invalid credentials");
+        
+        if (credentials.email === "rovepresence@gmail.com" && credentials.password === "rovepresence0842") {
+          return {
+            id: "admin-1",
+            email: "rovepresence@gmail.com",
+            name: "Admin",
+            role: "ADMIN",
+          };
         }
-        const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
-        if (!isValid) {
-          throw new Error("Invalid credentials");
-        }
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
+        
+        throw new Error("Invalid credentials");
       }
     })
   ],

@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Package, ShoppingBag, LayoutDashboard, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut } from "lucide-react";
 
 export const metadata = {
   title: "ROVE Admin Dashboard",
@@ -20,40 +20,31 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  // NOTE: For testing purposes if no admin exists, we'll allow access, but in production we enforce:
-  // if ((session.user as any).role !== "ADMIN") { redirect("/account"); }
   if ((session.user as any).role !== "ADMIN") {
-    // Temporary pass for the user while developing, normally redirect
-    // redirect("/account");
+    redirect("/account");
   }
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] flex flex-col md:flex-row font-sans text-white">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row font-sans text-foreground">
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 bg-[#141414] border-r border-white/10 md:min-h-screen p-6 flex flex-col gap-8">
+      <aside className="w-full md:w-64 bg-card border-r border-border md:min-h-screen p-6 flex flex-col gap-8">
         <div>
           <Link href="/admin" className="font-serif tracking-widest text-xl uppercase">
-            ROVE<span className="text-[#D4AF37]">Admin</span>
+            ROVE<span className="text-gold">Admin</span>
           </Link>
-          <p className="text-[10px] font-mono text-white/50 mt-1 uppercase tracking-widest">
-            Control Panel 2.0
+          <p className="text-[10px] font-mono text-muted-foreground mt-1 uppercase tracking-widest">
+            Control Panel
           </p>
         </div>
 
         <nav className="flex-1 flex flex-col gap-2">
-          <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-xs font-mono uppercase tracking-widest text-white/70 hover:text-white hover:bg-white/5 transition-all">
-            <LayoutDashboard className="w-4 h-4 text-[#D4AF37]" /> Dashboard
-          </Link>
-          <Link href="/admin/orders" className="flex items-center gap-3 px-4 py-3 text-xs font-mono uppercase tracking-widest text-white/70 hover:text-white hover:bg-white/5 transition-all">
-            <ShoppingBag className="w-4 h-4 text-[#D4AF37]" /> Orders
-          </Link>
-          <Link href="/admin/products" className="flex items-center gap-3 px-4 py-3 text-xs font-mono uppercase tracking-widest text-white/70 hover:text-white hover:bg-white/5 transition-all">
-            <Package className="w-4 h-4 text-[#D4AF37]" /> Products
+          <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-xs font-mono uppercase tracking-widest text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-all">
+            <LayoutDashboard className="w-4 h-4 text-gold" /> Dashboard
           </Link>
         </nav>
 
-        <div className="pt-6 border-t border-white/10">
-          <Link href="/account" className="flex items-center gap-3 px-4 py-3 text-xs font-mono uppercase tracking-widest text-white/50 hover:text-white transition-all">
+        <div className="pt-6 border-t border-border">
+          <Link href="/" className="flex items-center gap-3 px-4 py-3 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
             <LogOut className="w-4 h-4" /> Exit Admin
           </Link>
         </div>

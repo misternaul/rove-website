@@ -6,7 +6,12 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { siteContent } from "@/config/siteContent";
-import type { LookbookImage } from "@prisma/client";
+
+type LookbookImage = {
+  id: string;
+  url: string;
+  caption: string | null;
+};
 
 export default function LookbookGallery({ images }: { images: LookbookImage[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);

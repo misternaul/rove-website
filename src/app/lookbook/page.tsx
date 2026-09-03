@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { prisma } from "@/lib/prisma";
+import { getLiveSiteContent } from "@/lib/cms";
 
 export const dynamic = "force-dynamic";
 
@@ -12,9 +12,12 @@ export const metadata = {
 };
 
 export default async function LookbookPage() {
-  const images = await prisma.lookbookImage.findMany({
-    orderBy: { createdAt: 'desc' }
-  });
+  const content = await getLiveSiteContent();
+  const images = content.gallery.images.map((img, idx) => ({
+    id: `static-lookbook-${idx}`,
+    url: img.src,
+    caption: img.caption || img.title || `Plate 0${idx + 1}`
+  }));
 
   return (
     <div className="min-h-screen bg-background text-foreground">

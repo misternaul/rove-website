@@ -1,5 +1,5 @@
 import React from "react";
-import { prisma } from "@/lib/prisma";
+import { getLiveSiteContent } from "@/lib/cms";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Manifesto from "@/components/Manifesto";
@@ -12,17 +12,32 @@ import Footer from "@/components/Footer";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [products, lookbookImages] = await Promise.all([
-    prisma.product.findMany({
-      where: { showOnHomepage: true },
-      include: { images: true, variants: true },
-      orderBy: { orderIndex: 'asc' }
-    }),
-    prisma.lookbookImage.findMany({
-      where: { showOnHomepage: true },
-      orderBy: { createdAt: 'desc' }
-    })
-  ]);
+  const content = await getLiveSiteContent();
+  
+  // Transform static drops into the format expected by ProductShowcase
+  const products = content.drops.flatMap(drop => 
+    drop.colors.map((color) => ({
+      id: `${drop.id}-${color.id}`,
+      name: `${drop.name} - ${color.name}`,
+      shortDescription: drop.shortDescription,
+      basePrice: color.priceNumeric,
+      images: [
+        { id: `${color.id}-img-1`, url: color.frontImage, isPrimary: true },
+        { id: `${color.id}-img-2`, url: color.backImage, isPrimary: false }
+      ],
+      variants: color.sizes.map(s => ({
+        id: s.id,
+        size: s.name,
+        stock: s.stockQuantity
+      }))
+    }))
+  );
+
+  const lookbookImages = content.gallery.images.map((img, idx) => ({
+    id: `static-lookbook-${idx}`,
+    url: img.src,
+    caption: img.caption || img.title || `Plate 0${idx + 1}`
+  }));
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
