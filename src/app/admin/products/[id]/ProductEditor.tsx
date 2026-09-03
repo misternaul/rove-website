@@ -26,10 +26,11 @@ export default function ProductEditor({ product, variants }: { product: Product,
     setStatus("idle");
     
     try {
-      const res = await fetch(`/api/admin/products/${product.id}`, {
+      const res = await fetch(`/api/admin/products/update`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id: product.id,
           basePrice: parseFloat(basePrice),
           isDiscountActive,
           discountedPrice: discountedPrice ? parseFloat(discountedPrice) : null,

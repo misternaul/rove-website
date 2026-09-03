@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, { params }: { params: any }) {
   try {
     const { id: pollId } = await params;
     const session = await getServerSession(authOptions);

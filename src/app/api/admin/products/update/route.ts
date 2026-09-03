@@ -4,10 +4,12 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(req: NextRequest) {
   try {
-    const { id } = await params;
+    const body = await req.json();
+    const { id, basePrice, isDiscountActive, discountedPrice, variantStocks } = body;
     const session = await getServerSession(authOptions);
     
     // Quick security check (ensure user is admin)
@@ -15,9 +17,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // if (!session || (session.user as any).role !== "ADMIN") {
     //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     // }
-
-    const body = await req.json();
-    const { basePrice, isDiscountActive, discountedPrice, variantStocks } = body;
 
     // 1. Update Product Details
     await prisma.product.update({
