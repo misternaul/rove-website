@@ -3,6 +3,8 @@ import { getLiveSiteContent } from "@/lib/cms";
 
 const waitlistStorage: { email: string; drop?: string; size?: string; color?: string; price?: string; createdAt: string }[] = [];
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
