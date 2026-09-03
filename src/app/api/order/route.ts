@@ -78,9 +78,6 @@ export async function POST(req: Request) {
     });
 
     // Send transactional emails via Resend (fire and forget to not block response)
-    const { sendOrderConfirmation } = await import('@/lib/emails');
-    sendOrderConfirmation(email, order.orderNumber, order.totalAmount).catch(console.error);
-
     if (process.env.RESEND_API_KEY) {
       // Alert to admin
       import('resend').then(async ({ Resend }) => {
