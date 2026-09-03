@@ -45,6 +45,8 @@ export const metadata: Metadata = {
 };
 
 import { CartProvider } from "@/components/CartProvider";
+import { AuthProvider } from "@/components/AuthProvider";
+import Navbar from "@/components/Navbar";
 import CheckoutModal from "@/components/CheckoutModal";
 
 export default function RootLayout({
@@ -54,13 +56,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased dark scroll-smooth">
-      <body className="min-h-full flex flex-col bg-[#0D0D0D] text-white selection:bg-[#D4AF37] selection:text-[#0D0D0D]">
-        <CartProvider>
-          <SmoothScrollProvider>
-            {children}
-          </SmoothScrollProvider>
-          <CheckoutModal />
-        </CartProvider>
+      <body className="antialiased min-h-screen bg-[#0D0D0D] text-white flex flex-col selection:bg-[#D4AF37] selection:text-black">
+        <AuthProvider>
+          <CartProvider>
+            <Navbar />
+            <main className="flex-1 w-full">
+              <SmoothScrollProvider>
+                {children}
+              </SmoothScrollProvider>
+            </main>
+            <CheckoutModal />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

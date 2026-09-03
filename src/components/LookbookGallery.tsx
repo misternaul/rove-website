@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Eye } from "lucide-react";
 import { siteContent } from "@/config/siteContent";
@@ -110,10 +111,13 @@ export default function LookbookGallery() {
       </div>
 
       {/* Bottom hint for touch/drag */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 mt-4 text-right">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 mt-12 flex flex-col md:flex-row justify-between items-center gap-6 border-t border-white/10 pt-8">
         <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#D4AF37]/60">
           — End of Release 001 Plates —
         </span>
+        <Link href="/lookbook" className="px-8 py-3 border border-white/20 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors font-mono text-xs uppercase tracking-widest flex items-center gap-2 group">
+          View Complete Lookbook <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
     </section>
   );

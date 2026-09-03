@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { siteContent } from "@/config/siteContent";
 
@@ -83,14 +84,17 @@ export default function CraftDetails() {
         </div>
 
         {/* Bottom Editorial Callout Quote */}
-        <div className="mt-20 md:mt-28 p-10 md:p-14 bg-[#141414]/60 border border-[#D4AF37]/20 text-center relative overflow-hidden">
+        <div className="mt-20 md:mt-28 p-10 md:p-14 bg-[#141414]/60 border border-[#D4AF37]/20 text-center relative overflow-hidden flex flex-col items-center">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-60" />
           <p className="text-base sm:text-lg md:text-xl font-serif font-light text-white italic tracking-wide max-w-3xl mx-auto">
             {siteContent.craft.quote}
           </p>
-          <span className="block mt-4 text-[11px] font-mono uppercase tracking-[0.3em] text-[#D4AF37]">
+          <span className="block mt-4 mb-8 text-[11px] font-mono uppercase tracking-[0.3em] text-[#D4AF37]">
             — Rove Design Studio, Drop 001 Guidelines
           </span>
+          <Link href="/craftsmanship" className="px-8 py-3 border border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-colors font-mono text-xs uppercase tracking-widest">
+            Discover The Process
+          </Link>
         </div>
 
       </div>

@@ -1,0 +1,254 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// 1. USER & AUTHENTICATION
+// ============================================
+
+enum Role {
+  CUSTOMER
+  ROVER
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  passwordHash  String?
+  image         String?
+  role          Role      @default(CUSTOMER)
+  
+  // A rover gets access to the community
+  roverSince    DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  orders        Order[]
+  savedItems    SavedItem[]
+  stories       RoverStory[]
+  discussions   Discussion[]
+  comments      Comment[]
+  votes         PollVote[]
+}
+
+// ============================================
+// 2. E-COMMERCE & PRODUCTS
+// ============================================
+
+model Product {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  shortDescription String?
+  description      String?  // Rich text or long string
+  isFeatured       Boolean  @default(false)
+  showOnHomepage   Boolean  @default(false)
+  orderIndex       Int      @default(0)
+  
+  basePrice        Float
+  isDiscountActive Boolean  @default(false)
+  discountedPrice  Float?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  images           ProductImage[]
+  variants         ProductVariant[]
+  savedBy          SavedItem[]
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  isPrimary Boolean  @default(false)
+  
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductVariant {
+  id         String   @id @default(cuid())
+  colorName  String
+  colorHex   String
+  size       String   // e.g. M, L, XL
+  sku        String   @unique
+  stock      Int      @default(0)
+
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  orderItems OrderItem[]
+}
+
+model SavedItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, productId])
+}
+
+// ============================================
+// 3. ORDERS & CHECKOUT
+// ============================================
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  orderNumber    String      @unique // e.g. ROVE-10023
+  totalAmount    Float
+  status         OrderStatus @default(PENDING)
+  
+  // Customer info
+  email          String
+  phone          String
+  fullName       String
+  
+  // Shipping info
+  address        String
+  city           String
+  province       String
+  postalCode     String?
+  notes          String?
+
+  userId         String?
+  user           User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  items          OrderItem[]
+}
+
+model OrderItem {
+  id         String         @id @default(cuid())
+  quantity   Int
+  priceAtBuy Float          // Price paid at the time
+
+  orderId    String
+  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  variantId  String
+  variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+}
+
+// ============================================
+// 4. COMMUNITY & ROVERS
+// ============================================
+
+model RoverStory {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  imageUrl    String?
+  location    String?
+  productName String?
+  isPublished Boolean  @default(false)
+  
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+}
+
+model Discussion {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  category  String?   // Style, Routine, Product Feedback, etc
+  
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  comments  Comment[]
+}
+
+model Comment {
+  id           String     @id @default(cuid())
+  content      String
+  
+  authorId     String
+  author       User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  discussionId String
+  discussion   Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime   @default(now())
+}
+
+model Poll {
+  id        String       @id @default(cuid())
+  question  String
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  options   PollOption[]
+}
+
+model PollOption {
+  id      String     @id @default(cuid())
+  text    String
+  pollId  String
+  poll    Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes   PollVote[]
+}
+
+model PollVote {
+  id       String     @id @default(cuid())
+  userId   String
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  optionId String
+  option   PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime  @default(now())
+  
+  @@unique([userId, optionId]) // User can only vote once per option (or we can constrain per poll)
+}
+
+// ============================================
+// 5. CMS / JOURNAL
+// ============================================
+
+model Article {
+  id               String   @id @default(cuid())
+  title            String
+  slug             String   @unique
+  introduction     String?
+  content          String   // Rich Text or Markdown
+  featuredImage    String?
+  authorName       String   @default("ROVE Studio")
+  category         String?
+  tags             String[]
+  
+  isPublished      Boolean  @default(false)
+  publishedAt      DateTime?
+  
+  seoTitle         String?
+  seoDescription   String?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

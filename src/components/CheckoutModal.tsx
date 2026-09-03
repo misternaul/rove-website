@@ -181,6 +181,62 @@ ${notes.trim() || "None"}
 
   if (!isCartOpen) return null;
 
+  // Success Screen
+  if (status === "success") {
+    return (
+      <AnimatePresence>
+        {isCartOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0D0D0D]/95 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              className="w-full max-w-lg bg-[#141414] border border-[#D4AF37]/30 p-12 relative text-center"
+            >
+              <button
+                onClick={() => setIsCartOpen(false)}
+                className="absolute top-6 right-6 text-white/50 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="w-16 h-16 mx-auto rounded-full bg-[#D4AF37]/10 flex items-center justify-center mb-8">
+                <Check className="w-8 h-8 text-[#D4AF37]" />
+              </div>
+
+              <h2 className="text-3xl font-serif mb-4 text-[#D4AF37]">WELCOME TO ROVE.</h2>
+              <p className="text-white/80 font-light mb-8 leading-relaxed">
+                Your purchase makes you part of something bigger. Become a Rover and join the exclusive ROVE community for free. Participate in polls, share your stories, and access private discussions.
+              </p>
+
+              <div className="space-y-4">
+                <button 
+                  onClick={() => {
+                    setIsCartOpen(false);
+                    window.location.href = "/register"; // Direct to register
+                  }}
+                  className="w-full py-4 bg-[#D4AF37] text-black font-mono text-xs uppercase tracking-[0.3em] font-bold shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all"
+                >
+                  Join the Community
+                </button>
+                <button
+                  onClick={handleClose}
+                  className="w-full py-4 border border-white/10 text-white/70 hover:bg-white/5 hover:text-white font-mono text-xs uppercase tracking-[0.3em] transition-all"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  }
+
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 overflow-y-auto">
@@ -222,65 +278,7 @@ ${notes.trim() || "None"}
 
           <div className="p-6 md:p-8 overflow-y-auto flex-1 space-y-8">
             
-            {status === "success" ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-6 space-y-6"
-              >
-                <div className="w-16 h-16 bg-[#25D366]/15 border border-[#25D366] rounded-full flex items-center justify-center mx-auto text-[#25D366] shadow-[0_0_25px_rgba(37,211,102,0.25)]">
-                  <Check className="w-8 h-8" />
-                </div>
-                <div>
-                  <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37]">
-                    Order Recorded Successfully
-                  </span>
-                  <h4 className="text-2xl md:text-3xl font-serif text-white mt-2">
-                    Thank You, {fullName}
-                  </h4>
-                  <p className="text-xs text-white/70 font-mono mt-2">
-                    Reference ID: <span className="text-[#D4AF37] font-bold">{confirmedOrderId}</span>
-                  </p>
-                </div>
-                <div className="p-5 bg-[#0D0D0D] border border-white/10 max-w-md mx-auto text-left font-mono text-xs space-y-3 shadow-inner">
-                  <div className="flex justify-between pb-2 border-b border-white/10">
-                    <span className="text-white/60">Total Items:</span>
-                    <span className="text-white font-semibold">{totalQuantity}</span>
-                  </div>
-                  <div className="flex justify-between pb-2 border-b border-white/10">
-                    <span className="text-white/60">Total Valuation:</span>
-                    <span className="text-[#D4AF37] font-bold text-sm">{formattedTotalPrice} (COD)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-white/60">Shipping To:</span>
-                    <span className="text-white">{city}</span>
-                  </div>
-                </div>
-                <div className="p-4 bg-[#25D366]/10 border border-[#25D366]/40 max-w-md mx-auto text-left space-y-2">
-                  <strong className="text-xs font-mono text-[#25D366] uppercase tracking-wider block flex items-center gap-1.5">
-                    <MessageCircle className="w-4 h-4 fill-[#25D366] text-black" /> Step 2: Instant WhatsApp Confirmation
-                  </strong>
-                  <p className="text-xs text-white/80 leading-relaxed font-sans font-light">
-                    Click below to open WhatsApp with our fulfillment team. Your order details will be automatically attached for fastest dispatch!
-                  </p>
-                </div>
-                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <button
-                    onClick={openWhatsAppVerification}
-                    className="w-full sm:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-[#000000] font-mono font-bold text-xs tracking-[0.15em] uppercase flex items-center justify-center gap-2 shadow-2xl transform hover:scale-105 transition-all"
-                  >
-                    <MessageCircle className="w-4 h-4 fill-black" />
-                    <span>Send WhatsApp Confirmation</span>
-                  </button>
-                  <button
-                    onClick={handleClose}
-                    className="w-full sm:w-auto px-6 py-4 bg-[#0D0D0D] border border-white/20 hover:border-[#D4AF37] text-white font-mono text-xs tracking-[0.2em] uppercase transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              </motion.div>
-            ) : cartItems.length === 0 ? (
+            {cartItems.length === 0 ? (
               <div className="text-center py-12 space-y-6">
                 <ShoppingBag className="w-12 h-12 text-white/20 mx-auto" />
                 <div>
