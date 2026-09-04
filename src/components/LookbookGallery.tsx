@@ -1,13 +1,29 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useScroll } from "framer-motion";
 import { ArrowLeft, ArrowRight, Eye } from "lucide-react";
 import { siteContent } from "@/config/siteContent";
 
-export default function LookbookGallery() {
+export default function LookbookGallery({ filterHome = false }: { filterHome?: boolean }) {
+  const [config, setConfig] = useState(siteContent);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetch("/api/cms")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.success && data.data) {
+          setConfig(data.data);
+        }
+      })
+      .catch((err) => console.warn("Using default codex for gallery:", err));
+  }, []);
+
+  const rawImages = config.gallery.images || [];
+  const displayImages = filterHome ? rawImages.filter((img: any) => img.showOnHome) : rawImages;
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -17,33 +33,33 @@ export default function LookbookGallery() {
   };
 
   return (
-    <section id="gallery" className="relative py-28 md:py-40 bg-[#0D0D0D] text-white border-t border-[#D4AF37]/15">
+    <section id="gallery" className="relative py-28 md:py-40 bg-background text-foreground border-t border-[#D4AF37]/15">
       <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
         <div>
           <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#D4AF37] block mb-2">
             {siteContent.gallery.badge}
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-light font-serif tracking-tight text-white">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-light font-serif tracking-tight text-foreground">
             {siteContent.gallery.title}
           </h2>
         </div>
 
         {/* Gallery Navigation Controls */}
         <div className="flex items-center gap-3">
-          <span className="text-xs font-mono tracking-widest text-white/50 mr-2 hidden sm:inline">
+          <span className="text-xs font-mono tracking-widest text-foreground/50 mr-2 hidden sm:inline">
             Scroll or Drag
           </span>
           <button
             onClick={() => scroll("left")}
             aria-label="Scroll Gallery Left"
-            className="w-12 h-12 border border-white/20 hover:border-[#D4AF37] text-white hover:text-[#D4AF37] flex items-center justify-center transition-all bg-[#141414]"
+            className="w-12 h-12 border border-foreground/20 hover:border-[#D4AF37] text-foreground hover:text-[#D4AF37] flex items-center justify-center transition-all bg-matte"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => scroll("right")}
             aria-label="Scroll Gallery Right"
-            className="w-12 h-12 border border-white/20 hover:border-[#D4AF37] text-white hover:text-[#D4AF37] flex items-center justify-center transition-all bg-[#141414]"
+            className="w-12 h-12 border border-foreground/20 hover:border-[#D4AF37] text-foreground hover:text-[#D4AF37] flex items-center justify-center transition-all bg-matte"
           >
             <ArrowRight className="w-4 h-4" />
           </button>
@@ -57,7 +73,7 @@ export default function LookbookGallery() {
         className="flex overflow-x-auto gap-8 px-6 md:px-12 max-w-7xl mx-auto no-scrollbar scroll-smooth pb-8"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none", overscrollBehaviorX: "contain" }}
       >
-        {siteContent.gallery.images.map((item, index) => (
+        {displayImages.map((item: any, index: number) => (
           <motion.div
             key={item.title}
             initial={{ opacity: 0, x: 35 }}
@@ -68,7 +84,7 @@ export default function LookbookGallery() {
           >
             {/* Image Box */}
             <div
-              className={`relative w-full ${item.aspect} bg-[#141414] border border-white/10 group-hover:border-[#D4AF37] transition-all duration-500 overflow-hidden shadow-2xl`}
+              className={`relative w-full ${item.aspect} bg-matte border border-foreground/10 group-hover:border-[#D4AF37] transition-all duration-500 overflow-hidden shadow-2xl`}
             >
               <Image
                 src={item.src}
@@ -79,7 +95,7 @@ export default function LookbookGallery() {
                 className="object-cover transition-transform duration-1000 group-hover:scale-105"
                 sizes="(max-width: 640px) 300px, (max-width: 768px) 380px, 440px"
               />
-              <div className="absolute top-4 left-4 px-3 py-1 bg-[#0D0D0D]/90 border border-[#D4AF37]/30">
+              <div className="absolute top-4 left-4 px-3 py-1 bg-background/90 border border-[#D4AF37]/30">
                 <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-[#D4AF37]">
                   {item.tag}
                 </span>
@@ -95,13 +111,13 @@ export default function LookbookGallery() {
 
             {/* Caption & Title */}
             <div className="mt-6 flex flex-col">
-              <div className="flex items-baseline justify-between border-b border-white/10 pb-3 mb-2">
-                <h3 className="text-base sm:text-lg font-serif font-light text-white group-hover:text-[#D4AF37] transition-colors">
+              <div className="flex items-baseline justify-between border-b border-foreground/10 pb-3 mb-2">
+                <h3 className="text-base sm:text-lg font-serif font-light text-foreground group-hover:text-[#D4AF37] transition-colors">
                   {item.title}
                 </h3>
                 <span className="text-xs font-mono text-[#D4AF37]/80 font-semibold">0{index + 1} / 05</span>
               </div>
-              <p className="text-xs text-white/60 font-light tracking-wide font-sans">
+              <p className="text-xs text-foreground/60 font-light tracking-wide font-sans">
                 {item.caption}
               </p>
             </div>

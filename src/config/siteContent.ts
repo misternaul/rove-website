@@ -47,6 +47,26 @@ export interface DropItem {
   guaranteeText: string;
 }
 
+export interface JournalPost {
+  id: string;
+  slug: string;
+  title: string;
+  date: string;
+  seoDescription: string;
+  content: string; // Markdown or plain text
+  coverImage: string;
+}
+
+export interface GalleryImage {
+  id: string;
+  src: string;
+  title: string;
+  caption: string;
+  aspect: string;
+  tag: string;
+  showOnHome: boolean; // 👉 New: Admin can toggle which Lookbook images appear on Homepage
+}
+
 export interface SiteConfig {
   brand: {
     name: string;
@@ -96,7 +116,12 @@ export interface SiteConfig {
   gallery: {
     badge: string;
     title: string;
-    images: { src: string; title: string; caption: string; aspect: string; tag: string }[];
+    images: GalleryImage[];
+  };
+  journal: {
+    badge: string;
+    title: string;
+    posts: JournalPost[];
   };
   waitlist: {
     badge: string;
@@ -150,11 +175,11 @@ export const siteContent: SiteConfig = {
   // --------------------------------------------------------------------------
   nav: {
     links: [
-      { name: "Manifesto", href: "#manifesto" },
-      { name: "Releases & Drops", href: "#showcase" },
-      { name: "Craftsmanship", href: "#craft" },
-      { name: "Lookbook", href: "#gallery" },
-      { name: "Allocation & Orders", href: "#waitlist" },
+      { name: "Manifesto", href: "/#manifesto" },
+      { name: "Shop", href: "/shop" },
+      { name: "Craftsmanship", href: "/craftsmanship" },
+      { name: "Lookbook", href: "/lookbook" },
+      { name: "Journal", href: "/journal" },
     ],
     ctaText: "Order Allocation",
   },
@@ -313,40 +338,69 @@ export const siteContent: SiteConfig = {
     title: "The Drop 001 Lookbook",
     images: [
       {
+        id: "img-1",
         src: "/images/editorial-rocks.png",
         title: "Obsidian on Mineral Rock",
         caption: "Drop 001 Editorial Campaign — Jet Black Edition",
         aspect: "aspect-[3/4]",
         tag: "Editorial Campaign",
+        showOnHome: true,
       },
       {
+        id: "img-2",
         src: "/images/editorial-wardrobe.png",
         title: "Sanctuary of Quiet Strength",
         caption: "Architectural Wardrobe Framing — Nothing More, Nothing Less",
         aspect: "aspect-[3/4]",
         tag: "Lifestyle Portrait",
+        showOnHome: true,
       },
       {
+        id: "img-3",
         src: "/images/editorial-detail.png",
         title: "Textile Architecture",
         caption: "Embossed Weave Structure & Engineered Shoulder Seams",
         aspect: "aspect-[3/4]",
         tag: "Macro Texture",
+        showOnHome: true,
       },
       {
+        id: "img-4",
         src: "/images/editorial-acessories.png",
         title: "The Horizon Principle",
         caption: "Rove Design Systems & Minimalist Brand Codex",
         aspect: "aspect-[3/4]",
         tag: "Design Codex",
+        showOnHome: false,
       },
       {
+        id: "img-5",
         src: "/images/editorial-packaging.png",
         title: "Bespoke Studio Presentation",
         caption: "Elevated Unboxing Experience & Sustainable Protection",
         aspect: "aspect-[3/4]",
         tag: "Studio Packaging",
+        showOnHome: false,
       },
+    ],
+  },
+  
+  // --------------------------------------------------------------------------
+  // 8. JOURNAL / BLOG POSTS
+  // --------------------------------------------------------------------------
+  journal: {
+    badge: "ROVE Journal",
+    title: "Design Philosophy & Studio Notes",
+    posts: [
+      {
+        id: "post-1",
+        slug: "the-art-of-less-noise",
+        title: "The Art of Less Noise: Engineering the Everyday Uniform",
+        date: "October 14, 2026",
+        seoDescription: "An exploration into Rove's design philosophy and why we believe true luxury doesn't need to shout.",
+        content: "We founded ROVE on a singular premise: the modern wardrobe is too loud. Fast fashion creates a relentless cycle of consumption and disposable design, while logomania turns individuals into walking billboards.\n\nOur approach is different. We believe in clothing as architecture—a quiet, structural foundation that allows the individual wearing it to be the focal point, not the garment itself.\n\nBy prioritizing uncompromised fabrics, obsessive stitching techniques, and a timeless silhouette, we are engineering everyday uniforms meant to be worn, lived in, and relied upon.",
+        coverImage: "/images/editorial-rocks.png",
+      }
     ],
   },
 

@@ -197,23 +197,23 @@ ${notes.trim() || "None"}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-2xl bg-[#141414] border border-[#D4AF37]/30 text-white shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col my-8"
+          className="relative w-full max-w-2xl bg-matte border border-[#D4AF37]/30 text-foreground shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col my-8"
         >
-          <div className="p-6 border-b border-white/10 flex items-center justify-between bg-[#0D0D0D] flex-shrink-0">
+          <div className="p-6 border-b border-foreground/10 flex items-center justify-between bg-background flex-shrink-0">
             <div className="flex items-center gap-3">
               <ShoppingBag className="w-5 h-5 text-[#D4AF37]" />
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#D4AF37] block">
                   Studio Allocation
                 </span>
-                <h3 className="text-lg font-serif tracking-wide text-white">
+                <h3 className="text-lg font-serif tracking-wide text-foreground">
                   Your Cart & Checkout
                 </h3>
               </div>
             </div>
             <button
               onClick={handleClose}
-              className="w-10 h-10 border border-white/20 hover:border-[#D4AF37] text-white/70 hover:text-white flex items-center justify-center transition-colors bg-[#141414]"
+              className="w-10 h-10 border border-foreground/20 hover:border-[#D4AF37] text-foreground/70 hover:text-foreground flex items-center justify-center transition-colors bg-matte"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -235,32 +235,32 @@ ${notes.trim() || "None"}
                   <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37]">
                     Order Recorded Successfully
                   </span>
-                  <h4 className="text-2xl md:text-3xl font-serif text-white mt-2">
+                  <h4 className="text-2xl md:text-3xl font-serif text-foreground mt-2">
                     Thank You, {fullName}
                   </h4>
-                  <p className="text-xs text-white/70 font-mono mt-2">
+                  <p className="text-xs text-foreground/70 font-mono mt-2">
                     Reference ID: <span className="text-[#D4AF37] font-bold">{confirmedOrderId}</span>
                   </p>
                 </div>
-                <div className="p-5 bg-[#0D0D0D] border border-white/10 max-w-md mx-auto text-left font-mono text-xs space-y-3 shadow-inner">
-                  <div className="flex justify-between pb-2 border-b border-white/10">
-                    <span className="text-white/60">Total Items:</span>
-                    <span className="text-white font-semibold">{totalQuantity}</span>
+                <div className="p-5 bg-background border border-foreground/10 max-w-md mx-auto text-left font-mono text-xs space-y-3 shadow-inner">
+                  <div className="flex justify-between pb-2 border-b border-foreground/10">
+                    <span className="text-foreground/60">Total Items:</span>
+                    <span className="text-foreground font-semibold">{totalQuantity}</span>
                   </div>
-                  <div className="flex justify-between pb-2 border-b border-white/10">
-                    <span className="text-white/60">Total Valuation:</span>
+                  <div className="flex justify-between pb-2 border-b border-foreground/10">
+                    <span className="text-foreground/60">Total Valuation:</span>
                     <span className="text-[#D4AF37] font-bold text-sm">{formattedTotalPrice} (COD)</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/60">Shipping To:</span>
-                    <span className="text-white">{city}</span>
+                    <span className="text-foreground/60">Shipping To:</span>
+                    <span className="text-foreground">{city}</span>
                   </div>
                 </div>
                 <div className="p-4 bg-[#25D366]/10 border border-[#25D366]/40 max-w-md mx-auto text-left space-y-2">
                   <strong className="text-xs font-mono text-[#25D366] uppercase tracking-wider block flex items-center gap-1.5">
                     <MessageCircle className="w-4 h-4 fill-[#25D366] text-black" /> Step 2: Instant WhatsApp Confirmation
                   </strong>
-                  <p className="text-xs text-white/80 leading-relaxed font-sans font-light">
+                  <p className="text-xs text-foreground/80 leading-relaxed font-sans font-light">
                     Click below to open WhatsApp with our fulfillment team. Your order details will be automatically attached for fastest dispatch!
                   </p>
                 </div>
@@ -274,7 +274,7 @@ ${notes.trim() || "None"}
                   </button>
                   <button
                     onClick={handleClose}
-                    className="w-full sm:w-auto px-6 py-4 bg-[#0D0D0D] border border-white/20 hover:border-[#D4AF37] text-white font-mono text-xs tracking-[0.2em] uppercase transition-colors"
+                    className="w-full sm:w-auto px-6 py-4 bg-background border border-foreground/20 hover:border-[#D4AF37] text-foreground font-mono text-xs tracking-[0.2em] uppercase transition-colors"
                   >
                     Close
                   </button>
@@ -282,10 +282,10 @@ ${notes.trim() || "None"}
               </motion.div>
             ) : cartItems.length === 0 ? (
               <div className="text-center py-12 space-y-6">
-                <ShoppingBag className="w-12 h-12 text-white/20 mx-auto" />
+                <ShoppingBag className="w-12 h-12 text-foreground/20 mx-auto" />
                 <div>
-                  <h4 className="text-xl font-serif text-white">Your Cart is Empty</h4>
-                  <p className="text-sm text-white/50 font-mono mt-2">Explore our collections and add items to your cart.</p>
+                  <h4 className="text-xl font-serif text-foreground">Your Cart is Empty</h4>
+                  <p className="text-sm text-foreground/50 font-mono mt-2">Explore our collections and add items to your cart.</p>
                 </div>
                 <button
                   onClick={handleClose}
@@ -299,30 +299,30 @@ ${notes.trim() || "None"}
                 {/* CART ITEMS LIST */}
                 <div className="space-y-4">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex gap-4 p-4 bg-[#0D0D0D] border border-white/10 relative group">
-                      <div className="relative w-20 h-24 bg-[#141414] flex-shrink-0">
+                    <div key={item.id} className="flex gap-4 p-4 bg-background border border-foreground/10 relative group">
+                      <div className="relative w-20 h-24 bg-matte flex-shrink-0">
                         <Image src={item.image} alt={item.colorName} fill className="object-cover" />
                       </div>
                       <div className="flex-1 flex flex-col justify-between py-1">
                         <div>
                           <div className="flex justify-between items-start gap-4">
-                            <h4 className="text-sm font-serif text-white line-clamp-1">{item.dropName}</h4>
+                            <h4 className="text-sm font-serif text-foreground line-clamp-1">{item.dropName}</h4>
                             <button
                               onClick={() => removeFromCart(item.id)}
-                              className="text-white/40 hover:text-red-400 p-1 transition-colors flex-shrink-0"
+                              className="text-foreground/40 hover:text-red-400 p-1 transition-colors flex-shrink-0"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
-                          <p className="text-[10px] text-white/60 font-mono uppercase mt-1">
+                          <p className="text-[10px] text-foreground/60 font-mono uppercase mt-1">
                             {item.colorName} | Size: {item.sizeName}
                           </p>
                         </div>
                         <div className="flex items-center justify-between mt-4">
-                          <div className="flex items-center border border-white/20 bg-[#141414]">
+                          <div className="flex items-center border border-foreground/20 bg-matte">
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="p-1.5 text-white/70 hover:text-white transition-colors"
+                              className="p-1.5 text-foreground/70 hover:text-foreground transition-colors"
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
@@ -330,7 +330,7 @@ ${notes.trim() || "None"}
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               disabled={item.quantity >= item.maxStock}
-                              className="p-1.5 text-white/70 hover:text-[#D4AF37] disabled:text-white/20 disabled:cursor-not-allowed transition-colors"
+                              className="p-1.5 text-foreground/70 hover:text-[#D4AF37] disabled:text-foreground/20 disabled:cursor-not-allowed transition-colors"
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>
@@ -342,19 +342,19 @@ ${notes.trim() || "None"}
                       </div>
                     </div>
                   ))}
-                  <div className="pt-4 border-t border-white/10 flex justify-between items-end">
-                    <span className="text-xs font-mono uppercase text-white/60 tracking-widest">Total Valuation</span>
+                  <div className="pt-4 border-t border-foreground/10 flex justify-between items-end">
+                    <span className="text-xs font-mono uppercase text-foreground/60 tracking-widest">Total Valuation</span>
                     <span className="text-xl md:text-2xl font-mono font-bold text-[#D4AF37]">{formattedTotalPrice}</span>
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6 pt-6 border-t border-white/10">
+                <form onSubmit={handleSubmit} className="space-y-6 pt-6 border-t border-foreground/10">
                   <h4 className="text-xs font-mono tracking-[0.2em] uppercase text-[#D4AF37] mb-4">
                     Shipping Details
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
                         Full Name <span className="text-[#D4AF37]">*</span>
                       </label>
                       <input
@@ -363,11 +363,11 @@ ${notes.trim() || "None"}
                         onChange={(e) => setFullName(e.target.value)}
                         required
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
+                        className="w-full bg-background border border-foreground/20 px-4 py-3 text-sm text-foreground font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
                         Phone / WhatsApp <span className="text-[#D4AF37]">*</span>
                       </label>
                       <input
@@ -376,19 +376,19 @@ ${notes.trim() || "None"}
                         onChange={(e) => setPhone(e.target.value)}
                         required
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
+                        className="w-full bg-background border border-foreground/20 px-4 py-3 text-sm text-foreground font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                        Email Address <span className="text-white/40">(Optional)</span>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
+                        Email Address <span className="text-foreground/40">(Optional)</span>
                       </label>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
+                        className="w-full bg-background border border-foreground/20 px-4 py-3 text-sm text-foreground font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                   </div>
@@ -396,7 +396,7 @@ ${notes.trim() || "None"}
                   <div className="space-y-4 pt-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                        <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
                           City / Province <span className="text-[#D4AF37]">*</span>
                         </label>
                         <input
@@ -405,24 +405,24 @@ ${notes.trim() || "None"}
                           onChange={(e) => setCity(e.target.value)}
                           required
                           disabled={status === "submitting"}
-                          className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
+                          className="w-full bg-background border border-foreground/20 px-4 py-3 text-sm text-foreground font-mono focus:border-[#D4AF37]"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                          Nearest Landmark <span className="text-white/40">(Optional)</span>
+                        <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
+                          Nearest Landmark <span className="text-foreground/40">(Optional)</span>
                         </label>
                         <input
                           type="text"
                           value={landmark}
                           onChange={(e) => setLandmark(e.target.value)}
                           disabled={status === "submitting"}
-                          className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
+                          className="w-full bg-background border border-foreground/20 px-4 py-3 text-sm text-foreground font-mono focus:border-[#D4AF37]"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
                         Primary Address (House #, Street) <span className="text-[#D4AF37]">*</span>
                       </label>
                       <input
@@ -431,31 +431,31 @@ ${notes.trim() || "None"}
                         onChange={(e) => setPrimaryAddress(e.target.value)}
                         required
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
+                        className="w-full bg-background border border-foreground/20 px-4 py-3 text-sm text-foreground font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                        2nd Address / Apartment <span className="text-white/40">(Optional)</span>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
+                        2nd Address / Apartment <span className="text-foreground/40">(Optional)</span>
                       </label>
                       <input
                         type="text"
                         value={secondaryAddress}
                         onChange={(e) => setSecondaryAddress(e.target.value)}
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37]"
+                        className="w-full bg-background border border-foreground/20 px-4 py-3 text-sm text-foreground font-mono focus:border-[#D4AF37]"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-mono uppercase tracking-wider text-white/80 mb-2">
-                        Special Instructions <span className="text-white/40">(Optional)</span>
+                      <label className="block text-[11px] font-mono uppercase tracking-wider text-foreground/80 mb-2">
+                        Special Instructions <span className="text-foreground/40">(Optional)</span>
                       </label>
                       <textarea
                         rows={2}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         disabled={status === "submitting"}
-                        className="w-full bg-[#0D0D0D] border border-white/20 px-4 py-3 text-sm text-white font-mono focus:border-[#D4AF37] resize-none"
+                        className="w-full bg-background border border-foreground/20 px-4 py-3 text-sm text-foreground font-mono focus:border-[#D4AF37] resize-none"
                       />
                     </div>
                   </div>
@@ -468,7 +468,7 @@ ${notes.trim() || "None"}
                   )}
 
                   <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 text-white/70 text-xs font-sans font-light">
+                    <div className="flex items-center gap-3 text-foreground/70 text-xs font-sans font-light">
                       <ShieldCheck className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />
                       <span>Verified Cash on Delivery</span>
                     </div>
@@ -486,7 +486,7 @@ ${notes.trim() || "None"}
 
           </div>
 
-          <div className="px-6 py-4 bg-[#0D0D0D] border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-[10px] font-mono text-white/40 uppercase">
+          <div className="px-6 py-4 bg-background border-t border-foreground/10 flex flex-wrap items-center justify-between gap-4 text-[10px] font-mono text-foreground/40 uppercase">
             <div className="flex items-center gap-2">
               <Truck className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Complimentary Courier Across Pakistan</span>

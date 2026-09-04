@@ -46,6 +46,7 @@ export const metadata: Metadata = {
 
 import { CartProvider } from "@/components/CartProvider";
 import CheckoutModal from "@/components/CheckoutModal";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -53,14 +54,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased dark scroll-smooth">
-      <body className="min-h-full flex flex-col bg-[#0D0D0D] text-white selection:bg-[#D4AF37] selection:text-[#0D0D0D]">
-        <CartProvider>
-          <SmoothScrollProvider>
-            {children}
-          </SmoothScrollProvider>
-          <CheckoutModal />
-        </CartProvider>
+    <html lang="en" className="h-full antialiased dark scroll-smooth" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-accent selection:text-background">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <CartProvider>
+            <SmoothScrollProvider>
+              {children}
+            </SmoothScrollProvider>
+            <CheckoutModal />
+          </CartProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

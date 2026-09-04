@@ -12,7 +12,12 @@ const fallbackSizes: SizeOption[] = [
   { id: "L", name: "Large", details: 'Chest: 21" | Length: 28.5" | Shoulder: 18"', stockQuantity: 50 },
 ];
 
-export default function ProductShowcase() {
+interface ProductShowcaseProps {
+  initialDropId?: string;
+  hideSwitcher?: boolean;
+}
+
+export default function ProductShowcase({ initialDropId, hideSwitcher = false }: ProductShowcaseProps = {}) {
   const [config, setConfig] = useState<SiteConfig>(siteContent);
   const [activeDropIndex, setActiveDropIndex] = useState(0);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
@@ -29,13 +34,24 @@ export default function ProductShowcase() {
       .then((data) => {
         if (data && data.success && data.data) {
           setConfig(data.data);
+          if (initialDropId) {
+            const idx = data.data.drops.findIndex((d: DropItem) => d.id === initialDropId);
+            if (idx !== -1) setActiveDropIndex(idx);
+          }
         }
       })
       .catch((err) => console.warn("Using default codex for product showcase:", err));
-  }, []);
+  }, [initialDropId]);
+
+  useEffect(() => {
+    if (initialDropId) {
+      const idx = config.drops.findIndex((d) => d.id === initialDropId);
+      if (idx !== -1) setActiveDropIndex(idx);
+    }
+  }, [initialDropId, config.drops]);
 
   const currentDrop: DropItem = config.drops[activeDropIndex] || config.drops[0] || siteContent.drops[0];
-  const selectedColor = currentDrop.colors[selectedColorIndex] || currentDrop.colors[0];
+  const selectedColor = currentDrop?.colors?.[selectedColorIndex] || currentDrop?.colors?.[0] || { sizes: [], frontImage: "", backImage: "", name: "Loading...", priceFormatted: "" };
 
   // 👉 Size options are now dynamically managed directly under EACH individual product / item!
   const availableSizes: SizeOption[] = selectedColor.sizes && selectedColor.sizes.length > 0
@@ -72,7 +88,7 @@ export default function ProductShowcase() {
   };
 
   return (
-    <section id="showcase" className="relative py-24 md:py-40 bg-[#0D0D0D] text-white border-t border-[#D4AF37]/15">
+    <section id="showcase" className="relative py-24 md:py-40 bg-background text-foreground border-t border-[#D4AF37]/15">
       
       {/* Ambient Radial background */}
       <div className="absolute top-1/4 left-1/3 w-[600px] h-[600px] bg-gradient-to-br from-[#D4AF37]/5 via-[#5E0E1A]/10 to-transparent rounded-full blur-[160px] pointer-events-none" />
@@ -84,7 +100,7 @@ export default function ProductShowcase() {
           <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#D4AF37] block mb-3">
             {currentDrop.badge}
           </span>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-light font-serif tracking-tight text-white mb-4">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-light font-serif tracking-tight text-foreground mb-4">
             {currentDrop.name}
           </h2>
           <div className="w-16 h-[1px] bg-[#D4AF37] mx-auto my-6" />
@@ -94,13 +110,13 @@ export default function ProductShowcase() {
         </div>
 
         {/* RELEASES / MULTI-DROP TAB SWITCHER */}
-        {config.drops.length > 1 && (
+        {config.drops.length > 1 && !hideSwitcher && (
           <div className="mb-16 flex flex-col items-center">
-            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/50 mb-3 flex items-center gap-2">
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-foreground/50 mb-3 flex items-center gap-2">
               <Layers className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Select Studio Release</span>
             </span>
-            <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-[#141414] border border-white/15 max-w-2xl">
+            <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-matte border border-foreground/15 max-w-2xl">
               {config.drops.map((drop, i) => (
                 <button
                   key={drop.id}
@@ -108,7 +124,7 @@ export default function ProductShowcase() {
                   className={`px-6 py-3 text-xs font-mono uppercase tracking-[0.2em] transition-all ${
                     activeDropIndex === i
                       ? "bg-[#D4AF37] text-[#0D0D0D] font-bold shadow-md"
-                      : "text-white/70 hover:text-white bg-transparent"
+                      : "text-foreground/70 hover:text-foreground bg-transparent"
                   }`}
                 >
                   {drop.name}
@@ -131,7 +147,7 @@ export default function ProductShowcase() {
                 className={`flex-1 py-3 text-xs font-mono uppercase tracking-[0.2em] transition-all border ${
                   activeView === "front"
                     ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10"
-                    : "border-white/15 text-white/60 hover:text-white bg-[#141414]"
+                    : "border-foreground/15 text-foreground/60 hover:text-foreground bg-matte"
                 }`}
               >
                 Image 1 (Front View)
@@ -141,7 +157,7 @@ export default function ProductShowcase() {
                 className={`flex-1 py-3 text-xs font-mono uppercase tracking-[0.2em] transition-all border ${
                   activeView === "back"
                     ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10"
-                    : "border-white/15 text-white/60 hover:text-white bg-[#141414]"
+                    : "border-foreground/15 text-foreground/60 hover:text-foreground bg-matte"
                 }`}
               >
                 Image 2 (Back View)
@@ -149,7 +165,7 @@ export default function ProductShowcase() {
             </div>
 
             {/* Main Photography Canvas */}
-            <div className="relative w-full max-w-xl aspect-[3/4] bg-[#141414] border border-white/10 overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+            <div className="relative w-full max-w-xl aspect-[3/4] bg-matte border border-foreground/10 overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
               
               <AnimatePresence mode="wait">
                 <motion.div
@@ -174,10 +190,10 @@ export default function ProductShowcase() {
               {/* Decorative Frame Overlay */}
               <div className="absolute inset-0 border-[12px] border-[#0D0D0D]/40 pointer-events-none" />
               <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between pointer-events-none">
-                <span className="px-3 py-1.5 bg-[#0D0D0D]/90 backdrop-blur-md border border-[#D4AF37]/30 text-[10px] font-mono text-[#D4AF37] uppercase tracking-[0.2em]">
+                <span className="px-3 py-1.5 bg-background/90 backdrop-blur-md border border-[#D4AF37]/30 text-[10px] font-mono text-[#D4AF37] uppercase tracking-[0.2em]">
                   {selectedColor.name}
                 </span>
-                <span className="px-3 py-1.5 bg-[#0D0D0D]/90 backdrop-blur-md border border-[#D4AF37]/30 text-[10px] font-mono text-white/90 uppercase tracking-[0.2em] font-semibold">
+                <span className="px-3 py-1.5 bg-background/90 backdrop-blur-md border border-[#D4AF37]/30 text-[10px] font-mono text-foreground/90 uppercase tracking-[0.2em] font-semibold">
                   {selectedColor.priceFormatted}
                 </span>
               </div>
@@ -187,29 +203,29 @@ export default function ProductShowcase() {
             <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-xl">
               <button
                 onClick={() => setActiveView("front")}
-                className={`relative h-20 bg-[#141414] border overflow-hidden transition-all ${
-                  activeView === "front" ? "border-[#D4AF37] ring-1 ring-[#D4AF37]" : "border-white/15 opacity-60 hover:opacity-100"
+                className={`relative h-20 bg-matte border overflow-hidden transition-all ${
+                  activeView === "front" ? "border-[#D4AF37] ring-1 ring-[#D4AF37]" : "border-foreground/15 opacity-60 hover:opacity-100"
                 }`}
               >
                 <Image src={selectedColor.frontImage} alt="Front Thumbnail" fill className="object-cover object-top" />
                 <div className="absolute inset-0 bg-black/30 flex items-end p-1.5">
-                  <span className="text-[9px] font-mono tracking-wider uppercase text-white bg-black/80 px-1.5 py-0.5">Image 1</span>
+                  <span className="text-[9px] font-mono tracking-wider uppercase text-foreground bg-black/80 px-1.5 py-0.5">Image 1</span>
                 </div>
               </button>
               <button
                 onClick={() => setActiveView("back")}
-                className={`relative h-20 bg-[#141414] border overflow-hidden transition-all ${
-                  activeView === "back" ? "border-[#D4AF37] ring-1 ring-[#D4AF37]" : "border-white/15 opacity-60 hover:opacity-100"
+                className={`relative h-20 bg-matte border overflow-hidden transition-all ${
+                  activeView === "back" ? "border-[#D4AF37] ring-1 ring-[#D4AF37]" : "border-foreground/15 opacity-60 hover:opacity-100"
                 }`}
               >
                 <Image src={selectedColor.backImage} alt="Back Thumbnail" fill className="object-cover object-top" />
                 <div className="absolute inset-0 bg-black/30 flex items-end p-1.5">
-                  <span className="text-[9px] font-mono tracking-wider uppercase text-white bg-black/80 px-1.5 py-0.5">Image 2</span>
+                  <span className="text-[9px] font-mono tracking-wider uppercase text-foreground bg-black/80 px-1.5 py-0.5">Image 2</span>
                 </div>
               </button>
             </div>
 
-            <p className="mt-4 text-xs text-white/50 font-mono italic text-center max-w-md">
+            <p className="mt-4 text-xs text-foreground/50 font-mono italic text-center max-w-md">
               &ldquo;{selectedColor.caption}&rdquo;
             </p>
           </div>
@@ -217,18 +233,18 @@ export default function ProductShowcase() {
           {/* RIGHT: Product Customizer & Direct Order Action (Columns 8 to 12) */}
           <div className="lg:col-span-5 flex flex-col justify-between">
             
-            <div className="p-8 md:p-10 bg-[#141414] border border-white/10 shadow-2xl relative">
+            <div className="p-8 md:p-10 bg-matte border border-foreground/10 shadow-2xl relative">
               <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#D4AF37]" />
               
               {/* Dynamic Pricing Display in PKR based on selected product item */}
-              <div className="flex flex-col mb-8 pb-8 border-b border-white/10">
+              <div className="flex flex-col mb-8 pb-8 border-b border-foreground/10">
                 <div className="flex items-baseline justify-between mb-2">
-                  <span className="text-xs font-mono uppercase tracking-[0.2em] text-white/50">
+                  <span className="text-xs font-mono uppercase tracking-[0.2em] text-foreground/50">
                     Valuation ({selectedColor.name.split(" ")[0]})
                   </span>
                   <div className="flex items-baseline gap-3">
                     {selectedColor.isDiscountActive && (
-                      <span className="text-lg sm:text-xl font-mono text-white/40 line-through tracking-tight">
+                      <span className="text-lg sm:text-xl font-mono text-foreground/40 line-through tracking-tight">
                         {selectedColor.priceFormatted}
                       </span>
                     )}
@@ -242,7 +258,7 @@ export default function ProductShowcase() {
                     </motion.span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-sans text-white/70">
+                <div className="flex items-center gap-2 text-xs font-sans text-foreground/70">
                   <span className="inline-block w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
                   <span>{currentDrop.shippingNote}</span>
                 </div>
@@ -254,8 +270,8 @@ export default function ProductShowcase() {
                   <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] font-semibold">
                     1. Select Item / Colorway
                   </span>
-                  <span className="text-xs font-mono text-white/80">
-                    Active: <strong className="text-white font-medium">{selectedColor.name}</strong>
+                  <span className="text-xs font-mono text-foreground/80">
+                    Active: <strong className="text-foreground font-medium">{selectedColor.name}</strong>
                   </span>
                 </div>
 
@@ -267,20 +283,20 @@ export default function ProductShowcase() {
                       className={`p-3.5 border flex flex-col gap-2 transition-all ${
                         selectedColorIndex === i
                           ? "border-[#D4AF37] bg-[#D4AF37]/15 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
-                          : "border-white/15 hover:border-white/40 bg-[#0D0D0D]"
+                          : "border-foreground/15 hover:border-foreground/40 bg-background"
                       }`}
                     >
                       <div className="flex items-center gap-2.5 w-full">
                         <span
-                          className="w-4 h-4 rounded-full border border-white/40 flex-shrink-0"
+                          className="w-4 h-4 rounded-full border border-foreground/40 flex-shrink-0"
                           style={{ backgroundColor: c.hex || "#777777" }}
                         />
-                        <span className="text-xs font-mono uppercase tracking-wider text-left text-white leading-tight font-semibold truncate">
+                        <span className="text-xs font-mono uppercase tracking-wider text-left text-foreground leading-tight font-semibold truncate">
                           {c.name}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between w-full pt-1 border-t border-white/10">
-                        <span className="text-[10px] font-mono text-white/50 uppercase">Price:</span>
+                      <div className="flex items-center justify-between w-full pt-1 border-t border-foreground/10">
+                        <span className="text-[10px] font-mono text-foreground/50 uppercase">Price:</span>
                         <span className="text-xs font-mono font-bold text-[#D4AF37]">
                           {c.isDiscountActive ? c.discountedPriceFormatted : c.priceFormatted}
                         </span>
@@ -296,7 +312,7 @@ export default function ProductShowcase() {
                   <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] font-semibold">
                     2. Select Sizing Grade
                   </span>
-                  <span className="text-[11px] font-mono text-white/60 hover:text-white underline cursor-pointer">
+                  <span className="text-[11px] font-mono text-foreground/60 hover:text-foreground underline cursor-pointer">
                     Tailored Fit Specs
                   </span>
                 </div>
@@ -316,7 +332,7 @@ export default function ProductShowcase() {
                             ? "border-red-900/30 bg-red-950/10 text-red-500/50 cursor-not-allowed"
                             : validSizeIndex === idx
                               ? "border-[#D4AF37] bg-[#D4AF37]/15 text-[#D4AF37] font-bold shadow-md"
-                              : "border-white/15 text-white/70 hover:border-white/50 hover:text-white bg-[#0D0D0D]"
+                              : "border-foreground/15 text-foreground/70 hover:border-foreground/50 hover:text-foreground bg-background"
                         }`}
                       >
                         <span className={`text-sm font-semibold ${isOutOfStock ? "line-through" : ""}`}>
@@ -336,7 +352,7 @@ export default function ProductShowcase() {
                 </div>
 
                 {/* Size Exact Measurements Feedback for active size */}
-                <div className="mt-3 p-3.5 bg-[#0D0D0D] border border-white/10 text-xs font-mono text-white/80 text-center shadow-inner">
+                <div className="mt-3 p-3.5 bg-background border border-foreground/10 text-xs font-mono text-foreground/80 text-center shadow-inner">
                   <span className="text-[#D4AF37] font-semibold">{selectedSize.name} Specs: </span>
                   <span className="text-[#FFFFFF]">{selectedSize.details}</span>
                 </div>
@@ -374,7 +390,7 @@ export default function ProductShowcase() {
 
                 <button
                   onClick={handleReserveAllocation}
-                  className="w-full py-3.5 bg-[#0D0D0D] border border-white/20 hover:border-[#D4AF37] text-white/80 hover:text-white font-mono text-[11px] tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-background border border-foreground/20 hover:border-[#D4AF37] text-foreground/80 hover:text-foreground font-mono text-[11px] tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
                   <span>{currentDrop.secondaryActionText}</span>
@@ -382,12 +398,12 @@ export default function ProductShowcase() {
               </div>
 
               {/* Trust Value Propositions */}
-              <div className="mt-8 pt-6 border-t border-white/10 space-y-3">
-                <div className="flex items-center gap-3 text-xs text-white/70 font-light">
+              <div className="mt-8 pt-6 border-t border-foreground/10 space-y-3">
+                <div className="flex items-center gap-3 text-xs text-foreground/70 font-light">
                   <Shield className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
                   <span>{currentDrop.guaranteeText}</span>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-white/70 font-light">
+                <div className="flex items-center gap-3 text-xs text-foreground/70 font-light">
                   <RefreshCw className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
                   <span>Bespoke 3-line sleeve embroidery standard on every garment</span>
                 </div>
@@ -406,17 +422,17 @@ export default function ProductShowcase() {
                 return (
                   <div
                     key={acc.id}
-                    className="bg-[#141414] border border-white/10 hover:border-white/20 transition-colors overflow-hidden"
+                    className="bg-matte border border-foreground/10 hover:border-foreground/20 transition-colors overflow-hidden"
                   >
                     <button
                       onClick={() => setOpenAccordion(isOpen ? null : acc.id)}
-                      className="w-full p-5 text-left flex items-center justify-between text-xs font-mono uppercase tracking-wider text-white hover:text-[#D4AF37] transition-colors"
+                      className="w-full p-5 text-left flex items-center justify-between text-xs font-mono uppercase tracking-wider text-foreground hover:text-[#D4AF37] transition-colors"
                     >
                       <span>{acc.title}</span>
                       {isOpen ? (
                         <ChevronUp className="w-4 h-4 text-[#D4AF37]" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-white/50" />
+                        <ChevronDown className="w-4 h-4 text-foreground/50" />
                       )}
                     </button>
 
@@ -426,7 +442,7 @@ export default function ProductShowcase() {
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="px-5 pb-5 text-xs text-white/70 font-light leading-relaxed border-t border-white/5 pt-3"
+                        className="px-5 pb-5 text-xs text-foreground/70 font-light leading-relaxed border-t border-foreground/5 pt-3"
                       >
                         {acc.content}
                       </motion.div>

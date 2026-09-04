@@ -7,7 +7,7 @@ import { siteContent } from "@/config/siteContent";
 
 export default function CraftDetails() {
   return (
-    <section id="craft" className="relative py-28 md:py-40 bg-[#0D0D0D] text-white border-t border-[#D4AF37]/15 overflow-hidden">
+    <section id="craft" className="relative py-28 md:py-40 bg-background text-foreground border-t border-[#D4AF37]/15 overflow-hidden">
       
       {/* Background glow */}
       <div className="absolute top-1/3 right-0 w-[500px] h-[500px] bg-[#D4AF37]/4 rounded-full blur-[150px] pointer-events-none" />
@@ -19,7 +19,7 @@ export default function CraftDetails() {
           <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#D4AF37] block mb-3">
             {siteContent.craft.badge}
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-light font-serif tracking-tight text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-light font-serif tracking-tight text-foreground mb-6">
             {siteContent.craft.title}
           </h2>
           <p className="text-sm md:text-base text-[#CDBFA6]/80 font-light leading-relaxed font-sans">
@@ -36,12 +36,12 @@ export default function CraftDetails() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px", amount: 0.15 }}
               transition={{ duration: 0.85, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className={`group bg-[#141414] border border-white/10 hover:border-[#D4AF37]/50 transition-all duration-500 flex flex-col overflow-hidden gpu-layer ${
+              className={`group bg-matte border border-foreground/10 hover:border-[#D4AF37]/50 transition-all duration-500 flex flex-col overflow-hidden gpu-layer ${
                 idx === 0 ? "md:col-span-2 lg:col-span-1" : ""
               }`}
             >
               {/* Image Frame */}
-              <div className="relative w-full aspect-square overflow-hidden bg-[#0D0D0D]">
+              <div className="relative w-full aspect-square overflow-hidden bg-background">
                 <Image
                   src={item.image}
                   alt={item.title}
@@ -52,7 +52,7 @@ export default function CraftDetails() {
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent opacity-60" />
-                <div className="absolute top-4 right-4 px-2.5 py-1 bg-[#0D0D0D]/80 border border-[#D4AF37]/20">
+                <div className="absolute top-4 right-4 px-2.5 py-1 bg-background/80 border border-[#D4AF37]/20">
                   <span className="text-[10px] font-mono text-[#D4AF37] tracking-[0.2em] uppercase">
                     0{idx + 1}
                   </span>
@@ -65,15 +65,15 @@ export default function CraftDetails() {
                   <span className="text-[10px] font-mono tracking-[0.25em] text-[#D4AF37] uppercase block mb-2">
                     {item.subtitle}
                   </span>
-                  <h3 className="text-xl font-serif font-normal text-white mb-4 tracking-tight group-hover:text-[#D4AF37] transition-colors">
+                  <h3 className="text-xl font-serif font-normal text-foreground mb-4 tracking-tight group-hover:text-[#D4AF37] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-white/70 font-light leading-relaxed font-sans">
+                  <p className="text-xs sm:text-sm text-foreground/70 font-light leading-relaxed font-sans">
                     {item.description}
                   </p>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-white/40 uppercase">
+                <div className="mt-8 pt-4 border-t border-foreground/5 flex items-center justify-between text-[11px] font-mono text-foreground/40 uppercase">
                   <span>Standard Drop 001</span>
                   <span className="text-[#D4AF37]">Rove Hallmark</span>
                 </div>
@@ -83,9 +83,9 @@ export default function CraftDetails() {
         </div>
 
         {/* Bottom Editorial Callout Quote */}
-        <div className="mt-20 md:mt-28 p-10 md:p-14 bg-[#141414]/60 border border-[#D4AF37]/20 text-center relative overflow-hidden">
+        <div className="mt-20 md:mt-28 p-10 md:p-14 bg-matte/60 border border-[#D4AF37]/20 text-center relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-60" />
-          <p className="text-base sm:text-lg md:text-xl font-serif font-light text-white italic tracking-wide max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl font-serif font-light text-foreground italic tracking-wide max-w-3xl mx-auto">
             {siteContent.craft.quote}
           </p>
           <span className="block mt-4 text-[11px] font-mono uppercase tracking-[0.3em] text-[#D4AF37]">

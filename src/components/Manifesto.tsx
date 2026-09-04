@@ -29,7 +29,7 @@ export default function Manifesto() {
   return (
     <section
       id="manifesto"
-      className="relative py-32 md:py-44 bg-[#0D0D0D] text-white overflow-hidden border-t border-b border-[#D4AF37]/15"
+      className="relative py-32 md:py-44 bg-background text-foreground overflow-hidden border-t border-b border-[#D4AF37]/15"
     >
       {/* Ambient center lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#D4AF37]/4 rounded-full blur-[160px] pointer-events-none" />
@@ -82,14 +82,14 @@ export default function Manifesto() {
           
           <motion.div
             variants={itemVariants}
-            className="mt-16 pt-12 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 w-full max-w-3xl text-left sm:text-center gpu-layer"
+            className="mt-16 pt-12 border-t border-foreground/10 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 w-full max-w-3xl text-left sm:text-center gpu-layer"
           >
             {siteContent.manifesto.pillars.map((pillar) => (
               <div key={pillar.title}>
                 <span className="block text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-medium mb-1">
                   {pillar.title}
                 </span>
-                <span className="text-xs text-white/60 font-light block font-sans">
+                <span className="text-xs text-foreground/60 font-light block font-sans">
                   {pillar.subtitle}
                 </span>
               </div>

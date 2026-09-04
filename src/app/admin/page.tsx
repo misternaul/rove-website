@@ -30,7 +30,7 @@ export default function StudioAdminPage() {
   const [pinError, setPinError] = useState("");
 
   const [config, setConfig] = useState<SiteConfig>(siteContent);
-  const [activeTab, setActiveTab] = useState<"drops" | "brand" | "storage">("drops");
+  const [activeTab, setActiveTab] = useState<"drops" | "brand" | "storage" | "lookbook" | "journal">("drops");
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
   const [selectedDropIndex, setSelectedDropIndex] = useState(0);
@@ -357,6 +357,18 @@ export default function StudioAdminPage() {
             className={`px-6 py-3 text-xs uppercase tracking-[0.2em] flex items-center gap-2 border-b-2 font-mono whitespace-nowrap transition-all ${activeTab === "storage" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10 font-bold" : "border-transparent text-white/60 hover:text-white"}`}
           >
             <HelpCircle className="w-4 h-4" /> 3. ☁️ Fix Cloud Saving & Image Uploads
+          </button>
+          <button
+            onClick={() => setActiveTab("lookbook")}
+            className={`px-6 py-3 text-xs uppercase tracking-[0.2em] flex items-center gap-2 border-b-2 font-mono whitespace-nowrap transition-all ${activeTab === "lookbook" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10 font-bold" : "border-transparent text-white/60 hover:text-white"}`}
+          >
+            <ImageIcon className="w-4 h-4" /> 4. Lookbook & Magazine
+          </button>
+          <button
+            onClick={() => setActiveTab("journal")}
+            className={`px-6 py-3 text-xs uppercase tracking-[0.2em] flex items-center gap-2 border-b-2 font-mono whitespace-nowrap transition-all ${activeTab === "journal" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10 font-bold" : "border-transparent text-white/60 hover:text-white"}`}
+          >
+            <Settings className="w-4 h-4" /> 5. Journal / SEO Posts
           </button>
         </div>
 
@@ -879,6 +891,239 @@ export default function StudioAdminPage() {
               </div>
             </div>
 
+          </div>
+        )}
+
+        {/* TAB 4: LOOKBOOK / MAGAZINE */}
+        {activeTab === "lookbook" && (
+          <div className="bg-[#141414] border border-white/10 p-6 md:p-8 space-y-8 max-w-5xl">
+            <div>
+              <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] block mb-1 font-mono">Lookbook Editor</span>
+              <h3 className="text-2xl md:text-3xl font-serif text-white">Visual Compendium & Magazine</h3>
+              <p className="text-sm text-white/60 mt-2">Add and manage images for your Lookbook page. Select which ones should also be featured on the homepage.</p>
+            </div>
+
+            <button
+              onClick={() => {
+                const newImg = { id: `img-${Date.now()}`, src: "", title: "New Lookbook Image", caption: "Caption here", aspect: "aspect-[3/4]", tag: "Editorial", showOnHome: false };
+                setConfig({ ...config, gallery: { ...config.gallery, images: [...(config.gallery?.images || []), newImg] } });
+              }}
+              className="px-4 py-2 bg-[#0D0D0D] border border-white/20 text-xs font-mono uppercase text-[#D4AF37] hover:border-[#D4AF37] transition-all flex items-center gap-2"
+            >
+              <Plus className="w-3.5 h-3.5" /> Add Lookbook Image
+            </button>
+
+            <div className="space-y-6">
+              {(config.gallery?.images || []).map((img, idx) => (
+                <div key={img.id || idx} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start p-5 bg-[#0D0D0D] border border-white/15">
+                  <div className="md:col-span-3">
+                    <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Image URL</label>
+                    <input
+                      type="text"
+                      value={img.src}
+                      placeholder="/images/your-image.jpg or https://..."
+                      onChange={(e) => {
+                        const newImages = [...config.gallery.images];
+                        newImages[idx].src = e.target.value;
+                        setConfig({ ...config, gallery: { ...config.gallery, images: newImages } });
+                      }}
+                      className="w-full bg-[#141414] border border-white/20 p-2.5 text-xs text-white font-mono focus:border-[#D4AF37]"
+                    />
+                    <div className="mt-4 flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={img.showOnHome}
+                        onChange={(e) => {
+                          const newImages = [...config.gallery.images];
+                          newImages[idx].showOnHome = e.target.checked;
+                          setConfig({ ...config, gallery: { ...config.gallery, images: newImages } });
+                        }}
+                        className="w-4 h-4 accent-[#D4AF37] bg-[#141414]"
+                        id={`home-${idx}`}
+                      />
+                      <label htmlFor={`home-${idx}`} className="text-[11px] font-mono uppercase text-[#D4AF37] cursor-pointer">
+                        Feature on Homepage
+                      </label>
+                    </div>
+                  </div>
+                  <div className="md:col-span-3">
+                    <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Title</label>
+                    <input
+                      type="text"
+                      value={img.title}
+                      onChange={(e) => {
+                        const newImages = [...config.gallery.images];
+                        newImages[idx].title = e.target.value;
+                        setConfig({ ...config, gallery: { ...config.gallery, images: newImages } });
+                      }}
+                      className="w-full bg-[#141414] border border-white/20 p-2.5 text-xs text-white focus:border-[#D4AF37]"
+                    />
+                  </div>
+                  <div className="md:col-span-4">
+                    <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Caption</label>
+                    <input
+                      type="text"
+                      value={img.caption}
+                      onChange={(e) => {
+                        const newImages = [...config.gallery.images];
+                        newImages[idx].caption = e.target.value;
+                        setConfig({ ...config, gallery: { ...config.gallery, images: newImages } });
+                      }}
+                      className="w-full bg-[#141414] border border-white/20 p-2.5 text-xs text-white focus:border-[#D4AF37]"
+                    />
+                  </div>
+                  <div className="md:col-span-2 flex justify-end">
+                    <button
+                      onClick={() => {
+                        const newImages = [...config.gallery.images];
+                        newImages.splice(idx, 1);
+                        setConfig({ ...config, gallery: { ...config.gallery, images: newImages } });
+                      }}
+                      className="p-2 border border-red-900/50 text-red-400 hover:bg-red-900/20 transition-all"
+                      title="Remove Image"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 5: JOURNAL / SEO POSTS */}
+        {activeTab === "journal" && (
+          <div className="bg-[#141414] border border-white/10 p-6 md:p-8 space-y-8 max-w-5xl">
+            <div>
+              <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] block mb-1 font-mono">Journal Editor</span>
+              <h3 className="text-2xl md:text-3xl font-serif text-white">Articles & SEO Content</h3>
+              <p className="text-sm text-white/60 mt-2">Publish new articles. All content uses simple markdown/text and automatically builds SEO-friendly standalone pages.</p>
+            </div>
+
+            <button
+              onClick={() => {
+                const newPost = {
+                  id: `post-${Date.now()}`,
+                  slug: `new-article-${Date.now()}`,
+                  title: "New Studio Article",
+                  date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+                  seoDescription: "A brief summary for Google Search and preview cards.",
+                  content: "Write your article content here...",
+                  coverImage: ""
+                };
+                setConfig({ ...config, journal: { ...config.journal, posts: [...(config.journal?.posts || []), newPost] } });
+              }}
+              className="px-4 py-2 bg-[#0D0D0D] border border-white/20 text-xs font-mono uppercase text-[#D4AF37] hover:border-[#D4AF37] transition-all flex items-center gap-2"
+            >
+              <Plus className="w-3.5 h-3.5" /> Draft New Article
+            </button>
+
+            <div className="space-y-8">
+              {(config.journal?.posts || []).map((post, idx) => (
+                <div key={post.id || idx} className="p-6 bg-[#0D0D0D] border border-white/15 space-y-5">
+                  <div className="flex justify-between items-start gap-4 flex-wrap">
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Article Title</label>
+                        <input
+                          type="text"
+                          value={post.title}
+                          onChange={(e) => {
+                            const newPosts = [...config.journal.posts];
+                            newPosts[idx].title = e.target.value;
+                            setConfig({ ...config, journal: { ...config.journal, posts: newPosts } });
+                          }}
+                          className="w-full bg-[#141414] border border-white/20 p-2.5 text-xs text-white focus:border-[#D4AF37]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">URL Slug (e.g. my-new-article)</label>
+                        <input
+                          type="text"
+                          value={post.slug}
+                          onChange={(e) => {
+                            const newPosts = [...config.journal.posts];
+                            newPosts[idx].slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+                            setConfig({ ...config, journal: { ...config.journal, posts: newPosts } });
+                          }}
+                          className="w-full bg-[#141414] border border-white/20 p-2.5 text-xs text-[#D4AF37] font-mono focus:border-[#D4AF37]"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const newPosts = [...config.journal.posts];
+                        newPosts.splice(idx, 1);
+                        setConfig({ ...config, journal: { ...config.journal, posts: newPosts } });
+                      }}
+                      className="p-2.5 border border-red-900/50 text-red-400 hover:bg-red-900/20 transition-all flex-shrink-0"
+                      title="Delete Article"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Publish Date</label>
+                      <input
+                        type="text"
+                        value={post.date}
+                        onChange={(e) => {
+                          const newPosts = [...config.journal.posts];
+                          newPosts[idx].date = e.target.value;
+                          setConfig({ ...config, journal: { ...config.journal, posts: newPosts } });
+                        }}
+                        className="w-full bg-[#141414] border border-white/20 p-2.5 text-xs text-white focus:border-[#D4AF37]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Cover Image URL</label>
+                      <input
+                        type="text"
+                        value={post.coverImage}
+                        placeholder="/images/cover.jpg or https://..."
+                        onChange={(e) => {
+                          const newPosts = [...config.journal.posts];
+                          newPosts[idx].coverImage = e.target.value;
+                          setConfig({ ...config, journal: { ...config.journal, posts: newPosts } });
+                        }}
+                        className="w-full bg-[#141414] border border-white/20 p-2.5 text-xs text-white font-mono focus:border-[#D4AF37]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">SEO Description (Meta Tag)</label>
+                    <textarea
+                      rows={2}
+                      value={post.seoDescription}
+                      onChange={(e) => {
+                        const newPosts = [...config.journal.posts];
+                        newPosts[idx].seoDescription = e.target.value;
+                        setConfig({ ...config, journal: { ...config.journal, posts: newPosts } });
+                      }}
+                      className="w-full bg-[#141414] border border-white/20 p-2.5 text-xs text-white focus:border-[#D4AF37] resize-none"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider text-white/70 mb-1">Article Content (Markdown Supported)</label>
+                    <textarea
+                      rows={12}
+                      value={post.content}
+                      onChange={(e) => {
+                        const newPosts = [...config.journal.posts];
+                        newPosts[idx].content = e.target.value;
+                        setConfig({ ...config, journal: { ...config.journal, posts: newPosts } });
+                      }}
+                      className="w-full bg-[#141414] border border-white/20 p-4 text-sm text-white font-mono focus:border-[#D4AF37] leading-relaxed resize-y"
+                    />
+                  </div>
+
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

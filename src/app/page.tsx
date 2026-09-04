@@ -10,7 +10,7 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#0D0D0D]">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#0D0D0D]">
       {/* Editorial Luxury Header & Navigation */}
       <Navbar />
 
@@ -29,7 +29,7 @@ export default function Home() {
         <CraftDetails />
 
         {/* 5. Lookbook & Visual Compendium — Smooth Horizontal Scrolling Strip */}
-        <LookbookGallery />
+        <LookbookGallery filterHome={true} />
 
         {/* 6. Priority Waitlist & Allocation Access Flow */}
         <WaitlistSection />

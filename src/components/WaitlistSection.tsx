@@ -103,7 +103,7 @@ export default function WaitlistSection() {
   };
 
   return (
-    <section id="waitlist" className="relative py-32 md:py-48 bg-[#0D0D0D] text-white border-t border-[#D4AF37]/20 overflow-hidden">
+    <section id="waitlist" className="relative py-32 md:py-48 bg-background text-foreground border-t border-[#D4AF37]/20 overflow-hidden">
       {/* Ambient Radial Highlights */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-[#D4AF37]/8 to-[#5E0E1A]/10 rounded-full blur-[170px] pointer-events-none" />
 
@@ -114,7 +114,7 @@ export default function WaitlistSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px", amount: 0.2 }}
           transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-[#141414]/90 border border-[#D4AF37]/30 p-8 md:p-16 shadow-2xl relative gpu-layer"
+          className="bg-matte/90 border border-[#D4AF37]/30 p-8 md:p-16 shadow-2xl relative gpu-layer"
         >
           {/* Corner decorative gold indicators */}
           <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#D4AF37]" />
@@ -122,12 +122,12 @@ export default function WaitlistSection() {
           <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#D4AF37]" />
           <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-[#D4AF37]" />
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#0D0D0D] border border-[#D4AF37]/30 text-[10px] font-mono tracking-[0.3em] text-[#D4AF37] uppercase mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-background border border-[#D4AF37]/30 text-[10px] font-mono tracking-[0.3em] text-[#D4AF37] uppercase mb-8">
             <Sparkles className="w-3 h-3 text-[#D4AF37] animate-pulse" />
             <span>{siteContent.waitlist.badge}</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-light font-serif tracking-tight text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-light font-serif tracking-tight text-foreground mb-4">
             {siteContent.waitlist.title}
           </h2>
           
@@ -137,10 +137,10 @@ export default function WaitlistSection() {
 
           {/* Reserved product indicator badge if forwarded from Product Showcase CTA */}
           {reservedProduct && (
-            <div className="mb-8 p-4 bg-[#0D0D0D]/90 border border-white/15 max-w-sm mx-auto flex items-center justify-between text-xs font-mono text-left">
+            <div className="mb-8 p-4 bg-background/90 border border-foreground/15 max-w-sm mx-auto flex items-center justify-between text-xs font-mono text-left">
               <div>
                 <span className="text-[9px] uppercase tracking-[0.2em] text-[#D4AF37] block">{reservedProduct.drop || "Studio Release"}</span>
-                <span className="text-white font-medium block mt-0.5">
+                <span className="text-foreground font-medium block mt-0.5">
                   {reservedProduct.color} • Size {reservedProduct.size}
                 </span>
                 <span className="text-[#D4AF37] text-[11px] font-bold block mt-0.5">
@@ -149,7 +149,7 @@ export default function WaitlistSection() {
               </div>
               <button
                 onClick={() => setReservedProduct(null)}
-                className="text-[10px] text-white/40 hover:text-white uppercase underline font-sans"
+                className="text-[10px] text-foreground/40 hover:text-foreground uppercase underline font-sans"
               >
                 Clear
               </button>
@@ -163,13 +163,13 @@ export default function WaitlistSection() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                className="py-10 bg-[#0D0D0D] border border-[#D4AF37] max-w-lg mx-auto p-6 text-center shadow-2xl"
+                className="py-10 bg-background border border-[#D4AF37] max-w-lg mx-auto p-6 text-center shadow-2xl"
               >
                 <div className="w-12 h-12 bg-[#D4AF37]/10 border border-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-4 text-[#D4AF37]">
                   <Check className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-serif text-white mb-2">You Are On The List</h3>
-                <p className="text-xs text-white/75 leading-relaxed font-light mb-6 font-mono">
+                <h3 className="text-xl font-serif text-foreground mb-2">You Are On The List</h3>
+                <p className="text-xs text-foreground/75 leading-relaxed font-light mb-6 font-mono">
                   Your allocation priority has been logged in our studio records. You will receive private notice prior to public commercial release.
                 </p>
                 <button
@@ -195,7 +195,7 @@ export default function WaitlistSection() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="enter.your@email.com"
                     disabled={status === "loading"}
-                    className="flex-1 bg-[#0D0D0D] border border-white/20 px-5 py-4 text-sm text-white placeholder:text-white/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
+                    className="flex-1 bg-background border border-foreground/20 px-5 py-4 text-sm text-foreground placeholder:text-foreground/30 font-mono focus:outline-none focus:border-[#D4AF37] transition-colors rounded-none"
                     required
                   />
                   <button
@@ -216,7 +216,7 @@ export default function WaitlistSection() {
                   </div>
                 )}
 
-                <div className="mt-4 flex items-center justify-center gap-2 text-[10px] font-mono text-white/40 tracking-wider">
+                <div className="mt-4 flex items-center justify-center gap-2 text-[10px] font-mono text-foreground/40 tracking-wider">
                   <Lock className="w-3 h-3 text-[#D4AF37]" />
                   <span>{siteContent.waitlist.privacyNote}</span>
                 </div>

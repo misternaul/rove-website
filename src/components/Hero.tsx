@@ -11,7 +11,7 @@ export default function Hero() {
   const basePrice = currentDrop.colors[0]?.priceFormatted || "PKR 2,299";
 
   return (
-    <section className="relative w-full min-h-screen bg-[#0D0D0D] text-white flex flex-col justify-between pt-24 pb-12 md:pb-20 overflow-hidden border-b border-[#D4AF37]/20">
+    <section className="relative w-full min-h-screen bg-background text-foreground flex flex-col justify-between pt-24 pb-12 md:pb-20 overflow-hidden border-b border-[#D4AF37]/20">
       
       {/* Background Radial Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-[#D4AF37]/5 via-[#5E0E1A]/10 to-transparent rounded-full blur-[160px] pointer-events-none" />
@@ -44,7 +44,7 @@ export default function Hero() {
             className="lg:col-span-7 flex flex-col z-10 gpu-layer"
           >
             <h1 className="text-5xl sm:text-7xl md:text-8xl font-light font-serif tracking-tight leading-[0.95] mb-8 text-[#FFFFFF]">
-              <span className="block font-normal text-white hover:text-[#D4AF37] transition-colors duration-700">
+              <span className="block font-normal text-foreground hover:text-[#D4AF37] transition-colors duration-700">
                 {siteContent.hero.titleLine1}
               </span>
               <span className="block font-serif italic text-gold-gradient mt-2">
@@ -66,7 +66,7 @@ export default function Hero() {
               </a>
               <a
                 href="#manifesto"
-                className="px-8 py-4 bg-[#141414] hover:bg-white/10 text-white border border-white/20 hover:border-[#D4AF37] font-mono text-xs tracking-[0.25em] uppercase transition-all duration-500 text-center block"
+                className="px-8 py-4 bg-matte hover:bg-white/10 text-foreground border border-foreground/20 hover:border-[#D4AF37] font-mono text-xs tracking-[0.25em] uppercase transition-all duration-500 text-center block"
               >
                 {siteContent.hero.ctaSecondary}
               </a>
@@ -84,7 +84,7 @@ export default function Hero() {
               
               {/* Left Plate (Editorial Rocks) */}
               <div className="relative transform lg:-translate-y-6 group">
-                <div className="relative w-full aspect-[3/4] bg-[#141414] border border-white/10 overflow-hidden shadow-2xl">
+                <div className="relative w-full aspect-[3/4] bg-matte border border-foreground/10 overflow-hidden shadow-2xl">
                   <Image
                     src={siteContent.hero.images.leftFramed.src}
                     alt={siteContent.hero.images.leftFramed.caption}
@@ -103,7 +103,7 @@ export default function Hero() {
 
               {/* Right Plate (Editorial Wardrobe) */}
               <div className="relative transform lg:translate-y-6 group">
-                <div className="relative w-full aspect-[3/4] bg-[#141414] border border-[#D4AF37]/30 overflow-hidden shadow-2xl">
+                <div className="relative w-full aspect-[3/4] bg-matte border border-[#D4AF37]/30 overflow-hidden shadow-2xl">
                   <Image
                     src={siteContent.hero.images.rightFramed.src}
                     alt={siteContent.hero.images.rightFramed.caption}
@@ -115,7 +115,7 @@ export default function Hero() {
                   />
                   <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
                 </div>
-                <div className="mt-3 text-[10px] font-mono text-white/60 tracking-[0.2em] uppercase text-right">
+                <div className="mt-3 text-[10px] font-mono text-foreground/60 tracking-[0.2em] uppercase text-right">
                   {siteContent.hero.images.rightFramed.caption.split("—")[0]?.trim() || "Sanctuary Frame"}
                 </div>
               </div>
@@ -127,14 +127,14 @@ export default function Hero() {
       </div>
 
       {/* Bottom Specification Bar & Scroll Indicator */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full mt-16 pt-8 border-t border-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10">
         <div className="grid grid-cols-3 gap-6 md:gap-12 w-full sm:w-auto text-center sm:text-left">
           {siteContent.hero.specItems.map((spec) => (
             <div key={spec.label}>
               <span className="block text-[9px] md:text-[10px] font-mono uppercase tracking-[0.25em] text-[#D4AF37]">
                 {spec.label}
               </span>
-              <span className="block text-xs md:text-sm font-light text-white/90 mt-1 font-serif">
+              <span className="block text-xs md:text-sm font-light text-foreground/90 mt-1 font-serif">
                 {spec.value}
               </span>
             </div>
@@ -143,7 +143,7 @@ export default function Hero() {
 
         <a
           href="#showcase"
-          className="group flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] hover:text-white transition-colors"
+          className="group flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] hover:text-foreground transition-colors"
         >
           <span>{siteContent.hero.scrollText}</span>
           <div className="w-8 h-8 rounded-full border border-[#D4AF37] group-hover:border-white flex items-center justify-center transition-colors">
