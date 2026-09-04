@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { getLiveSiteContent, saveLiveSiteContent } from "@/lib/cms";
 import { siteContent } from "@/config/siteContent";
 
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     if (action === "reset") {
       const result = await saveLiveSiteContent(siteContent);
-      revalidateTag("cms");
+      revalidatePath("/", "layout");
       return NextResponse.json(result);
     }
 
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: result.message, code: result.code }, { status: 503 });
     }
 
-    revalidateTag("cms");
+    revalidatePath("/", "layout");
 
     return NextResponse.json(result);
   } catch (err: unknown) {
