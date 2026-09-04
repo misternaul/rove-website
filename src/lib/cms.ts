@@ -33,36 +33,43 @@ function getRedisClient(): Redis | null {
   return null;
 }
 
+import { unstable_cache } from "next/cache";
+
 /**
  * Fetches current site content and active Drops.
- * Prioritizes live dynamic edits stored in Vercel Upstash Redis, falling back to local file codex.
+ * Uses Next.js unstable_cache to prevent server roundtrips on every page navigation.
  */
-export async function getLiveSiteContent(): Promise<SiteConfig> {
-  const redis = getRedisClient();
-  if (redis) {
-    try {
-      const storedData = await redis.get<SiteConfig>(REDIS_KEY);
-      if (storedData && storedData.drops) {
-        // Merge with default structural properties in case new fields were added
-        return { ...siteContent, ...storedData };
+export const getLiveSiteContent = unstable_cache(
+  async (): Promise<SiteConfig> => {
+    const redis = getRedisClient();
+    if (redis) {
+      try {
+        const storedData = await redis.get<SiteConfig>(REDIS_KEY);
+        if (storedData && storedData.drops) {
+          return { ...siteContent, ...storedData };
+        }
+      } catch (err) {
+        console.warn("Notice: Could not query Upstash Redis, falling back to default siteContent:", err);
       }
-    } catch (err) {
-      console.warn("Notice: Could not query Upstash Redis, falling back to default siteContent:", err);
-    }
-  } else if (process.env.NODE_ENV === "development") {
-    // In local dev without Redis, try reading from temporary cache JSON if present
-    try {
-      const cachePath = path.join(process.cwd(), ".next", "cms_cache.json");
-      if (fs.existsSync(cachePath)) {
-        const raw = fs.readFileSync(cachePath, "utf-8");
-        return { ...siteContent, ...JSON.parse(raw) };
+    } else if (process.env.NODE_ENV === "development") {
+      try {
+        const cachePath = path.join(process.cwd(), ".next", "cms_cache.json");
+        if (fs.existsSync(cachePath)) {
+          const raw = fs.readFileSync(cachePath, "utf-8");
+          return { ...siteContent, ...JSON.parse(raw) };
+        }
+      } catch {
+        // Ignore cache error in dev
       }
-    } catch {
-      // Ignore cache error in dev
     }
+    return siteContent;
+  },
+  ["live-site-content"], // Cache key
+  {
+    revalidate: 60, // Background revalidation every 60 seconds (ISR)
+    tags: ["cms"], // Tag for on-demand revalidation
   }
-  return siteContent;
-}
+);
 
 /**
  * Saves live administrative edits directly to Vercel storage without re-coding or rebuilding.
