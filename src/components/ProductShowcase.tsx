@@ -104,7 +104,7 @@ export default function ProductShowcase({ initialDropId, hideSwitcher = false }:
             {currentDrop.name}
           </h2>
           <div className="w-16 h-[1px] bg-[#D4AF37] mx-auto my-6" />
-          <p className="text-sm md:text-base text-[#CDBFA6]/90 font-light max-w-xl mx-auto leading-relaxed font-sans">
+          <p className="text-sm md:text-base text-foreground/80/90 font-light max-w-xl mx-auto leading-relaxed font-sans">
             {currentDrop.shortDescription}
           </p>
         </div>
@@ -189,40 +189,6 @@ export default function ProductShowcase({ initialDropId, hideSwitcher = false }:
 
               {/* Decorative Frame Overlay */}
               <div className="absolute inset-0 border-[12px] border-[#0D0D0D]/40 pointer-events-none" />
-              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between pointer-events-none">
-                <span className="px-3 py-1.5 bg-background/90 backdrop-blur-md border border-[#D4AF37]/30 text-[10px] font-mono text-[#D4AF37] uppercase tracking-[0.2em]">
-                  {selectedColor.name}
-                </span>
-                <span className="px-3 py-1.5 bg-background/90 backdrop-blur-md border border-[#D4AF37]/30 text-[10px] font-mono text-foreground/90 uppercase tracking-[0.2em] font-semibold">
-                  {selectedColor.priceFormatted}
-                </span>
-              </div>
-            </div>
-
-            {/* Thumbnail Quick Switcher below image */}
-            <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-xl">
-              <button
-                onClick={() => setActiveView("front")}
-                className={`relative h-20 bg-matte border overflow-hidden transition-all ${
-                  activeView === "front" ? "border-[#D4AF37] ring-1 ring-[#D4AF37]" : "border-foreground/15 opacity-60 hover:opacity-100"
-                }`}
-              >
-                <Image src={selectedColor.frontImage} alt="Front Thumbnail" fill className="object-cover object-top" />
-                <div className="absolute inset-0 bg-black/30 flex items-end p-1.5">
-                  <span className="text-[9px] font-mono tracking-wider uppercase text-foreground bg-black/80 px-1.5 py-0.5">Image 1</span>
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveView("back")}
-                className={`relative h-20 bg-matte border overflow-hidden transition-all ${
-                  activeView === "back" ? "border-[#D4AF37] ring-1 ring-[#D4AF37]" : "border-foreground/15 opacity-60 hover:opacity-100"
-                }`}
-              >
-                <Image src={selectedColor.backImage} alt="Back Thumbnail" fill className="object-cover object-top" />
-                <div className="absolute inset-0 bg-black/30 flex items-end p-1.5">
-                  <span className="text-[9px] font-mono tracking-wider uppercase text-foreground bg-black/80 px-1.5 py-0.5">Image 2</span>
-                </div>
-              </button>
             </div>
 
             <p className="mt-4 text-xs text-foreground/50 font-mono italic text-center max-w-md">
@@ -354,7 +320,7 @@ export default function ProductShowcase({ initialDropId, hideSwitcher = false }:
                 {/* Size Exact Measurements Feedback for active size */}
                 <div className="mt-3 p-3.5 bg-background border border-foreground/10 text-xs font-mono text-foreground/80 text-center shadow-inner">
                   <span className="text-[#D4AF37] font-semibold">{selectedSize.name} Specs: </span>
-                  <span className="text-[#FFFFFF]">{selectedSize.details}</span>
+                  <span className="text-foreground">{selectedSize.details}</span>
                 </div>
               </div>
 
@@ -362,6 +328,13 @@ export default function ProductShowcase({ initialDropId, hideSwitcher = false }:
               <div className="space-y-4">
                 <button
                   onClick={() => {
+                    let finalPriceNumeric = selectedColor.isDiscountActive ? selectedColor.discountedPriceNumeric : selectedColor.priceNumeric;
+                    let finalPriceStr = selectedColor.isDiscountActive ? selectedColor.discountedPriceFormatted : selectedColor.priceFormatted;
+                    
+                    if (finalPriceNumeric === undefined || isNaN(finalPriceNumeric)) {
+                      finalPriceNumeric = parseInt((finalPriceStr || "").replace(/\D/g, ""), 10) || 0;
+                    }
+
                     addToCart({
                       id: `${currentDrop.id}_${selectedColor.id}_${selectedSize.id}`,
                       dropId: currentDrop.id,
@@ -371,8 +344,8 @@ export default function ProductShowcase({ initialDropId, hideSwitcher = false }:
                       sizeId: selectedSize.id,
                       sizeName: selectedSize.name,
                       quantity: 1,
-                      priceFormatted: selectedColor.isDiscountActive ? selectedColor.discountedPriceFormatted! : selectedColor.priceFormatted,
-                      priceNumeric: selectedColor.isDiscountActive ? selectedColor.discountedPriceNumeric! : selectedColor.priceNumeric,
+                      priceFormatted: finalPriceStr || "",
+                      priceNumeric: finalPriceNumeric,
                       image: selectedColor.frontImage,
                       maxStock: selectedSize.stockQuantity ?? 50
                     });

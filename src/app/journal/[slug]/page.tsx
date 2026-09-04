@@ -7,9 +7,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
   const config = await getLiveSiteContent();
-  const post = config.journal?.posts?.find(p => p.slug === params.slug);
+  const post = config.journal?.posts?.find(p => p.slug === resolvedParams.slug);
   
   if (!post) return { title: "Post Not Found" };
   
@@ -22,9 +23,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function JournalPostPage({ params }: { params: { slug: string } }) {
+export default async function JournalPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
   const config = await getLiveSiteContent();
-  const post = config.journal?.posts?.find(p => p.slug === params.slug);
+  const post = config.journal?.posts?.find(p => p.slug === resolvedParams.slug);
 
   if (!post) {
     notFound();

@@ -74,7 +74,7 @@ export default function CraftDetails() {
                 </div>
 
                 <div className="mt-8 pt-4 border-t border-foreground/5 flex items-center justify-between text-[11px] font-mono text-foreground/40 uppercase">
-                  <span>Standard Drop 001</span>
+                  <span>Standard Studio Edition</span>
                   <span className="text-[#D4AF37]">Rove Hallmark</span>
                 </div>
               </div>
@@ -89,7 +89,7 @@ export default function CraftDetails() {
             {siteContent.craft.quote}
           </p>
           <span className="block mt-4 text-[11px] font-mono uppercase tracking-[0.3em] text-[#D4AF37]">
-            — Rove Design Studio, Drop 001 Guidelines
+            — Rove Design Studio, Guidelines
           </span>
         </div>
 

@@ -61,14 +61,14 @@ export default function Manifesto() {
           
           <motion.p
             variants={itemVariants}
-            className="text-xl sm:text-2xl md:text-3xl font-light text-[#FFFFFF] leading-[1.6] mb-8 font-serif max-w-3xl gpu-layer"
+            className="text-xl sm:text-2xl md:text-3xl font-light text-foreground leading-[1.6] mb-8 font-serif max-w-3xl gpu-layer"
           >
             {siteContent.manifesto.paragraph1}
           </motion.p>
           
           <motion.p
             variants={itemVariants}
-            className="text-base sm:text-lg md:text-xl font-light text-[#CDBFA6]/90 leading-relaxed mb-8 max-w-2xl font-sans gpu-layer"
+            className="text-base sm:text-lg md:text-xl font-light text-foreground/80/90 leading-relaxed mb-8 max-w-2xl font-sans gpu-layer"
           >
             {siteContent.manifesto.paragraph2}
           </motion.p>

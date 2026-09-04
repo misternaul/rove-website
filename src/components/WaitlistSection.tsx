@@ -16,7 +16,7 @@ export default function WaitlistSection() {
     color: defaultColor,
     size: defaultSize,
     price: defaultPrice,
-    drop: primaryDrop?.name || "Drop 001",
+    drop: primaryDrop?.name || "Studio Release",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -63,7 +63,7 @@ export default function WaitlistSection() {
               access_key: accessKey.trim(),
               subject: `🌟 Rove Waitlist Reservation: ${email.trim()} (${reservedProduct?.color || "Item"}, Size ${reservedProduct?.size || "M"})`,
               from_name: "ROVE Studio Allocation Hub",
-              message: `New studio priority waitlist registration!\n\nClient Email: ${email.trim()}\nTarget Release: ${reservedProduct?.drop || "Drop 001"}\nColorway: ${reservedProduct?.color || "Unspecified"}\nSize Grade: ${reservedProduct?.size || "Unspecified"}\nValuation: ${reservedProduct?.price || defaultPrice}\nTimestamp: ${new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" })}`,
+              message: `New studio priority waitlist registration!\n\nClient Email: ${email.trim()}\nTarget Release: ${reservedProduct?.drop || "Studio Release"}\nColorway: ${reservedProduct?.color || "Unspecified"}\nSize Grade: ${reservedProduct?.size || "Unspecified"}\nValuation: ${reservedProduct?.price || defaultPrice}\nTimestamp: ${new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" })}`,
             }),
           });
           const wData = await wRes.json();
@@ -131,7 +131,7 @@ export default function WaitlistSection() {
             {siteContent.waitlist.title}
           </h2>
           
-          <p className="text-sm md:text-base text-[#CDBFA6]/80 font-light max-w-xl mx-auto leading-relaxed mb-8 font-sans">
+          <p className="text-sm md:text-base text-foreground/80/80 font-light max-w-xl mx-auto leading-relaxed mb-8 font-sans">
             {siteContent.waitlist.description}
           </p>
 

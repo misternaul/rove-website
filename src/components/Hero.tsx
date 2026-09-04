@@ -7,7 +7,7 @@ import { ArrowDown, Sparkles } from "lucide-react";
 import { siteContent } from "@/config/siteContent";
 
 export default function Hero() {
-  const currentDrop = siteContent.drops[0] || { name: "Drop 001", colors: [{ priceFormatted: "PKR 2,299" }] };
+  const currentDrop = siteContent.drops[0] || { name: "Studio Release", colors: [{ priceFormatted: "PKR 2,299" }] };
   const basePrice = currentDrop.colors[0]?.priceFormatted || "PKR 2,299";
 
   return (
@@ -43,7 +43,7 @@ export default function Hero() {
             transition={{ duration: 1.1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-7 flex flex-col z-10 gpu-layer"
           >
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-light font-serif tracking-tight leading-[0.95] mb-8 text-[#FFFFFF]">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-light font-serif tracking-tight leading-[0.95] mb-8 text-foreground">
               <span className="block font-normal text-foreground hover:text-[#D4AF37] transition-colors duration-700">
                 {siteContent.hero.titleLine1}
               </span>
@@ -52,7 +52,7 @@ export default function Hero() {
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base md:text-lg text-[#CDBFA6]/90 max-w-xl font-light leading-relaxed mb-12 tracking-wide font-sans">
+            <p className="text-sm sm:text-base md:text-lg text-foreground/80/90 max-w-xl font-light leading-relaxed mb-12 tracking-wide font-sans">
               {siteContent.hero.subtitle}
             </p>
 

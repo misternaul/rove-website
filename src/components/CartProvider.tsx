@@ -93,18 +93,28 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const totalPriceNumeric = cartItems.reduce((acc, item) => acc + item.priceNumeric * item.quantity, 0);
+
+  const getSafeNumericPrice = (item: CartItem) => {
+    if (item.priceNumeric && !isNaN(item.priceNumeric)) return item.priceNumeric;
+    if (item.priceFormatted) {
+      const parsed = parseInt(item.priceFormatted.replace(/\D/g, ""), 10);
+      if (!isNaN(parsed)) return parsed;
+    }
+    return 0;
+  };
+
+  const totalPriceNumeric = cartItems.reduce((acc, item) => acc + getSafeNumericPrice(item) * item.quantity, 0);
 
   return (
     <CartContext.Provider
       value={{
+        isCartOpen,
+        setIsCartOpen,
         cartItems,
         addToCart,
         updateQuantity,
         removeFromCart,
         clearCart,
-        isCartOpen,
-        setIsCartOpen,
         totalQuantity,
         totalPriceNumeric,
       }}

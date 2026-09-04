@@ -79,7 +79,7 @@ export default function CheckoutModal() {
     const timestamp = new Date().toLocaleString("en-PK", { timeZone: "Asia/Karachi" });
 
     const cartListText = cartItems.map((item, idx) => 
-      `${idx + 1}. ${item.dropName} - ${item.colorName} - Size: ${item.sizeName} | QTY: ${item.quantity} | Total: PKR ${(item.priceNumeric * item.quantity).toLocaleString()}`
+      `${idx + 1}. ${item.dropName} - ${item.colorName} - Size: ${item.sizeName} | QTY: ${item.quantity} | Total: PKR ${((item.priceNumeric || parseInt((item.priceFormatted || "").replace(/\D/g, ""), 10) || 0) * item.quantity).toLocaleString()}`
     ).join("\n");
 
     const orderSummaryText = `
@@ -183,7 +183,7 @@ ${notes.trim() || "None"}
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 overflow-y-auto" data-lenis-prevent="true">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -336,7 +336,7 @@ ${notes.trim() || "None"}
                             </button>
                           </div>
                           <span className="text-xs font-mono font-bold text-[#D4AF37]">
-                            PKR {(item.priceNumeric * item.quantity).toLocaleString()}
+                            PKR {((item.priceNumeric || parseInt((item.priceFormatted || "").replace(/\D/g, ""), 10) || 0) * item.quantity).toLocaleString()}
                           </span>
                         </div>
                       </div>

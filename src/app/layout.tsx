@@ -4,9 +4,9 @@ import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.rovepresence.com"),
-  title: "ROVE — Less Noise. More Presence. | Drop 001",
+  title: "ROVE — Less Noise. More Presence. | Studio",
   description:
-    "ROVE is built on the belief that less is more. Uncompromised comfort, durability, and understated elegance for everyday essentials. Explore Drop 001: The Premium Polo.",
+    "ROVE is built on the belief that less is more. Uncompromised comfort, durability, and understated elegance for everyday essentials. Explore our studio releases.",
   keywords: ["Rove", "luxury apparel", "premium polo", "minimalist fashion", "DTC fashion", "less noise more presence"],
   authors: [{ name: "ROVE Design Studio" }],
   icons: {

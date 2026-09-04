@@ -175,7 +175,6 @@ export const siteContent: SiteConfig = {
   // --------------------------------------------------------------------------
   nav: {
     links: [
-      { name: "Manifesto", href: "/#manifesto" },
       { name: "Shop", href: "/shop" },
       { name: "Craftsmanship", href: "/craftsmanship" },
       { name: "Lookbook", href: "/lookbook" },
@@ -196,18 +195,18 @@ export const siteContent: SiteConfig = {
     ctaSecondary: "Read The Manifesto",
     scrollText: "Scroll For Specification",
     specItems: [
-      { label: "Current Release", value: "Drop 001: The Rove Polo" },
+      { label: "Current Release", value: "Studio Release: The Rove Polo" },
       { label: "Valuation Range", value: "PKR 2,299 — PKR 2,499" },
       { label: "Sizing Grading", value: "Medium & Large Custom Fit" },
     ],
     images: {
       leftFramed: {
         src: "/images/editorial-rocks.png",
-        caption: "Drop 001 Editorial — Obsidian Solitude",
+        caption: "Studio Editorial — Obsidian Solitude",
       },
       rightFramed: {
         src: "/images/editorial-wardrobe.png",
-        caption: "Drop 001 Sanctuary — Quiet Confidence",
+        caption: "Studio Sanctuary — Quiet Confidence",
       },
     },
   },
@@ -335,13 +334,13 @@ export const siteContent: SiteConfig = {
   // --------------------------------------------------------------------------
   gallery: {
     badge: "Visual Compendium",
-    title: "The Drop 001 Lookbook",
+    title: "The Studio Lookbook",
     images: [
       {
         id: "img-1",
         src: "/images/editorial-rocks.png",
         title: "Obsidian on Mineral Rock",
-        caption: "Drop 001 Editorial Campaign — Jet Black Edition",
+        caption: "Studio Editorial Campaign — Jet Black Edition",
         aspect: "aspect-[3/4]",
         tag: "Editorial Campaign",
         showOnHome: true,
@@ -408,7 +407,7 @@ export const siteContent: SiteConfig = {
   // 8. ALLOCATION WAITLIST & NEWSLETTER SECTION
   // --------------------------------------------------------------------------
   waitlist: {
-    badge: "Drop 001 & Future Studio Releases",
+    badge: "Studio Releases",
     title: "Join The Private Allocation List",
     description:
       "Our production runs are intentional, highly disciplined, and strictly limited in number. Register your email to secure priority notice and guaranteed early allocation access before future seasonal releases open to the public.",

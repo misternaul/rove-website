@@ -22,8 +22,8 @@ export default function LookbookGallery({ filterHome = false }: { filterHome?: b
       .catch((err) => console.warn("Using default codex for gallery:", err));
   }, []);
 
-  const rawImages = config.gallery.images || [];
-  const displayImages = filterHome ? rawImages.filter((img: any) => img.showOnHome) : rawImages;
+  const rawImages = config.gallery?.images || [];
+  const displayImages = filterHome ? rawImages.filter((img: any) => img.showOnHome !== false) : rawImages;
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -69,9 +69,8 @@ export default function LookbookGallery({ filterHome = false }: { filterHome?: b
       {/* Horizontal Scroll Gallery Container with Lenis Prevent & Hardware Optimization */}
       <div
         ref={scrollRef}
-        data-lenis-prevent="true"
         className="flex overflow-x-auto gap-8 px-6 md:px-12 max-w-7xl mx-auto no-scrollbar scroll-smooth pb-8"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none", overscrollBehaviorX: "contain" }}
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {displayImages.map((item: any, index: number) => (
           <motion.div
@@ -100,13 +99,6 @@ export default function LookbookGallery({ filterHome = false }: { filterHome?: b
                   {item.tag}
                 </span>
               </div>
-
-              {/* Interactive Inspect Hover Overlay */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div className="px-5 py-2.5 bg-[#D4AF37] text-[#0D0D0D] font-mono text-[10px] tracking-[0.2em] uppercase font-semibold flex items-center gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                  <Eye className="w-3.5 h-3.5" /> View Plate
-                </div>
-              </div>
             </div>
 
             {/* Caption & Title */}
@@ -115,7 +107,7 @@ export default function LookbookGallery({ filterHome = false }: { filterHome?: b
                 <h3 className="text-base sm:text-lg font-serif font-light text-foreground group-hover:text-[#D4AF37] transition-colors">
                   {item.title}
                 </h3>
-                <span className="text-xs font-mono text-[#D4AF37]/80 font-semibold">0{index + 1} / 05</span>
+                <span className="text-xs font-mono text-[#D4AF37]/80 font-semibold">0{index + 1}</span>
               </div>
               <p className="text-xs text-foreground/60 font-light tracking-wide font-sans">
                 {item.caption}
@@ -128,7 +120,7 @@ export default function LookbookGallery({ filterHome = false }: { filterHome?: b
       {/* Bottom hint for touch/drag */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 mt-4 text-right">
         <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#D4AF37]/60">
-          — End of Release 001 Plates —
+          — End of Collection —
         </span>
       </div>
     </section>

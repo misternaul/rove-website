@@ -92,7 +92,7 @@ export default function Footer() {
                 <Compass className="w-4 h-4" />
               </a>
               <a
-                href="#gallery"
+                href="/lookbook"
                 aria-label="Global Stockists"
                 className="w-11 h-11 border border-foreground/20 hover:border-[#D4AF37] text-foreground hover:text-[#D4AF37] flex items-center justify-center transition-all bg-matte"
               >
@@ -121,7 +121,7 @@ export default function Footer() {
             <span>•</span>
             <span className="hover:text-foreground/80 cursor-pointer">Terms of Allocation</span>
             <span>•</span>
-            <span className="text-[#D4AF37]/80">Drop 001 ({siteContent.brand.defaultCurrency})</span>
+            <span className="text-[#D4AF37]/80">Current Release ({siteContent.brand.defaultCurrency})</span>
           </div>
         </div>
 

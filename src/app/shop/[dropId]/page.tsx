@@ -5,9 +5,10 @@ import ProductShowcase from "@/components/ProductShowcase";
 import { getLiveSiteContent } from "@/lib/cms";
 import { notFound } from "next/navigation";
 
-export default async function DropPage({ params }: { params: { dropId: string } }) {
+export default async function DropPage({ params }: { params: Promise<{ dropId: string }> }) {
+  const resolvedParams = await params;
   const config = await getLiveSiteContent();
-  const drop = config.drops.find(d => d.id === params.dropId);
+  const drop = config.drops.find(d => d.id === resolvedParams.dropId);
 
   if (!drop) {
     notFound();
