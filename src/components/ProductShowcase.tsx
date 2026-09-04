@@ -307,9 +307,11 @@ export default function ProductShowcase({ initialDropId, hideSwitcher = false }:
                         {isOutOfStock && (
                           <span className="text-[9px] text-red-500 font-bold tracking-widest mt-1">SOLD OUT</span>
                         )}
-                        {isLowStock && (
-                          <span className="absolute -top-2.5 right-0 bg-[#D4AF37] text-black text-[8px] font-bold px-2 py-0.5 shadow-md">
-                            ONLY {s.stockQuantity} LEFT
+                        {!isOutOfStock && s.stockQuantity !== undefined && (
+                          <span className={`absolute -top-2.5 right-0 text-[8px] font-bold px-2 py-0.5 shadow-md ${
+                            isLowStock ? "bg-red-500 text-white" : "bg-[#D4AF37] text-black"
+                          }`}>
+                            {s.stockQuantity} LEFT
                           </span>
                         )}
                       </button>
