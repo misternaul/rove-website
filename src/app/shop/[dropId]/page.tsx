@@ -1,6 +1,6 @@
 import React from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
+
 import ProductShowcase from "@/components/ProductShowcase";
 import { getLiveSiteContent } from "@/lib/cms";
 import { notFound } from "next/navigation";
@@ -16,13 +16,13 @@ export default async function DropPage({ params }: { params: Promise<{ dropId: s
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-accent selection:text-background flex flex-col">
-      <Navbar />
+      
 
       <main className="flex-grow w-full relative">
         <ProductShowcase initialDropId={resolvedParams.dropId} hideSwitcher={true} />
       </main>
 
-      <Footer />
+      
     </div>
   );
 }

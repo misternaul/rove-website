@@ -1,6 +1,6 @@
 import React from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
+
 import { getLiveSiteContent } from "@/lib/cms";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -34,7 +34,7 @@ export default async function JournalPostPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-accent selection:text-background flex flex-col">
-      <Navbar />
+      
 
       <main className="flex-grow w-full relative pt-32 pb-24 max-w-3xl mx-auto px-6 md:px-12">
         
@@ -68,7 +68,7 @@ export default async function JournalPostPage({ params }: { params: Promise<{ sl
 
       </main>
 
-      <Footer />
+      
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
+
 import { getLiveSiteContent } from "@/lib/cms";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,7 +11,7 @@ export default async function ShopPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-accent selection:text-background flex flex-col">
-      <Navbar />
+      
 
       <main className="flex-grow w-full relative pt-32 pb-24 max-w-7xl mx-auto px-6 md:px-12">
         <div className="text-center mb-16">
@@ -61,7 +61,7 @@ export default async function ShopPage() {
         </div>
       </main>
 
-      <Footer />
+      
     </div>
   );
 }

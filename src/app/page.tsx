@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "@/components/Navbar";
+
 import Hero from "@/components/Hero";
 import Manifesto from "@/components/Manifesto";
 
@@ -7,13 +7,13 @@ import ProductShowcase from "@/components/ProductShowcase";
 import CraftDetails from "@/components/CraftDetails";
 import LookbookGallery from "@/components/LookbookGallery";
 import WaitlistSection from "@/components/WaitlistSection";
-import Footer from "@/components/Footer";
+
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-[#D4AF37] selection:text-[#0D0D0D]">
       {/* Editorial Luxury Header & Navigation */}
-      <Navbar />
+      
 
       {/* Main Single-Page Scroll Storytelling Experience */}
       <main className="w-full relative">
@@ -39,7 +39,7 @@ export default function Home() {
       </main>
 
       {/* Minimalist Footer */}
-      <Footer />
+      
     </div>
   );
 }

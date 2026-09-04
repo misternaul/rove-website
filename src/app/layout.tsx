@@ -47,6 +47,7 @@ export const metadata: Metadata = {
 import { CartProvider } from "@/components/CartProvider";
 import CheckoutModal from "@/components/CheckoutModal";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import SiteLayout from "@/components/SiteLayout";
 
 export default function RootLayout({
   children,
@@ -59,7 +60,9 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <CartProvider>
             <SmoothScrollProvider>
-              {children}
+              <SiteLayout>
+                {children}
+              </SiteLayout>
             </SmoothScrollProvider>
             <CheckoutModal />
           </CartProvider>
