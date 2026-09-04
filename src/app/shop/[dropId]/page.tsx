@@ -19,7 +19,7 @@ export default async function DropPage({ params }: { params: Promise<{ dropId: s
       <Navbar />
 
       <main className="flex-grow w-full relative">
-        <ProductShowcase initialDropId={params.dropId} hideSwitcher={true} />
+        <ProductShowcase initialDropId={resolvedParams.dropId} hideSwitcher={true} />
       </main>
 
       <Footer />
