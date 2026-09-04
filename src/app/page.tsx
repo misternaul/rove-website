@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import Manifesto from "@/components/Manifesto";
+
 import ProductShowcase from "@/components/ProductShowcase";
 import CraftDetails from "@/components/CraftDetails";
 import LookbookGallery from "@/components/LookbookGallery";
@@ -20,7 +20,7 @@ export default function Home() {
         <Hero />
 
         {/* 2. Brand Manifesto — Philosophy & Values Under 80 Words */}
-        <Manifesto />
+        
 
         {/* 3. Product Showcase — Interactive Color & Size Selector + Sticky Viewer */}
         <ProductShowcase />

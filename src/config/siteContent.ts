@@ -187,15 +187,15 @@ export const siteContent: SiteConfig = {
   // 3. HERO SECTION
   // --------------------------------------------------------------------------
   hero: {
-    badge: "Release 001 — Essential Edition",
+    badge: "Essential Edition",
     titleLine1: "LESS NOISE.",
     titleLine2: "MORE PRESENCE.",
     subtitle: "A discipline of quiet confidence. Foundational everyday attire engineered with uncompromising structural comfort, enduring resilience, and effortless architectural poise.",
     ctaPrimary: "Explore Releases",
-    ctaSecondary: "Read The Manifesto",
+    ctaSecondary: "View Lookbook",
     scrollText: "Scroll For Specification",
     specItems: [
-      { label: "Current Release", value: "Studio Release: The Rove Polo" },
+      { label: "Current Release", value: "The Rove Polo" },
       { label: "Valuation Range", value: "PKR 2,299 — PKR 2,499" },
       { label: "Sizing Grading", value: "Medium & Large Custom Fit" },
     ],
@@ -234,7 +234,7 @@ export const siteContent: SiteConfig = {
   drops: [
     {
       id: "drop-001",
-      badge: "Release 001 — Direct Studio Allocation",
+      badge: "Direct Studio Allocation",
       name: "The Rove Horizon Polo",
       shippingNote: "Complimentary Express Courier Nationwide Across Pakistan",
       shortDescription:

@@ -65,7 +65,7 @@ export default function Hero() {
                 {siteContent.hero.ctaPrimary}
               </a>
               <a
-                href="#manifesto"
+                href="/lookbook"
                 className="px-8 py-4 bg-matte hover:bg-white/10 text-foreground border border-foreground/20 hover:border-[#D4AF37] font-mono text-xs tracking-[0.25em] uppercase transition-all duration-500 text-center block"
               >
                 {siteContent.hero.ctaSecondary}
