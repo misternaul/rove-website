@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import Manifesto from "@/components/Manifesto";
 
 import ProductShowcase from "@/components/ProductShowcase";
 import CraftDetails from "@/components/CraftDetails";
@@ -18,6 +19,8 @@ export default function Home() {
       <main className="w-full relative">
         {/* 1. Hero Section — Editorial Framed Gallery & Brand Slogan */}
         <Hero />
+
+        <Manifesto />
 
         {/* 2. Brand Manifesto — Philosophy & Values Under 80 Words */}
         

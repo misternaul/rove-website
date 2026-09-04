@@ -66,20 +66,6 @@ export default function Manifesto() {
             {siteContent.manifesto.paragraph1}
           </motion.p>
           
-          <motion.p
-            variants={itemVariants}
-            className="text-base sm:text-lg md:text-xl font-light text-foreground/80/90 leading-relaxed mb-8 max-w-2xl font-sans gpu-layer"
-          >
-            {siteContent.manifesto.paragraph2}
-          </motion.p>
-          
-          <motion.p
-            variants={itemVariants}
-            className="text-lg sm:text-xl md:text-2xl font-normal italic text-gold-gradient tracking-wide max-w-2xl font-serif gpu-layer"
-          >
-            {siteContent.manifesto.quote}
-          </motion.p>
-          
           <motion.div
             variants={itemVariants}
             className="mt-16 pt-12 border-t border-foreground/10 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 w-full max-w-3xl text-left sm:text-center gpu-layer"
