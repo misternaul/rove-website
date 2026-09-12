@@ -1010,5 +1010,7 @@ export default function StudioAdminPage() {
         
         </div>
       </div>
-    );
+    </div>
+  );
 }
+
