@@ -9,7 +9,7 @@ const REDIS_KEY = "rove_studio_content_v2";
  * Automatically checks all common Vercel & Upstash environment variable conventions.
  * Whether linked via legacy Vercel KV or Upstash Marketplace integration, this finds the credentials!
  */
-function getRedisClient(): Redis | null {
+export function getRedisClient(): Redis | null {
   const url =
     process.env.UPSTASH_REDIS_REST_URL ||
     process.env.KV_REST_API_URL ||

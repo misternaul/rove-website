@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLiveSiteContent, saveLiveSiteContent } from "@/lib/cms";
+import { getLiveSiteContent, saveLiveSiteContent, getRedisClient } from "@/lib/cms";
 
 interface CartItemPayload {
   id: string;
@@ -117,6 +117,22 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
     console.log("🔥 NEW ROVE ORDER / TEST TRANSMITTED 🔥");
     console.log(orderSummaryText);
     console.log("=========================================");
+
+    const redis = getRedisClient();
+    if (redis && !isTestEmail) {
+      try {
+        await redis.lpush("rove_orders_list", {
+          orderId,
+          timestamp,
+          customer: { fullName, phone, email, city, primaryAddress, secondaryAddress, landmark, notes },
+          items: cartItems,
+          totalQuantity,
+          formattedTotalPrice
+        });
+      } catch (err) {
+        console.error("Redis order save failed:", err);
+      }
+    }
 
     let emailDeliveryStatus = "NOT_ATTEMPTED";
     let emailErrorMessage = "";
