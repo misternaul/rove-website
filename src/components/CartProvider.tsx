@@ -62,7 +62,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const existing = prev.find((item) => item.id === newItem.id);
       if (existing) {
         const newQty = Math.min(existing.quantity + newItem.quantity, existing.maxStock);
-        return prev.map((item) => (item.id === newItem.id ? { ...item, quantity: newQty } : item));
+        return prev.map((item) => (item.id === newItem.id ? { ...item, ...newItem, quantity: newQty } : item));
       }
       return [...prev, newItem];
     });
@@ -95,11 +95,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const getSafeNumericPrice = (item: CartItem) => {
-    if (item.priceNumeric && !isNaN(item.priceNumeric)) return item.priceNumeric;
     if (item.priceFormatted) {
       const parsed = parseInt(item.priceFormatted.replace(/\D/g, ""), 10);
       if (!isNaN(parsed)) return parsed;
     }
+    if (item.priceNumeric && !isNaN(item.priceNumeric)) return item.priceNumeric;
     return 0;
   };
 
@@ -131,3 +131,4 @@ export function useCart() {
   }
   return context;
 }
+

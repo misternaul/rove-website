@@ -333,7 +333,7 @@ export default function ProductShowcase({ initialDropId, hideSwitcher = false }:
                     let finalPriceNumeric = selectedColor.isDiscountActive ? selectedColor.discountedPriceNumeric : selectedColor.priceNumeric;
                     let finalPriceStr = selectedColor.isDiscountActive ? selectedColor.discountedPriceFormatted : selectedColor.priceFormatted;
                     
-                    if (finalPriceNumeric === undefined || isNaN(finalPriceNumeric)) {
+                    if (true) {
                       finalPriceNumeric = parseInt((finalPriceStr || "").replace(/\D/g, ""), 10) || 0;
                     }
 

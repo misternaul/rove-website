@@ -910,6 +910,8 @@ export default function StudioAdminPage() {
           </div>
         )}
 
+        {activeTab === "journal" && <JournalView config={config} setConfig={setConfig} />}
+        
         {/* TAB 4: LOOKBOOK / MAGAZINE */}
         {activeTab === "lookbook" && (
           <div className="bg-[#141414] border border-white/10 p-6 md:p-8 space-y-8 max-w-5xl">
@@ -1013,5 +1015,6 @@ export default function StudioAdminPage() {
     </div>
   );
 }
+
 
 
