@@ -33,7 +33,7 @@ export default function StudioAdminPage() {
   const [pinError, setPinError] = useState("");
 
   const [config, setConfig] = useState<SiteConfig>(siteContent);
-  const [activeTab, setActiveTab] = useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">|useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">|useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">|useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">|useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">("drops");
+  const [activeTab, setActiveTab] = useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">("orders");
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
   const [selectedDropIndex, setSelectedDropIndex] = useState(0);
@@ -738,7 +738,7 @@ export default function StudioAdminPage() {
         )}
 
         {/* TAB 2: FIX EMAIL DELIVERY & WHATSAPP */}
-        {activeTab ===useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">&& (
+        {activeTab === "brand" && (
           <div className="max-w-4xl bg-[#141414] border border-white/10 p-8 space-y-10 shadow-2xl">
             <div>
               <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4AF37] block mb-2">Order Dispatch & Real-Time Notifications</span>
@@ -853,7 +853,7 @@ export default function StudioAdminPage() {
         )}
 
         {/* TAB 3: HOW TO FIX CLOUD SAVING & IMAGE UPLOADS */}
-        {activeTab ===useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">&& (
+        {activeTab === "storage" && (
           <div className="max-w-4xl bg-[#141414] border border-white/10 p-8 md:p-10 space-y-10 text-sm font-sans leading-relaxed shadow-2xl">
             <div>
               <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#D4AF37] block mb-2">Troubleshooting Guide & Setup</span>
@@ -911,7 +911,7 @@ export default function StudioAdminPage() {
         )}
 
         {/* TAB 4: LOOKBOOK / MAGAZINE */}
-        {activeTab ===useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">&& (
+        {activeTab === "lookbook" && (
           <div className="bg-[#141414] border border-white/10 p-6 md:p-8 space-y-8 max-w-5xl">
             <div>
               <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] block mb-1 font-mono">Lookbook Editor</span>
@@ -1013,4 +1013,5 @@ export default function StudioAdminPage() {
     </div>
   );
 }
+
 
