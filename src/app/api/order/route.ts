@@ -127,12 +127,12 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
           [orderId]: {
             status: "pending",
             orderId,
-          orderId,
-          timestamp,
-          customer: { fullName, phone, email, city, primaryAddress, secondaryAddress, landmark, notes },
-          items: cartItems,
-          totalQuantity,
-          formattedTotalPrice
+            timestamp,
+            customer: { fullName, phone, email, city, primaryAddress, secondaryAddress, landmark, notes },
+            items: cartItems,
+            totalQuantity,
+            formattedTotalPrice
+          }
         });
       } catch (err) {
         console.error("Redis order save failed:", err);
@@ -265,6 +265,9 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
     );
   }
 }
+
+
+
 
 
 
