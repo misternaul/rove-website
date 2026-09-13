@@ -123,7 +123,10 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
     const redis = getRedisClient();
     if (redis && !isTestEmail) {
       try {
-        await redis.hset("rove_orders", {`n          [orderId]: {`n            status: "pending",`n            orderId, // Include ID inside the hash object as well
+        await redis.hset("rove_orders", {
+          [orderId]: {
+            status: "pending",
+            orderId,
           orderId,
           timestamp,
           customer: { fullName, phone, email, city, primaryAddress, secondaryAddress, landmark, notes },
@@ -262,6 +265,7 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
     );
   }
 }
+
 
 
 
