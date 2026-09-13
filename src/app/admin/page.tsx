@@ -21,10 +21,12 @@ import {
   Send,
   Mail,
   ShieldAlert,
+  TrendingUp,
 } from "lucide-react";
 import { SiteConfig, siteContent, ColorOption, SizeOption } from "@/config/siteContent";
 import OrdersView from "@/components/admin/OrdersView";
 import JournalView from "@/components/admin/JournalView";
+import DashboardOverview from "@/components/admin/DashboardOverview";
 import SettingsView from "@/components/admin/SettingsView";
 
 export default function StudioAdminPage() {
@@ -33,7 +35,7 @@ export default function StudioAdminPage() {
   const [pinError, setPinError] = useState("");
 
   const [config, setConfig] = useState<SiteConfig>(siteContent);
-  const [activeTab, setActiveTab] = useState<"orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">("orders");
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "drops" | "brand" | "storage" | "lookbook" | "journal">("overview");
   const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
   const [selectedDropIndex, setSelectedDropIndex] = useState(0);
@@ -343,6 +345,12 @@ export default function StudioAdminPage() {
         
         {/* Sidebar Navigation */}
         <div className="w-full lg:w-64 shrink-0 flex flex-col gap-2">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`px-4 py-4 text-xs uppercase tracking-[0.2em] flex items-center gap-3 font-mono border border-white/5 transition-all text-left ${activeTab === "overview" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10 font-bold" : "bg-[#141414] text-white/60 hover:text-white"}`}
+            >
+              <TrendingUp className="w-4 h-4" /> Overview
+            </button>
           <button
             onClick={() => setActiveTab("orders")}
             className={`px-4 py-4 text-xs uppercase tracking-[0.2em] flex items-center gap-3 font-mono border border-white/5 transition-all text-left ${activeTab === "orders" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/10 font-bold" : "bg-[#141414] text-white/60 hover:text-white"}`}
@@ -384,6 +392,7 @@ export default function StudioAdminPage() {
         {/* Main Content Area */}
         <div className="flex-1 w-full min-w-0">
 
+          {activeTab === "overview" && <DashboardOverview config={config} adminPin={pin} />}
           {activeTab === "orders" && <OrdersView adminPin={pin} />}
 
           {/* TAB 1: PRODUCT DROPS & PRICING */}
@@ -1015,6 +1024,9 @@ export default function StudioAdminPage() {
     </div>
   );
 }
+
+
+
 
 
 

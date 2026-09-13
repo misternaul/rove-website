@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getLiveSiteContent, saveLiveSiteContent, getRedisClient } from "@/lib/cms";
 
 interface CartItemPayload {
@@ -74,7 +75,8 @@ export async function POST(request: Request) {
       if (stockWasModified) {
         // Broadcast stock update back to cloud automatically!
         await saveLiveSiteContent(liveConfig);
-        console.log(`📦 Order ${orderId}: Successfully decremented live inventory stock.`);
+        revalidatePath('/', 'layout');
+        console.log(`Order ${orderId}: Successfully decremented live inventory stock and revalidated cache.`);
       }
     }
 
@@ -121,7 +123,7 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
     const redis = getRedisClient();
     if (redis && !isTestEmail) {
       try {
-        await redis.lpush("rove_orders_list", {
+        await redis.hset("rove_orders", {`n          [orderId]: {`n            status: "pending",`n            orderId, // Include ID inside the hash object as well
           orderId,
           timestamp,
           customer: { fullName, phone, email, city, primaryAddress, secondaryAddress, landmark, notes },
@@ -260,3 +262,7 @@ ${notes || "This is a verification dispatch from ROVE Admin Store Controller."}
     );
   }
 }
+
+
+
+
